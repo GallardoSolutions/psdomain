@@ -1,2 +1,2 @@
 # psdomain
-Model for PromoStandards in Python
+Domain Model for PromoStandards in Python
