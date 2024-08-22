@@ -163,17 +163,17 @@ MARKETING = 4005    # Marketing material
 
 class MediaContent(base.PSBaseModel):
     productId: str
-    partId: str | None
-    url: str | None
+    partId: str | None = None
+    url: str | None = None
     mediaType: str
-    fileSize: float | None
-    width: int | None
-    height: int | None
-    dpi: int | None
-    color: str | None
-    description: str | None
+    fileSize: float | None = None
+    width: int | None = None
+    height: int | None = None
+    dpi: int | None = None
+    color: str | None = None
+    description: str | None = None
     singlePart: bool
-    changeTimeStamp: datetime | None
+    changeTimeStamp: datetime | None = None
     ClassTypeArray: ClassTypeArray
     DecorationArray: DecorationArray | None
     LocationArray: LocationArray | None
@@ -319,6 +319,17 @@ class MediaContentDetailsResponse(base.PSBaseModel):
         self.MediaContentArray = MediaContentArray(MediaContent=media_content)
 
     MediaContent = property(_get_media_content, _set_media_content)
+
+    def new_without_broken_links(self, broken_urls: list[str]) -> 'MediaContentDetailsResponse':
+        media_content = [mc for mc in self.MediaContent if mc.url not in broken_urls]
+        return self.__class__.from_media_content(media_content)
+
+    @classmethod
+    def from_media_content(cls, media_content: list[MediaContent]) -> 'MediaContentDetailsResponse':
+        return cls(MediaContentArray=MediaContentArray(MediaContent=media_content), errorMessage=None)
+
+    def get_unique_urls(self) -> set[str]:
+        return {mc.url for mc in self.MediaContent}
 
     @property
     def is_ok(self):

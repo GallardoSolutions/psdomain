@@ -1,7 +1,7 @@
 # flake8: noqa F811
 from .fixtures import blank_mc, blank_hit, primary_decorated  # noqa
 from psdomain.model.media_content import ClassType, ClassTypeArray, BLANK, FRONT, DECORATED, DecorationArray, \
-    Decoration, Location, LocationArray
+    Decoration, Location, LocationArray, MediaContent, MediaContentArray, MediaContentDetailsResponse  # noqa
 
 
 def test_is_blank(blank_mc, blank_hit):
@@ -49,7 +49,6 @@ def test_location_list():
 
 
 def test_decoration_list():
-
     lst = [
         Decoration(decorationId=10, decorationName='Screen Print'),
         Decoration(decorationId=11, decorationName='Embroidery'),
@@ -57,3 +56,28 @@ def test_decoration_list():
     arr = DecorationArray(Decoration=lst)
     names_list = arr.names_list
     assert names_list == ['Screen Print', 'Embroidery']
+
+
+def test_get_unique_urls():
+    # test MediaContentDetailsResponse.get_unique_urls
+    empty_class_type_arr = ClassTypeArray(ClassType=[])
+    lst = [
+        MediaContent(url='http://www.example.com/1',
+                     mediaType='Image', productId='2',
+                     ClassTypeArray=empty_class_type_arr, DecorationArray=None, LocationArray=None,
+                     singlePart=True),
+        MediaContent(url='http://www.example.com/2',
+                     mediaType='Image', productId='2',
+                     ClassTypeArray=empty_class_type_arr, DecorationArray=None, LocationArray=None,
+                     singlePart=True
+                     ),
+        MediaContent(url='http://www.example.com/1',
+                     mediaType='Image', productId='2',
+                     ClassTypeArray=empty_class_type_arr, DecorationArray=None, LocationArray=None,
+                     singlePart=True
+                     ),
+    ]
+    arr = MediaContentArray(MediaContent=lst)
+    response = MediaContentDetailsResponse(MediaContentArray=arr, errorMessage=None)
+    unique_urls = response.get_unique_urls()
+    assert unique_urls == {'http://www.example.com/1', 'http://www.example.com/2'}
