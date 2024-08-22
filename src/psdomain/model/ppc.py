@@ -1,5 +1,5 @@
-import decimal
 from datetime import datetime
+from decimal import Decimal
 
 from pydantic import Field, model_validator
 
@@ -132,9 +132,9 @@ class ChargePrice(base.PSBaseModel):
     xUom: base.UOM = Field(examples=['EA'])
     yMinQty: int
     yUom: DecorationUomType = Field(examples=['Colors'])
-    price: decimal.Decimal
+    price: Decimal
     discountCode: str | None = Field(description='The industry discount code associated with the price')
-    repeatPrice: decimal.Decimal | None
+    repeatPrice: Decimal | None
     repeatDiscountCode: str | None
     priceEffectiveDate: datetime | None
     priceExpiryDate: datetime | None
@@ -159,6 +159,55 @@ class Charge(base.PSBaseModel):
     chargesPerLocation: int | None = Field(description='The number of times a charge will occur per location')
     chargesPerColor: int | None = Field(description='The number of times a charge will occur per color')
 
+    @property
+    def is_run(self) -> bool:
+        return self.chargeType.is_run
+
+    @property
+    def is_setup(self) -> bool:
+        return self.chargeType.is_setup
+
+    @property
+    def prices(self) -> list[ChargePrice]:
+        # returns a sorted list of part prices by minQuantity if PartPriceArray is not None, empty list otherwise
+        result = getattr(self, '_prices', None)
+        if result is None:
+            result = sorted(self.ChargePriceArray.ChargePrice, key=lambda p: p.xMinQty) if self.ChargePriceArray else []
+            setattr(self, '_prices', result)
+        return result
+
+    @property
+    def x_min_qty(self) -> int | None:
+        prices = self.prices
+        return prices[0].xMinQty if prices else None
+
+    @property
+    def y_min_qty(self) -> int | None:
+        prices = self.prices
+        return prices[0].yMinQty if prices else None
+
+    @property
+    def reversed_prices(self) -> list[ChargePrice]:
+        return self.prices[::-1]
+
+    def get_price(self, qty: int) -> ChargePrice | None:
+        # returns the price for the given quantity if it exists, None otherwise
+        for price in self.reversed_prices:
+            if price.xMinQty <= qty:
+                return price
+        return None
+
+    def get_charge_price(self, qty: int, repeat_price, num_colors: int = 1) -> Decimal | None:
+        price = self.get_price(qty)
+        if price:
+            unit_price = price.repeatPrice if repeat_price else price.price
+            charges_per_color = self.chargesPerColor or 1
+            if charges_per_color > 1:
+                # todo: implement this logic
+                unit_price = unit_price + charges_per_color
+            return unit_price
+        return None
+
 
 class ChargeArray(base.PSBaseModel):
     Charge: list[Charge]
@@ -177,9 +226,9 @@ class Decoration(base.PSBaseModel):
     decorationId: int
     decorationName: str
     decorationGeometry: DecorationGeometryType = Field(examples=['Rectangle'])
-    decorationHeight: decimal.Decimal | None = Field(examples=['4.0'])
-    decorationWidth: decimal.Decimal | None = Field(examples=['7.0'])
-    decorationDiameter: decimal.Decimal | None
+    decorationHeight: Decimal | None = Field(examples=['4.0'])
+    decorationWidth: Decimal | None = Field(examples=['7.0'])
+    decorationDiameter: Decimal | None
     decorationUom: DecorationUomType = Field(description='The unit of measure for the decoration area',
                                              examples=['Inches'])
     allowSubForDefaultLocation: bool | None = Field(description='Buyer is allowed to substitute a decoration location '
@@ -284,7 +333,7 @@ class LocationIdArray(base.PSBaseModel):
 class PartPrice(base.PSBaseModel):
     minQuantity: int = Field(description='The minimum quantity for the price')
     discountCode: str | None = Field(description='The industry discount code associated with the price.')
-    price: decimal.Decimal = Field(description='The base price of the good without decoration')
+    price: Decimal = Field(description='The base price of the good without decoration')
     priceUom: base.UOM = Field(examples=['EA'], description='The unit of measure for the price')
     priceEffectiveDate: datetime | None  # StormCreek is returning None for this field
     priceExpiryDate: datetime | None  # Spector is returning None for this field
@@ -311,12 +360,12 @@ class Part(base.PSBaseModel):
                                                 'is required for ordering')
     partGroupDescription: str = Field(description='A description of the partGroup: Optional Lid`, `Straw',
                                       examples=['Main Product', 'Optional Lid', 'Straw'])
-    ratio: decimal.Decimal = Field(description='Describes how the amount of partIds that need to be added to the order '
-                                               'based on the number of products ordered',
-                                   examples=[
-                                       'If 8 partIds would be required per 1 product ordered, then 8 should be '
-                                       'used as the ratio. If one partId is required for every 8 products, than '
-                                       'use .125'])
+    ratio: Decimal = Field(description='Describes how the amount of partIds that need to be added to the order '
+                                       'based on the number of products ordered',
+                           examples=[
+                               'If 8 partIds would be required per 1 product ordered, then 8 should be '
+                               'used as the ratio. If one partId is required for every 8 products, than '
+                               'use .125'])
     defaultPart: bool | None = Field(description='This part is included in the “Basic Pricing Configuration” service '
                                                  'price. This field is optional, but highly encouraged')
     LocationIdArray: LocationIdArray | None
