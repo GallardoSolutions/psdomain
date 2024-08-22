@@ -27,6 +27,18 @@ class ChargeType(base.StrEnum):
     RUN = "Run"
     ORDER = "Order"
 
+    @property
+    def is_run(self) -> bool:
+        return self == ChargeType.RUN
+
+    @property
+    def is_setup(self) -> bool:
+        return self == ChargeType.SETUP
+
+    @property
+    def is_order(self) -> bool:
+        return self == ChargeType.ORDER
+
 
 class ColorArray(base.PSBaseModel):
     Color: list[product_data.Color]
@@ -71,6 +83,9 @@ class ProductArray(base.PSBaseModel):
 class CurrencySupported(base.PSBaseModel):
     currency: base.Currency
 
+    def __hash__(self):
+        return hash(self.currency)
+
 
 class CurrencySupportedArray(base.PSBaseModel):
     CurrencySupported: list[CurrencySupported]
@@ -84,6 +99,10 @@ class FobPoint(base.PSBaseModel):
     fobCountry: str
     CurrencySupportedArray: CurrencySupportedArray | None  # HIT error
     ProductArray: ProductArray | None  # Spector error
+
+    def __str__(self):
+        fob_id = f'{self.fobId[:10]}...' if self.fobId and len(self.fobId) > 10 else self.fobId
+        return f"{fob_id} at {self.fobPostalCode} {self.fobCity}-{self.fobState}({self.fobCountry})"
 
 
 class FobPointArray(base.PSBaseModel):
@@ -270,6 +289,9 @@ class PartPrice(base.PSBaseModel):
     priceEffectiveDate: datetime | None  # StormCreek is returning None for this field
     priceExpiryDate: datetime | None  # Spector is returning None for this field
 
+    def __le__(self, other):
+        return self.minQuantity <= other.minQuantity
+
 
 class PartPriceArray(base.PSBaseModel):
     PartPrice: list[PartPrice]
@@ -298,6 +320,19 @@ class Part(base.PSBaseModel):
     defaultPart: bool | None = Field(description='This part is included in the “Basic Pricing Configuration” service '
                                                  'price. This field is optional, but highly encouraged')
     LocationIdArray: LocationIdArray | None
+
+    @property
+    def prices(self) -> list[PartPrice]:
+        # returns a sorted list of part prices by minQuantity if PartPriceArray is not None, empty list otherwise
+        return sorted(self.PartPriceArray.PartPrice, key=lambda p: p.minQuantity) if self.PartPriceArray else []
+
+    def get_price(self, qty: int) -> PartPrice | None:
+        # returns the price for the given quantity if it exists, None otherwise
+        reversed_prices = self.prices[::-1]
+        for price in reversed_prices:
+            if price.minQuantity <= qty:
+                return price
+        return None
 
 
 class PartArray(base.PSBaseModel):
