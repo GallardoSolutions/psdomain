@@ -25,6 +25,17 @@ class RelatedProductArray(base.PSBaseModel):
     RelatedProduct: list[RelatedProduct]
 
 
+class ApparelStyle(StrEnum):
+    Unisex = 'Unisex'
+    Youth = 'Youth'
+    Girls = 'Girls'
+    Boys = 'Boys'
+    Womens = 'Womens'
+    WomensTall = 'WomensTall'
+    Mens = 'Mens'
+    MensTall = 'MensTall'
+
+
 class ApparelSize(base.PSBaseModel):
     apparelStyle: str
     labelSize: str
