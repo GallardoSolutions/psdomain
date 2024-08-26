@@ -220,11 +220,11 @@ class InventoryLevelsResponseV200(PSBaseModel):
 
     def get_available_inventory(self, part_id: str) -> Decimal:
         pi = self.part_inventory_dict.get(part_id)
-        return int(pi.current_availability) if pi else ZERO
+        return pi.current_availability if pi else ZERO
 
     def get_incoming_inventory(self, part_id: str) -> Decimal:
         pi = self.part_inventory_dict.get(part_id)
-        return int(pi.future_availability) if pi else ZERO
+        return pi.future_availability if pi else ZERO
 
     @property
     def part_inventory_dict(self):

@@ -8,6 +8,9 @@ import decimal
 from pydantic import BaseModel, ConfigDict, constr, model_validator
 
 
+ZERO = decimal.Decimal(0)
+
+
 @dataclass
 class Event:
     pass

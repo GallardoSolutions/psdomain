@@ -1,9 +1,10 @@
 from datetime import datetime
 from typing import List, Optional
+from decimal import Decimal
 
 from pydantic import constr, field_validator
 
-from ..base import PSBaseModel
+from ..base import PSBaseModel, ZERO
 
 
 class AttributeFlex(PSBaseModel):
@@ -29,6 +30,10 @@ class ProductVariationInventory(PSBaseModel):
     customProductMessage: Optional[constr(max_length=256)] = None
     entryType: Optional[constr(max_length=64)] = None
     validTimestamp: Optional[datetime] = None
+
+    @property
+    def value(self):
+        return Decimal(self.quantityAvailable) if self.quantityAvailable else ZERO
 
 
 class ProductVariationInventoryArray(PSBaseModel):
@@ -77,3 +82,19 @@ class InventoryLevelsResponseV121(PSBaseModel):
         if not v:
             return None
         return v
+
+    @property
+    def parts(self) -> list[str]:
+        return list({pi.partID for pi in self.part_inventory})
+
+    @property
+    def part_inventory(self) -> List[ProductVariationInventory]:
+        if self.ProductVariationInventoryArray:
+            return self.ProductVariationInventoryArray.ProductVariationInventory
+        return []
+
+    def get_available_inventory(self, part_id: str) -> Decimal:
+        return sum([int(pi.value) for pi in self.part_inventory if pi.partID == part_id], ZERO)
+
+    def get_incoming_inventory(self, part_id: str) -> Decimal:
+        return ZERO
