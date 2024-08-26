@@ -1,4 +1,4 @@
-import decimal
+from decimal import Decimal
 from datetime import datetime
 from typing import Annotated
 
@@ -8,6 +8,9 @@ from .. import base
 from ..base import StrEnum
 
 PSBaseModel = base.PSBaseModel
+
+
+ZERO = Decimal(0)
 
 
 class LabelSize(StrEnum):
@@ -37,21 +40,33 @@ class LabelSize(StrEnum):
 
 
 class Quantity(PSBaseModel):
-    value: decimal.Decimal
+    value: Decimal
     uom: base.UOM
 
 
 class QuantityAvailable(PSBaseModel):
     Quantity: Quantity
 
+    @property
+    def value(self) -> Decimal:
+        return self.Quantity.value
+
 
 class FutureAvailability(PSBaseModel):
     Quantity: Quantity
     availableOn: datetime
 
+    @property
+    def value(self) -> Decimal:
+        return self.Quantity.value
+
 
 class FutureAvailabilityArray(PSBaseModel):
     FutureAvailability: list[FutureAvailability]
+
+    @property
+    def value(self) -> Decimal:
+        return sum([fa.value for fa in self.FutureAvailability], ZERO)
 
 
 class Address(PSBaseModel):
@@ -68,9 +83,25 @@ class InventoryLocation(PSBaseModel):
     inventoryLocationQuantity: QuantityAvailable | None
     FutureAvailabilityArray: FutureAvailabilityArray | None
 
+    @property
+    def future_availability(self) -> Decimal:
+        return self.FutureAvailabilityArray.value if self.FutureAvailabilityArray else ZERO
+
+    @property
+    def current_availability(self) -> Decimal:
+        return self.inventoryLocationQuantity.value if self.inventoryLocationQuantity else ZERO
+
 
 class InventoryLocationArray(PSBaseModel):
     InventoryLocation: list[InventoryLocation]
+
+    @property
+    def future_availability(self) -> Decimal:
+        return sum([loc.future_availability for loc in self.InventoryLocation], ZERO)
+
+    @property
+    def current_availability(self) -> Decimal:
+        return sum([loc.current_availability for loc in self.InventoryLocation], ZERO)
 
 
 class PartInventory(PSBaseModel):
@@ -86,6 +117,20 @@ class PartInventory(PSBaseModel):
     attributeSelection: str | None
     lastModified: datetime | None = None
     InventoryLocationArray: InventoryLocationArray | None
+
+    @property
+    def inventory_location(self):
+        return self.InventoryLocationArray.InventoryLocation if self.InventoryLocationArray else []
+
+    @property
+    def current_availability(self) -> Decimal:
+        if self.quantityAvailable:
+            return self.quantityAvailable.value
+        return sum([loc.current_availability for loc in self.inventory_location], ZERO)
+
+    @property
+    def future_availability(self) -> Decimal:
+        return sum([loc.future_availability for loc in self.inventory_location], ZERO)
 
 
 class PartInventoryArray(PSBaseModel):
@@ -172,3 +217,30 @@ class FilterValuesResponseV200(PSBaseModel):
 class InventoryLevelsResponseV200(PSBaseModel):
     Inventory: Inventory | None  # An object containing the inventory levels for the given product
     ServiceMessageArray: base.ServiceMessageArray | None
+
+    def get_available_inventory(self, part_id: str) -> Decimal:
+        pi = self.part_inventory_dict.get(part_id)
+        return int(pi.current_availability) if pi else ZERO
+
+    def get_incoming_inventory(self, part_id: str) -> Decimal:
+        pi = self.part_inventory_dict.get(part_id)
+        return int(pi.future_availability) if pi else ZERO
+
+    @property
+    def part_inventory_dict(self):
+        ret = getattr(self, '_part_inventory_dict', None)
+        if ret is None:
+            setattr(self, '_part_inventory_dict', self.gen_part_inventory_dict())
+            ret = self._part_inventory_dict
+        return ret
+
+    def gen_part_inventory_dict(self):
+        return {pi.partId: pi for pi in self.part_inventory}
+
+    @property
+    def part_inventory(self) -> list[PartInventory]:
+        return self.Inventory.part_inventory if self.Inventory else []
+
+    @property
+    def parts(self) -> list[str]:
+        return list({pi.partId for pi in self.part_inventory})
