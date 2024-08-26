@@ -113,7 +113,7 @@ class ServiceMessage(PSBaseModel):
     severity: Severity
 
     @model_validator(mode='before')
-    def normalize_severity(self, values):
+    def normalize_severity(cls, values):
         return normalize_severity(values)
 
 

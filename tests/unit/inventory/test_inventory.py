@@ -1,8 +1,11 @@
 # flake8: noqa F811
 from decimal import Decimal
 
-from psdomain.model.inventory.v_2_0_0 import ZERO
+from psdomain.model.inventory.v_2_0_0 import ZERO, InventoryLevelsResponseV200
+from psdomain.model.base import Severity
+
 from .fixtures import inventory_2_0_0_ok_obj, inventory_1_2_1_ok_obj  # noqa
+from .responses.v_2_0_0 import inventory_2_0_0_error_response
 
 
 def test_parts_2_0_0(inventory_2_0_0_ok_obj):
@@ -68,3 +71,11 @@ def test_get_incoming_inventory_1_2_1(inventory_1_2_1_ok_obj):
     obj = inventory_1_2_1_ok_obj
     for part_id in obj.parts:
         assert obj.get_incoming_inventory(part_id) == ZERO
+
+
+def test_error_in_inventory_2_0_0():
+    obj = InventoryLevelsResponseV200.model_validate_json(inventory_2_0_0_error_response)
+    assert obj.Inventory is None
+    msg = obj.ServiceMessageArray.ServiceMessage[0]
+    assert msg.code == 610
+    assert msg.severity == Severity.ERROR

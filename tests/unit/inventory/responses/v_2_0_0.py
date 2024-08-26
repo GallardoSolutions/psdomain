@@ -889,3 +889,5 @@ inventory_2_0_0_ok_response = {
     },
     "ServiceMessageArray": null
 }
+
+inventory_2_0_0_error_response = b'{"Inventory":null,"ServiceMessageArray":{"ServiceMessage":[{"code":610,"description":"Data violation","severity":"Error"}]}}'  # noqa
