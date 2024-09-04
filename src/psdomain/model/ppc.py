@@ -68,7 +68,7 @@ class DecorationColorResponse(base.PSBaseModel):
     ErrorMessage: base.ErrorMessage | None
 
     @property
-    def if_ok(self):
+    def is_ok(self):
         return self.ErrorMessage is None
 
 
@@ -104,6 +104,16 @@ class FobPoint(base.PSBaseModel):
         fob_id = f'{self.fobId[:10]}...' if self.fobId and len(self.fobId) > 10 else self.fobId
         return f"{fob_id} at {self.fobPostalCode} {self.fobCity}-{self.fobState}({self.fobCountry})"
 
+    @property
+    def products(self):
+        lst = self.ProductArray.Product if self.ProductArray else []
+        return [p.productId for p in lst]
+
+    @property
+    def currencies(self):
+        lst = self.CurrencySupportedArray.CurrencySupported if self.CurrencySupportedArray else []
+        return [c.currency for c in lst]
+
 
 class FobPointArray(base.PSBaseModel):
     FobPoint: list[FobPoint]
@@ -114,8 +124,23 @@ class FobPointsResponse(base.PSBaseModel):
     ErrorMessage: base.ErrorMessage | None
 
     @property
-    def if_ok(self):
+    def is_ok(self):
         return self.ErrorMessage is None
+
+    @property
+    def fob_points(self):
+        return self.FobPointArray.FobPoint if self.FobPointArray else []
+
+    @property
+    def fob_point_ids(self):
+        return [fp.fobId for fp in self.fob_points]
+
+    @property
+    def currencies(self):
+        ret = set()
+        for fp in self.fob_points:
+            ret.update(fp.currencies)
+        return ret
 
 
 class DecorationUomType(base.StrEnum):
@@ -288,7 +313,7 @@ class AvailableLocationsResponse(base.PSBaseModel):
     ErrorMessage: base.ErrorMessage | None
 
     @property
-    def if_ok(self):
+    def is_ok(self):
         return self.ErrorMessage is None
 
     @property
@@ -313,7 +338,7 @@ class AvailableChargesResponse(base.PSBaseModel):
     ErrorMessage: base.ErrorMessage | None = None
 
     @property
-    def if_ok(self):
+    def is_ok(self):
         return self.ErrorMessage is None
 
     @property
@@ -407,5 +432,5 @@ class ConfigurationAndPricingResponse(base.PSBaseModel):
     ErrorMessage: base.ErrorMessage | None
 
     @property
-    def if_ok(self):
+    def is_ok(self):
         return self.ErrorMessage is None
