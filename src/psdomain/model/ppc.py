@@ -10,10 +10,14 @@ from . import base
 def normalize_uom(values, field_name):
     if field_name in values:
         try:
-            if values[field_name] == 'SQUARE INCHES':
-                values[field_name] = DecorationUomType.SQUARE_INCHES
-            elif values[field_name]:
-                values[field_name] = DecorationUomType(values[field_name].capitalize())
+            if values[field_name]:
+                val = values[field_name].capitalize()
+                if val == 'Square inches':
+                    values[field_name] = DecorationUomType.SQUARE_INCHES
+                elif val == 'Inch':
+                    values[field_name] = DecorationUomType.INCHES
+                else:
+                    values[field_name] = DecorationUomType(val)
         except ValueError:
             raise ValueError(f"Invalid {field_name} value: {values[field_name]}")
     return values

@@ -3,8 +3,9 @@ from datetime import datetime
 from decimal import Decimal
 
 from .fixtures import ppc_blank_ok, ppc_decorated_ok  # noqa
+from .responses.ppc import json_ppc_empty_response, ppc_inch_instead_of_inches_response
 
-from psdomain.model.ppc import DecorationGeometryType, DecorationUomType
+from psdomain.model.ppc import DecorationGeometryType, DecorationUomType, ConfigurationAndPricingResponse
 
 
 def test_is_ok(ppc_blank_ok):
@@ -106,3 +107,21 @@ def test_charge_prices(ppc_decorated_ok):
     assert charge_price.priceEffectiveDate == datetime(2020, 2, 26, 0, 0)
     assert charge_price.priceExpiryDate == datetime(2028, 1, 1, 0, 0)
 
+
+def test_empty_response():
+    response = ConfigurationAndPricingResponse.model_validate_json(json_ppc_empty_response)
+    assert response.ErrorMessage is None
+    assert response.is_ok
+    assert len(response.parts) == 0
+    assert len(response.locations) == 0
+
+
+def test_inch_instead_of_inches():
+    response = ConfigurationAndPricingResponse.model_validate(ppc_inch_instead_of_inches_response)
+    assert response.ErrorMessage is None
+    assert response.is_ok
+    decoration = response.locations[0].decorations[0]
+    assert decoration.decorationHeight is None
+    assert decoration.decorationWidth is None
+    assert decoration.decorationDiameter is None
+    assert decoration.decorationUom == DecorationUomType.INCHES

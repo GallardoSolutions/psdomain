@@ -1,3 +1,7 @@
+import datetime
+from decimal import Decimal
+
+
 json_ppc_blank_response_ok = """{
     "Configuration": {
         "PartArray": {
@@ -690,3 +694,582 @@ json_ppc_kit_decorated_response_ok = """{
     },
     "ErrorMessage": null
 } """
+
+
+json_ppc_empty_response = """{
+    "Configuration": {
+        "PartArray": null,
+        "LocationArray": null,
+        "productId": null,
+        "currency": "USD",
+        "FobArray": null,
+        "fobPostalCode": null,
+        "priceType": "Customer"
+    },
+    "ErrorMessage": null
+}"""
+
+
+ppc_inch_instead_of_inches_response = {
+    'Configuration': {
+        'PartArray': {
+            'Part': [
+                {
+                    'partId': '0HM1031TNGN10',
+                    'partDescription': None,
+                    'PartPriceArray': {
+                        'PartPrice': [
+                            {
+                                'minQuantity': 50,
+                                'price': Decimal('72.0000'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 100,
+                                'price': Decimal('71.6100'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 250,
+                                'price': Decimal('71.4900'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 500,
+                                'price': Decimal('71.0000'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 1000,
+                                'price': Decimal('70.8500'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            }
+                        ]
+                    },
+                    'partGroup': 1,
+                    'nextPartGroup': None,
+                    'partGroupRequired': True,
+                    'partGroupDescription': 'Part Group',
+                    'ratio': Decimal('1.00'),
+                    'defaultPart': None,
+                    'LocationIdArray': {
+                        'LocationId': [
+                            {
+                                'locationId': 245
+                            }
+                        ]
+                    }
+                },
+                {
+                    'partId': '0HM1031TNGN11',
+                    'partDescription': None,
+                    'PartPriceArray': {
+                        'PartPrice': [
+                            {
+                                'minQuantity': 50,
+                                'price': Decimal('72.0000'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 100,
+                                'price': Decimal('71.6100'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 250,
+                                'price': Decimal('71.4900'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 500,
+                                'price': Decimal('71.0000'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 1000,
+                                'price': Decimal('70.8500'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            }
+                        ]
+                    },
+                    'partGroup': 1,
+                    'nextPartGroup': None,
+                    'partGroupRequired': True,
+                    'partGroupDescription': 'Part Group',
+                    'ratio': Decimal('1.00'),
+                    'defaultPart': None,
+                    'LocationIdArray': {
+                        'LocationId': [
+                            {
+                                'locationId': 245
+                            }
+                        ]
+                    }
+                },
+                {
+                    'partId': '0HM1031TNGN12',
+                    'partDescription': None,
+                    'PartPriceArray': {
+                        'PartPrice': [
+                            {
+                                'minQuantity': 50,
+                                'price': Decimal('72.0000'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 100,
+                                'price': Decimal('71.6100'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 250,
+                                'price': Decimal('71.4900'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 500,
+                                'price': Decimal('71.0000'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 1000,
+                                'price': Decimal('70.8500'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            }
+                        ]
+                    },
+                    'partGroup': 1,
+                    'nextPartGroup': None,
+                    'partGroupRequired': True,
+                    'partGroupDescription': 'Part Group',
+                    'ratio': Decimal('1.00'),
+                    'defaultPart': None,
+                    'LocationIdArray': {
+                        'LocationId': [
+                            {
+                                'locationId': 245
+                            }
+                        ]
+                    }
+                },
+                {
+                    'partId': '0HM1031TNGN13',
+                    'partDescription': None,
+                    'PartPriceArray': {
+                        'PartPrice': [
+                            {
+                                'minQuantity': 50,
+                                'price': Decimal('72.0000'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 100,
+                                'price': Decimal('71.6100'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 250,
+                                'price': Decimal('71.4900'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 500,
+                                'price': Decimal('71.0000'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 1000,
+                                'price': Decimal('70.8500'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            }
+                        ]
+                    },
+                    'partGroup': 1,
+                    'nextPartGroup': None,
+                    'partGroupRequired': True,
+                    'partGroupDescription': 'Part Group',
+                    'ratio': Decimal('1.00'),
+                    'defaultPart': None,
+                    'LocationIdArray': {
+                        'LocationId': [
+                            {
+                                'locationId': 245
+                            }
+                        ]
+                    }
+                },
+                {
+                    'partId': '0HM1031TNGN14',
+                    'partDescription': None,
+                    'PartPriceArray': {
+                        'PartPrice': [
+                            {
+                                'minQuantity': 50,
+                                'price': Decimal('72.0000'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 100,
+                                'price': Decimal('71.6100'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 250,
+                                'price': Decimal('71.4900'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 500,
+                                'price': Decimal('71.0000'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 1000,
+                                'price': Decimal('70.8500'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            }
+                        ]
+                    },
+                    'partGroup': 1,
+                    'nextPartGroup': None,
+                    'partGroupRequired': True,
+                    'partGroupDescription': 'Part Group',
+                    'ratio': Decimal('1.00'),
+                    'defaultPart': None,
+                    'LocationIdArray': {
+                        'LocationId': [
+                            {
+                                'locationId': 245
+                            }
+                        ]
+                    }
+                },
+                {
+                    'partId': '0HM1031TNGN8',
+                    'partDescription': None,
+                    'PartPriceArray': {
+                        'PartPrice': [
+                            {
+                                'minQuantity': 50,
+                                'price': Decimal('72.0000'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 100,
+                                'price': Decimal('71.6100'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 250,
+                                'price': Decimal('71.4900'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 500,
+                                'price': Decimal('71.0000'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 1000,
+                                'price': Decimal('70.8500'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            }
+                        ]
+                    },
+                    'partGroup': 1,
+                    'nextPartGroup': None,
+                    'partGroupRequired': True,
+                    'partGroupDescription': 'Part Group',
+                    'ratio': Decimal('1.00'),
+                    'defaultPart': None,
+                    'LocationIdArray': {
+                        'LocationId': [
+                            {
+                                'locationId': 245
+                            }
+                        ]
+                    }
+                },
+                {
+                    'partId': '0HM1031TNGN9',
+                    'partDescription': None,
+                    'PartPriceArray': {
+                        'PartPrice': [
+                            {
+                                'minQuantity': 50,
+                                'price': Decimal('72.0000'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 100,
+                                'price': Decimal('71.6100'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 250,
+                                'price': Decimal('71.4900'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 500,
+                                'price': Decimal('71.0000'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 1000,
+                                'price': Decimal('70.8500'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2023, 1, 1, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            }
+                        ]
+                    },
+                    'partGroup': 1,
+                    'nextPartGroup': None,
+                    'partGroupRequired': True,
+                    'partGroupDescription': 'Part Group',
+                    'ratio': Decimal('1.00'),
+                    'defaultPart': None,
+                    'LocationIdArray': {
+                        'LocationId': [
+                            {
+                                'locationId': 245
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        'LocationArray': {
+            'Location': [
+                {
+                    'locationId': 245,
+                    'locationName': 'STRAP',
+                    'DecorationArray': {
+                        'Decoration': [
+                            {
+                                'decorationId': 33105834,
+                                'decorationName': 'SUBLIMATED PATCH',
+                                'decorationGeometry': 'Other',
+                                'decorationHeight': None,
+                                'decorationWidth': None,
+                                'decorationDiameter': None,
+                                'decorationUom': 'Inch',
+                                'allowSubForDefaultLocation': False,
+                                'allowSubForDefaultMethod': False,
+                                'itemPartQuantityLTM': 0,
+                                'ChargeArray': {
+                                    'Charge': [
+                                        {
+                                            'chargeId': 99636467,
+                                            'chargeName': 'SUBLIMATED PATCH',
+                                            'chargeDescription': 'SUBLIMATED PATCH',
+                                            'chargeType': 'Run',
+                                            'ChargePriceArray': {
+                                                'ChargePrice': [
+                                                    {
+                                                        'xMinQty': 50,
+                                                        'xUom': 'EA',
+                                                        'yMinQty': 1,
+                                                        'yUom': 'Other',
+                                                        'price': Decimal('4.8800'),
+                                                        'discountCode': 'C',
+                                                        'repeatPrice': Decimal('4.8800'),
+                                                        'repeatDiscountCode': 'C',
+                                                        'priceEffectiveDate': datetime.datetime(2023, 7, 18, 0, 0),
+                                                        'priceExpiryDate': datetime.datetime(2030, 7, 23, 0, 0)
+                                                    },
+                                                    {
+                                                        'xMinQty': 100,
+                                                        'xUom': 'EA',
+                                                        'yMinQty': 1,
+                                                        'yUom': 'Other',
+                                                        'price': Decimal('4.8000'),
+                                                        'discountCode': 'C',
+                                                        'repeatPrice': Decimal('4.8000'),
+                                                        'repeatDiscountCode': 'C',
+                                                        'priceEffectiveDate': datetime.datetime(2023, 7, 18, 0, 0),
+                                                        'priceExpiryDate': datetime.datetime(2030, 7, 23, 0, 0)
+                                                    },
+                                                    {
+                                                        'xMinQty': 250,
+                                                        'xUom': 'EA',
+                                                        'yMinQty': 1,
+                                                        'yUom': 'Other',
+                                                        'price': Decimal('4.7700'),
+                                                        'discountCode': 'C',
+                                                        'repeatPrice': Decimal('4.7700'),
+                                                        'repeatDiscountCode': 'C',
+                                                        'priceEffectiveDate': datetime.datetime(2023, 7, 18, 0, 0),
+                                                        'priceExpiryDate': datetime.datetime(2030, 7, 23, 0, 0)
+                                                    },
+                                                    {
+                                                        'xMinQty': 500,
+                                                        'xUom': 'EA',
+                                                        'yMinQty': 1,
+                                                        'yUom': 'Other',
+                                                        'price': Decimal('4.6600'),
+                                                        'discountCode': 'C',
+                                                        'repeatPrice': Decimal('4.6600'),
+                                                        'repeatDiscountCode': 'C',
+                                                        'priceEffectiveDate': datetime.datetime(2023, 7, 18, 0, 0),
+                                                        'priceExpiryDate': datetime.datetime(2030, 7, 23, 0, 0)
+                                                    },
+                                                    {
+                                                        'xMinQty': 1000,
+                                                        'xUom': 'EA',
+                                                        'yMinQty': 1,
+                                                        'yUom': 'Other',
+                                                        'price': Decimal('4.6400'),
+                                                        'discountCode': 'C',
+                                                        'repeatPrice': Decimal('4.6400'),
+                                                        'repeatDiscountCode': 'C',
+                                                        'priceEffectiveDate': datetime.datetime(2023, 7, 18, 0, 0),
+                                                        'priceExpiryDate': datetime.datetime(2030, 7, 23, 0, 0)
+                                                    }
+                                                ]
+                                            },
+                                            'chargesAppliesLTM': None,
+                                            'chargesPerLocation': None,
+                                            'chargesPerColor': None
+                                        }
+                                    ]
+                                },
+                                'decorationUnitsIncluded': 1,
+                                'decorationUnitsIncludedUom': 'Other',
+                                'decorationUnitsMax': 4,
+                                'defaultDecoration': True,
+                                'leadTime': 3,
+                                'rushLeadTime': 1
+                            }
+                        ]
+                    },
+                    'decorationsIncluded': 1,
+                    'defaultLocation': True,
+                    'maxDecoration': 1,
+                    'minDecoration': 0,
+                    'locationRank': 1
+                }
+            ]
+        },
+        'productId': 'HM1031',
+        'currency': 'USD',
+        'FobArray': {
+            'Fob': [
+                {
+                    'fobId': '1',
+                    'fobPostalCode': '33777'
+                },
+                {
+                    'fobId': '12',
+                    'fobPostalCode': 'L6S6H2'
+                }
+            ]
+        },
+        'priceType': 'List'
+    },
+    'ErrorMessage': None
+}
