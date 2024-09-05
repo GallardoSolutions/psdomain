@@ -2,8 +2,12 @@
 from datetime import datetime
 from decimal import Decimal
 
+import pytest
+from pydantic import ValidationError
+
 from .fixtures import ppc_blank_ok, ppc_decorated_ok  # noqa
-from .responses.ppc import json_ppc_empty_response, ppc_inch_instead_of_inches_response, ppc_decoration_arr_non_existing
+from .responses.ppc import json_ppc_empty_response, ppc_inch_instead_of_inches_response, \
+    ppc_decoration_arr_non_existing, ppc_unknown_price_uom_response
 
 from psdomain.model.ppc import DecorationGeometryType, DecorationUomType, ConfigurationAndPricingResponse
 
@@ -133,3 +137,9 @@ def test_ppc_decoration_arr_non_existing():
     assert response.is_ok
     loc = response.locations[0]
     assert loc.decorations == []
+
+
+def test_ppc_unknown_price_uom_response():
+    # priceUom = "C" is not a valid value
+    with pytest.raises(ValidationError):
+        ConfigurationAndPricingResponse.model_validate(ppc_unknown_price_uom_response)

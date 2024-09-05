@@ -1446,3 +1446,129 @@ ppc_decoration_arr_non_existing = {
     },
     'ErrorMessage': None
 }
+
+ppc_unknown_price_uom_response = {
+    'Configuration': {
+        'PartArray': {
+            'Part': [
+                {
+                    'partId': '17286BLK',
+                    'partDescription': 'BLACK',
+                    'PartPriceArray': {
+                        'PartPrice': [
+                            {
+                                'minQuantity': 200,
+                                'price': Decimal('2.4200'),
+                                'discountCode': 'C',
+                                'priceUom': 'C',
+                                'priceEffectiveDate': datetime.datetime(2024, 5, 22, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 500,
+                                'price': Decimal('2.1000'),
+                                'discountCode': 'C',
+                                'priceUom': 'C',
+                                'priceEffectiveDate': datetime.datetime(2024, 5, 22, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2030, 1, 1, 0, 0)
+                            }
+                        ]
+                    },
+                    'partGroup': 1,
+                    'nextPartGroup': None,
+                    'partGroupRequired': True,
+                    'partGroupDescription': 'Part Group',
+                    'ratio': Decimal('1.00'),
+                    'defaultPart': None,
+                    'LocationIdArray': {
+                        'LocationId': [
+                            {
+                                'locationId': 56
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        'LocationArray': {
+            'Location': [
+                {
+                    'locationId': 56,
+                    'locationName': 'BARREL',
+                    'DecorationArray': {
+                        'Decoration': [
+                            {
+                                'decorationId': 3189501,
+                                'decorationName': 'LASER ENGRAVE',
+                                'decorationGeometry': 'Rectangle',
+                                'decorationHeight': Decimal('0.7500'),
+                                'decorationWidth': Decimal('2.1250'),
+                                'decorationDiameter': None,
+                                'decorationUom': 'Inches',
+                                'allowSubForDefaultLocation': False,
+                                'allowSubForDefaultMethod': False,
+                                'itemPartQuantityLTM': 0,
+                                'ChargeArray': {
+                                    'Charge': [
+                                        {
+                                            'chargeId': 7382268,
+                                            'chargeName': 'LASER ENGRAVE',
+                                            'chargeDescription': 'LASER ENGRAVE',
+                                            'chargeType': 'Setup',
+                                            'ChargePriceArray': {
+                                                'ChargePrice': [
+                                                    {
+                                                        'xMinQty': 1,
+                                                        'xUom': 'EA',
+                                                        'yMinQty': 1,
+                                                        'yUom': 'Other',
+                                                        'price': Decimal('45.0000'),
+                                                        'discountCode': 'G',
+                                                        'repeatPrice': Decimal('45.0000'),
+                                                        'repeatDiscountCode': 'G',
+                                                        'priceEffectiveDate': datetime.datetime(2021, 9, 13, 0, 0),
+                                                        'priceExpiryDate': datetime.datetime(2026, 1, 1, 0, 0)
+                                                    }
+                                                ]
+                                            },
+                                            'chargesAppliesLTM': None,
+                                            'chargesPerLocation': None,
+                                            'chargesPerColor': None
+                                        }
+                                    ]
+                                },
+                                'decorationUnitsIncluded': 1,
+                                'decorationUnitsIncludedUom': 'Other',
+                                'decorationUnitsMax': 1,
+                                'defaultDecoration': True,
+                                'leadTime': 3,
+                                'rushLeadTime': 1
+                            }
+                        ]
+                    },
+                    'decorationsIncluded': 1,
+                    'defaultLocation': True,
+                    'maxDecoration': 1,
+                    'minDecoration': 0,
+                    'locationRank': 1
+                }
+            ]
+        },
+        'productId': '17286',
+        'currency': 'USD',
+        'FobArray': {
+            'Fob': [
+                {
+                    'fobId': '69',
+                    'fobPostalCode': '12010'
+                },
+                {
+                    'fobId': '12',
+                    'fobPostalCode': 'L6S6H2'
+                }
+            ]
+        },
+        'priceType': 'List'
+    },
+    'ErrorMessage': None
+}

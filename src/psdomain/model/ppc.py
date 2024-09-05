@@ -23,6 +23,20 @@ def normalize_uom(values, field_name):
     return values
 
 
+def normalize_charge_type(values, field_name):
+    if field_name in values:
+        try:
+            if values[field_name]:
+                val = values[field_name].capitalize()
+                if val == 'Tape setup':
+                    values[field_name] = ChargeType.SETUP
+                else:
+                    values[field_name] = ChargeType(val)
+        except ValueError:
+            raise ValueError(f"Invalid {field_name} value: {values[field_name]}")
+    return values
+
+
 class ChargeType(base.StrEnum):
     """
     Types of Charges
@@ -247,6 +261,10 @@ class Charge(base.PSBaseModel):
             return unit_price
         return None
 
+    @model_validator(mode='before')
+    def normalize_charge_type(cls, values):
+        return normalize_charge_type(values, 'chargeType')
+
 
 class ChargeArray(base.PSBaseModel):
     Charge: list[Charge]
@@ -349,6 +367,10 @@ class AvailableCharge(base.PSBaseModel):
     chargeName: str
     chargeType: ChargeType
     chargeDescription: str | None
+
+    @model_validator(mode='before')
+    def normalize_charge_type(cls, values):
+        return normalize_charge_type(values, 'chargeType')
 
 
 class AvailableChargeArray(base.PSBaseModel):

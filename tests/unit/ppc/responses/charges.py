@@ -59,3 +59,138 @@ json_charges_ok = """{
     },
     "ErrorMessage": null
 }"""
+
+
+json_charges_setup_in_caps = {
+    'AvailableChargeArray': {
+        'AvailableCharge': [
+            {
+                'chargeId': 126578006,
+                'chargeName': 'Pad Print',
+                'chargeDescription': 'Pad Print',
+                'chargeType': 'Run'
+            },
+            {
+                'chargeId': 126578007,
+                'chargeName': 'Pad Print',
+                'chargeDescription': 'Pad Print',
+                'chargeType': 'SETUP'
+            },
+            {
+                'chargeId': 126578008,
+                'chargeName': 'Pad Print',
+                'chargeDescription': 'Pad Print',
+                'chargeType': 'Run'
+            },
+            {
+                'chargeId': 126578009,
+                'chargeName': 'Pad Print',
+                'chargeDescription': 'Pad Print',
+                'chargeType': 'SETUP'
+            },
+            {
+                'chargeId': 126578010,
+                'chargeName': 'Pad Print',
+                'chargeDescription': 'Pad Print',
+                'chargeType': 'Run'
+            },
+            {
+                'chargeId': 126578011,
+                'chargeName': 'Pad Print',
+                'chargeDescription': 'Pad Print',
+                'chargeType': 'SETUP'
+            },
+            {
+                'chargeId': 126578012,
+                'chargeName': 'Pad Print',
+                'chargeDescription': 'Pad Print',
+                'chargeType': 'Run'
+            },
+            {
+                'chargeId': 126578013,
+                'chargeName': 'Pad Print',
+                'chargeDescription': 'Pad Print',
+                'chargeType': 'SETUP'
+            },
+            {
+                'chargeId': 5285856,
+                'chargeName': 'Hp Printer',
+                'chargeDescription': 'Hp Printer',
+                'chargeType': 'Setup'
+            },
+            {
+                'chargeId': 108206182,
+                'chargeName': 'Tape Charge',
+                'chargeDescription': 'Tape Charge',
+                'chargeType': 'TAPE SETUP'
+            },
+            {
+                'chargeId': 24071476,
+                'chargeName': 'Pad Print',
+                'chargeDescription': 'Pad Print',
+                'chargeType': 'Setup'
+            },
+            {
+                'chargeId': 24071477,
+                'chargeName': 'Extra Color Charge',
+                'chargeDescription': 'Extra Color Charge',
+                'chargeType': 'Run'
+            },
+            {
+                'chargeId': 24071478,
+                'chargeName': 'Pad Print',
+                'chargeDescription': 'Pad Print',
+                'chargeType': 'Run'
+            },
+            {
+                'chargeId': 126578014,
+                'chargeName': 'Pad Print',
+                'chargeDescription': 'Pad Print',
+                'chargeType': 'Run'
+            },
+            {
+                'chargeId': 126578015,
+                'chargeName': 'Pad Print',
+                'chargeDescription': 'Pad Print',
+                'chargeType': 'SETUP'
+            },
+            {
+                'chargeId': 126578016,
+                'chargeName': 'Pad Print',
+                'chargeDescription': 'Pad Print',
+                'chargeType': 'Run'
+            },
+            {
+                'chargeId': 126578017,
+                'chargeName': 'Pad Print',
+                'chargeDescription': 'Pad Print',
+                'chargeType': 'SETUP'
+            },
+            {
+                'chargeId': 126578018,
+                'chargeName': 'Pad Print',
+                'chargeDescription': 'Pad Print',
+                'chargeType': 'Run'
+            },
+            {
+                'chargeId': 126578019,
+                'chargeName': 'Pad Print',
+                'chargeDescription': 'Pad Print',
+                'chargeType': 'SETUP'
+            },
+            {
+                'chargeId': 126578020,
+                'chargeName': 'Pad Print',
+                'chargeDescription': 'Pad Print',
+                'chargeType': 'Run'
+            },
+            {
+                'chargeId': 126578021,
+                'chargeName': 'Pad Print',
+                'chargeDescription': 'Pad Print',
+                'chargeType': 'SETUP'
+            }
+        ]
+    },
+    'ErrorMessage': None
+}
