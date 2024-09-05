@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from .fixtures import ppc_blank_ok, ppc_decorated_ok  # noqa
-from .responses.ppc import json_ppc_empty_response, ppc_inch_instead_of_inches_response
+from .responses.ppc import json_ppc_empty_response, ppc_inch_instead_of_inches_response, ppc_decoration_arr_non_existing
 
 from psdomain.model.ppc import DecorationGeometryType, DecorationUomType, ConfigurationAndPricingResponse
 
@@ -125,3 +125,11 @@ def test_inch_instead_of_inches():
     assert decoration.decorationWidth is None
     assert decoration.decorationDiameter is None
     assert decoration.decorationUom == DecorationUomType.INCHES
+
+
+def test_ppc_decoration_arr_non_existing():
+    response = ConfigurationAndPricingResponse.model_validate(ppc_decoration_arr_non_existing)
+    assert response.ErrorMessage is None
+    assert response.is_ok
+    loc = response.locations[0]
+    assert loc.decorations == []

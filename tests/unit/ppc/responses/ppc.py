@@ -1273,3 +1273,176 @@ ppc_inch_instead_of_inches_response = {
     },
     'ErrorMessage': None
 }
+
+
+ppc_decoration_arr_non_existing = {
+    'Configuration': {
+        'PartArray': {
+            'Part': [
+                {
+                    'partId': '0PATCH19WHT',
+                    'partDescription': None,
+                    'PartPriceArray': {
+                        'PartPrice': [
+                            {
+                                'minQuantity': 50,
+                                'price': Decimal('36.8600'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2022, 3, 28, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2028, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 100,
+                                'price': Decimal('29.6600'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2022, 3, 28, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2028, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 250,
+                                'price': Decimal('26.8600'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2022, 3, 28, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2028, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 500,
+                                'price': Decimal('23.9900'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2022, 3, 28, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2028, 1, 1, 0, 0)
+                            },
+                            {
+                                'minQuantity': 1000,
+                                'price': Decimal('23.9900'),
+                                'discountCode': 'C',
+                                'priceUom': 'EA',
+                                'priceEffectiveDate': datetime.datetime(2022, 3, 28, 0, 0),
+                                'priceExpiryDate': datetime.datetime(2028, 1, 1, 0, 0)
+                            }
+                        ]
+                    },
+                    'partGroup': 1,
+                    'nextPartGroup': 2,
+                    'partGroupRequired': True,
+                    'partGroupDescription': 'Part Group',
+                    'ratio': Decimal('1.00'),
+                    'defaultPart': None,
+                    'LocationIdArray': {
+                        'LocationId': [
+                            {
+                                'locationId': 242
+                            }
+                        ]
+                    }
+                },
+                {
+                    'partId': '3255BLK',
+                    'partDescription': 'BLACK',
+                    'PartPriceArray': None,
+                    'partGroup': 2,
+                    'nextPartGroup': None,
+                    'partGroupRequired': True,
+                    'partGroupDescription': 'TOTE BAG',
+                    'ratio': Decimal('1.00'),
+                    'defaultPart': None,
+                    'LocationIdArray': None
+                },
+                {
+                    'partId': '3255GRF',
+                    'partDescription': 'FOREST GREEN',
+                    'PartPriceArray': None,
+                    'partGroup': 2,
+                    'nextPartGroup': None,
+                    'partGroupRequired': True,
+                    'partGroupDescription': 'TOTE BAG',
+                    'ratio': Decimal('1.00'),
+                    'defaultPart': None,
+                    'LocationIdArray': None
+                },
+                {
+                    'partId': '3255NAT',
+                    'partDescription': 'NATURAL',
+                    'PartPriceArray': None,
+                    'partGroup': 2,
+                    'nextPartGroup': None,
+                    'partGroupRequired': True,
+                    'partGroupDescription': 'TOTE BAG',
+                    'ratio': Decimal('1.00'),
+                    'defaultPart': None,
+                    'LocationIdArray': None
+                },
+                {
+                    'partId': '3255NAV',
+                    'partDescription': 'NAVY BLUE',
+                    'PartPriceArray': None,
+                    'partGroup': 2,
+                    'nextPartGroup': None,
+                    'partGroupRequired': True,
+                    'partGroupDescription': 'TOTE BAG',
+                    'ratio': Decimal('1.00'),
+                    'defaultPart': None,
+                    'LocationIdArray': None
+                },
+                {
+                    'partId': '3255RED',
+                    'partDescription': 'RED',
+                    'PartPriceArray': None,
+                    'partGroup': 2,
+                    'nextPartGroup': None,
+                    'partGroupRequired': True,
+                    'partGroupDescription': 'TOTE BAG',
+                    'ratio': Decimal('1.00'),
+                    'defaultPart': None,
+                    'LocationIdArray': None
+                },
+                {
+                    'partId': '3255ROY',
+                    'partDescription': 'ROYAL BLUE',
+                    'PartPriceArray': None,
+                    'partGroup': 2,
+                    'nextPartGroup': None,
+                    'partGroupRequired': True,
+                    'partGroupDescription': 'TOTE BAG',
+                    'ratio': Decimal('1.00'),
+                    'defaultPart': None,
+                    'LocationIdArray': None
+                }
+            ]
+        },
+        'LocationArray': {
+            'Location': [
+                {
+                    'locationId': 242,
+                    'locationName': 'POCKET',
+                    'DecorationArray': None,
+                    'decorationsIncluded': 1,
+                    'defaultLocation': True,
+                    'maxDecoration': 1,
+                    'minDecoration': 0,
+                    'locationRank': 1
+                }
+            ]
+        },
+        'productId': '3255PAT',
+        'currency': 'USD',
+        'FobArray': {
+            'Fob': [
+                {
+                    'fobId': '1',
+                    'fobPostalCode': '33777'
+                },
+                {
+                    'fobId': '12',
+                    'fobPostalCode': 'L6S6H2'
+                }
+            ]
+        },
+        'priceType': 'List'
+    },
+    'ErrorMessage': None
+}

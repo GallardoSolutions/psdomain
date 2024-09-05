@@ -310,7 +310,7 @@ class DecorationArray(base.PSBaseModel):
 class Location(base.PSBaseModel):
     locationId: int
     locationName: str
-    DecorationArray: DecorationArray
+    DecorationArray: DecorationArray | None
     decorationsIncluded: int
     defaultLocation: bool
     maxDecoration: int
