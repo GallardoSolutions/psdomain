@@ -71,6 +71,16 @@ class DecorationColorResponse(base.PSBaseModel):
     def is_ok(self):
         return self.ErrorMessage is None
 
+    @property
+    def colors(self):
+        temp = self.DecorationColors
+        return temp.ColorArray.Color if temp and temp.ColorArray else []
+
+    @property
+    def decoration_methods(self):
+        temp = self.DecorationColors
+        return temp.DecorationMethodArray.DecorationMethod if temp and temp.DecorationMethodArray else []
+
 
 class Product(base.PSBaseModel):
     productId: str
@@ -284,6 +294,10 @@ class Decoration(base.PSBaseModel):
     def normalize_decoration_uom(cls, values):
         return normalize_uom(values, 'decorationUom')
 
+    @property
+    def charges(self):
+        return self.ChargeArray.Charge if self.ChargeArray else []
+
 
 class DecorationArray(base.PSBaseModel):
     Decoration: list[Decoration]
@@ -298,6 +312,10 @@ class Location(base.PSBaseModel):
     maxDecoration: int
     minDecoration: int
     locationRank: int | None = Field(description='Popularity of location based on supplier experience')
+
+    @property
+    def decorations(self):
+        return self.DecorationArray.Decoration if self.DecorationArray else []
 
 
 class LocationArray(base.PSBaseModel):
@@ -408,6 +426,10 @@ class Part(base.PSBaseModel):
                 return price
         return None
 
+    @property
+    def location_ids(self) -> list[str | int]:
+        return [x.locationId for x in self.LocationIdArray.LocationId] if self.LocationIdArray else []
+
 
 class PartArray(base.PSBaseModel):
     Part: list[Part]
@@ -426,6 +448,14 @@ class Configuration(base.PSBaseModel):
     def locations(self):
         return self.LocationArray.Location if self.LocationArray else []
 
+    @property
+    def parts(self):
+        return self.PartArray.Part if self.PartArray else []
+
+    @property
+    def fob_points(self):
+        return self.FobArray.Fob if self.FobArray else []
+
 
 class ConfigurationAndPricingResponse(base.PSBaseModel):
     Configuration: Configuration | None
@@ -434,3 +464,15 @@ class ConfigurationAndPricingResponse(base.PSBaseModel):
     @property
     def is_ok(self):
         return self.ErrorMessage is None
+
+    @property
+    def locations(self):
+        return self.Configuration.locations if self.Configuration else []
+
+    @property
+    def parts(self):
+        return self.Configuration.parts if self.Configuration else []
+
+    @property
+    def fob_points(self):
+        return self.Configuration.fob_points if self.Configuration else []
