@@ -25,10 +25,18 @@ class ProductCloseOutResponseV200(base.PSBaseModel):
     ProductCloseOutArray: ProductCloseOutArray | None
     ServiceMessageArray: base.ServiceMessageArray | None
 
+    @property
+    def is_ok(self):
+        return self.ServiceMessageArray is None
+
 
 class ProductDateModifiedResponseV200(base.PSBaseModel):
     ProductDateModifiedArray: ProductDateModifiedArray | None
     ServiceMessageArray: base.ServiceMessageArray | None
+
+    @property
+    def is_ok(self):
+        return self.ServiceMessageArray is None
 
 
 class GetProductSellableResponseV200(base.PSBaseModel):
@@ -37,4 +45,4 @@ class GetProductSellableResponseV200(base.PSBaseModel):
 
     @property
     def is_ok(self):
-        return self.ServiceMessageArray is None or not self.ServiceMessageArray.ServiceMessage
+        return self.ServiceMessageArray is None

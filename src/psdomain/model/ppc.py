@@ -37,6 +37,14 @@ def normalize_charge_type(values, field_name):
     return values
 
 
+class PPCResponse(base.PSBaseModel):
+    ErrorMessage: base.ErrorMessage | None
+
+    @property
+    def is_ok(self):
+        return self.ErrorMessage is None
+
+
 class ChargeType(base.StrEnum):
     """
     Types of Charges
@@ -147,13 +155,8 @@ class FobPointArray(base.PSBaseModel):
     FobPoint: list[FobPoint]
 
 
-class FobPointsResponse(base.PSBaseModel):
+class FobPointsResponse(PPCResponse):
     FobPointArray: FobPointArray | None
-    ErrorMessage: base.ErrorMessage | None
-
-    @property
-    def is_ok(self):
-        return self.ErrorMessage is None
 
     @property
     def fob_points(self):
@@ -221,6 +224,10 @@ class Charge(base.PSBaseModel):
         return self.chargeType.is_setup
 
     @property
+    def is_order(self) -> bool:
+        return self.chargeType.is_order
+
+    @property
     def prices(self) -> list[ChargePrice]:
         # returns a sorted list of part prices by minQuantity if PartPriceArray is not None, empty list otherwise
         result = getattr(self, '_prices', None)
@@ -245,21 +252,37 @@ class Charge(base.PSBaseModel):
 
     def get_price(self, qty: int) -> ChargePrice | None:
         # returns the price for the given quantity if it exists, None otherwise
-        for price in self.reversed_prices:
-            if price.xMinQty <= qty:
-                return price
+        for ch in self.reversed_prices:
+            if ch.xMinQty <= qty:
+                return ch
         return None
 
-    def get_charge_price(self, qty: int, repeat_price, num_colors: int = 1) -> Decimal | None:
-        price = self.get_price(qty)
-        if price:
-            unit_price = price.repeatPrice if repeat_price else price.price
+    def get_charge_price(self, qty: int, repeat_price: bool, num_colors: int = 1) -> Decimal | None:
+        ch = self.get_price(qty)
+        if ch:
+            unit_price = ch.repeatPrice if repeat_price else ch.price
             charges_per_color = self.chargesPerColor or 1
             if charges_per_color > 1:
                 # todo: implement this logic
                 unit_price = unit_price + charges_per_color
             return unit_price
         return None
+
+    @property
+    def is_extra_color(self) -> bool:
+        return (self.chargesPerColor and self.chargesPerColor > 1) or 'extra color' in self.chargeName.lower()
+
+    @property
+    def is_extra_location(self) -> bool:
+        return self.chargesPerLocation and self.chargesPerLocation > 1 or 'extra location' in self.chargeName.lower()
+
+    @property
+    def is_extra_stitch(self) -> bool:
+        return 'extra stitch' in self.chargeName.lower()
+
+    @property
+    def is_ltm(self) -> bool:
+        return self.chargesAppliesLTM
 
     @model_validator(mode='before')
     def normalize_charge_type(cls, values):
@@ -320,6 +343,15 @@ class Decoration(base.PSBaseModel):
     def charges(self):
         return self.ChargeArray.Charge if self.ChargeArray else []
 
+    def has_extra_color_charge(self):
+        return any(ch for ch in self.charges if ch.is_extra_color)
+
+    def has_extra_location_charge(self):
+        return any(ch for ch in self.charges if ch.is_extra_location)
+
+    def has_extra_stitch_charge(self):
+        return any(ch for ch in self.charges if ch.is_extra_stitch)
+
 
 class DecorationArray(base.PSBaseModel):
     Decoration: list[Decoration]
@@ -348,13 +380,8 @@ class AvailableLocationArray(base.PSBaseModel):
     AvailableLocation: list[product_data.Location]
 
 
-class AvailableLocationsResponse(base.PSBaseModel):
+class AvailableLocationsResponse(PPCResponse):
     AvailableLocationArray: AvailableLocationArray | None
-    ErrorMessage: base.ErrorMessage | None
-
-    @property
-    def is_ok(self):
-        return self.ErrorMessage is None
 
     @property
     def locations(self):
@@ -377,13 +404,8 @@ class AvailableChargeArray(base.PSBaseModel):
     AvailableCharge: list[AvailableCharge]
 
 
-class AvailableChargesResponse(base.PSBaseModel):
+class AvailableChargesResponse(PPCResponse):
     AvailableChargeArray: AvailableChargeArray | None
-    ErrorMessage: base.ErrorMessage | None = None
-
-    @property
-    def is_ok(self):
-        return self.ErrorMessage is None
 
     @property
     def charges(self):
@@ -483,13 +505,8 @@ class Configuration(base.PSBaseModel):
         return self.FobArray.Fob if self.FobArray else []
 
 
-class ConfigurationAndPricingResponse(base.PSBaseModel):
+class ConfigurationAndPricingResponse(PPCResponse):
     Configuration: Configuration | None
-    ErrorMessage: base.ErrorMessage | None
-
-    @property
-    def is_ok(self):
-        return self.ErrorMessage is None
 
     @property
     def locations(self):
