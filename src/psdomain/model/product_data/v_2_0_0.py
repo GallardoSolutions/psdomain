@@ -11,38 +11,18 @@ class ProductV200(Product):
     FobPointArray: FobPointArray | None
 
 
-class ProductResponseV200(base.PSBaseModel):
+class ProductResponseV200(base.ServiceMessageResponse):
     Product: ProductV200 | None = Field(None, alias='Product', description='Product Information',
                                         title='ProductV200')
-    ServiceMessageArray: base.ServiceMessageArray | None = None
-
-    @property
-    def is_ok(self):
-        return self.ServiceMessageArray is None
 
 
-class ProductCloseOutResponseV200(base.PSBaseModel):
+class ProductCloseOutResponseV200(base.ServiceMessageResponse):
     ProductCloseOutArray: ProductCloseOutArray | None
-    ServiceMessageArray: base.ServiceMessageArray | None
-
-    @property
-    def is_ok(self):
-        return self.ServiceMessageArray is None
 
 
-class ProductDateModifiedResponseV200(base.PSBaseModel):
+class ProductDateModifiedResponseV200(base.ServiceMessageResponse):
     ProductDateModifiedArray: ProductDateModifiedArray | None
-    ServiceMessageArray: base.ServiceMessageArray | None
-
-    @property
-    def is_ok(self):
-        return self.ServiceMessageArray is None
 
 
-class GetProductSellableResponseV200(base.PSBaseModel):
+class GetProductSellableResponseV200(base.ServiceMessageResponse):
     ProductSellableArray: ProductSellableArray | None
-    ServiceMessageArray: base.ServiceMessageArray | None = None
-
-    @property
-    def is_ok(self):
-        return self.ServiceMessageArray is None

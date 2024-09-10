@@ -5,7 +5,7 @@ from psdomain.model.inventory.v_2_0_0 import ZERO, InventoryLevelsResponseV200
 from psdomain.model.base import Severity
 
 from .fixtures import inventory_2_0_0_ok_obj, inventory_1_2_1_ok_obj  # noqa
-from .responses.v_2_0_0 import inventory_2_0_0_error_response
+from .responses.v_2_0_0 import inventory_2_0_0_error_response, inventory_2_0_0_error_response_2
 
 
 def test_parts_2_0_0(inventory_2_0_0_ok_obj):
@@ -79,3 +79,15 @@ def test_error_in_inventory_2_0_0():
     msg = obj.ServiceMessageArray.ServiceMessage[0]
     assert msg.code == 610
     assert msg.severity == Severity.ERROR
+
+
+def test_error_in_inventory_2_0_0_2():
+    obj = InventoryLevelsResponseV200.model_validate(inventory_2_0_0_error_response_2)
+    assert obj.Inventory is None
+    msg = obj.ServiceMessageArray.ServiceMessage[0]
+    assert msg.code == 160
+    assert msg.severity == Severity.ERROR
+    assert msg.description == 'No Results Found'
+    #
+    obj1 = InventoryLevelsResponseV200.model_validate(obj)
+    assert obj1 == obj

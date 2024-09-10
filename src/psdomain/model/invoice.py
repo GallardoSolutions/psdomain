@@ -1,7 +1,7 @@
 from datetime import date
 
 
-from .base import ServiceMessageArray, StrEnum, PSBaseModel
+from .base import ServiceMessageArray, StrEnum, PSBaseModel, ServiceMessageResponse
 
 
 class QueryType(StrEnum):
@@ -200,9 +200,8 @@ class InvoiceArray(PSBaseModel):
     Invoice: list[Invoice]
 
 
-class GetInvoiceResponse(PSBaseModel):
+class GetInvoiceResponse(ServiceMessageResponse):
     """
     Response object for the getInvoice method.
     """
     InvoiceArray: InvoiceArray | None
-    ServiceMessageArray: ServiceMessageArray | None

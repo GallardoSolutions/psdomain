@@ -98,6 +98,9 @@ class ErrorMessage(PSBaseModel):
     code: int
     description: str
 
+    def __str__(self):
+        return f'{self.code} - {self.description}'
+
 
 def normalize_severity(values):
     try:
@@ -116,9 +119,15 @@ class ServiceMessage(PSBaseModel):
     def normalize_severity(cls, values):
         return normalize_severity(values)
 
+    def __str__(self):
+        return f'{self.code} - {self.description} - {self.severity}'
+
 
 class ServiceMessageArray(PSBaseModel):
     ServiceMessage: list[ServiceMessage]
+
+    def __str__(self):
+        return '\n'.join(str(msg) for msg in self.ServiceMessage)
 
 
 class Fob(PSBaseModel):
@@ -670,3 +679,27 @@ class Currency(StrEnum):
     ZAR = "ZAR"  # South African Rand
     ZMK = "ZMK"  # Zambian Kwacha (1968–2012)
     ZMW = "ZMW"  # Zambian Kwacha
+
+
+class ErrorMessageResponse(PSBaseModel):
+    ErrorMessage: ErrorMessage | None
+
+    @property
+    def is_ok(self):
+        return self.ErrorMessage is None
+
+    @property
+    def errors(self):
+        return str(self.ErrorMessage) if self.ErrorMessage else None
+
+
+class ServiceMessageResponse(PSBaseModel):
+    ServiceMessageArray: ServiceMessageArray | None
+
+    @property
+    def is_ok(self):
+        return self.ServiceMessageArray is None
+
+    @property
+    def errors(self):
+        return str(self.ServiceMessageArray) if self.ServiceMessageArray else None

@@ -37,14 +37,6 @@ def normalize_charge_type(values, field_name):
     return values
 
 
-class PPCResponse(base.PSBaseModel):
-    ErrorMessage: base.ErrorMessage | None
-
-    @property
-    def is_ok(self):
-        return self.ErrorMessage is None
-
-
 class ChargeType(base.StrEnum):
     """
     Types of Charges
@@ -89,13 +81,8 @@ class DecorationColors(base.PSBaseModel):
     DecorationMethodArray: DecorationMethodArray | None  # # the docs say this is required but not sure
 
 
-class DecorationColorResponse(base.PSBaseModel):
+class DecorationColorResponse(base.ErrorMessageResponse):
     DecorationColors: DecorationColors | None
-    ErrorMessage: base.ErrorMessage | None
-
-    @property
-    def is_ok(self):
-        return self.ErrorMessage is None
 
     @property
     def colors(self):
@@ -155,7 +142,7 @@ class FobPointArray(base.PSBaseModel):
     FobPoint: list[FobPoint]
 
 
-class FobPointsResponse(PPCResponse):
+class FobPointsResponse(base.ErrorMessageResponse):
     FobPointArray: FobPointArray | None
 
     @property
@@ -380,7 +367,7 @@ class AvailableLocationArray(base.PSBaseModel):
     AvailableLocation: list[product_data.Location]
 
 
-class AvailableLocationsResponse(PPCResponse):
+class AvailableLocationsResponse(base.ErrorMessageResponse):
     AvailableLocationArray: AvailableLocationArray | None
 
     @property
@@ -404,7 +391,7 @@ class AvailableChargeArray(base.PSBaseModel):
     AvailableCharge: list[AvailableCharge]
 
 
-class AvailableChargesResponse(PPCResponse):
+class AvailableChargesResponse(base.ErrorMessageResponse):
     AvailableChargeArray: AvailableChargeArray | None
 
     @property
@@ -505,7 +492,7 @@ class Configuration(base.PSBaseModel):
         return self.FobArray.Fob if self.FobArray else []
 
 
-class ConfigurationAndPricingResponse(PPCResponse):
+class ConfigurationAndPricingResponse(base.ErrorMessageResponse):
     Configuration: Configuration | None
 
     @property

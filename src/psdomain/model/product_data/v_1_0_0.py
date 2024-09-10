@@ -8,30 +8,18 @@ class ProductV100(Product):
     pass
 
 
-class ProductResponseV100(base.PSBaseModel):
+class ProductResponseV100(base.ErrorMessage):
     Product: ProductV100 | None = Field(None, alias='Product', description='Product Information',
                                         title='Product')
-    ErrorMessage: base.ErrorMessage | None = None
-
-    @property
-    def is_ok(self):
-        return self.ErrorMessage is None
 
 
-class ProductCloseOutResponseV100(base.PSBaseModel):
+class ProductCloseOutResponseV100(base.ErrorMessageResponse):
     ProductCloseOutArray: ProductCloseOutArray | None
-    ErrorMessage: base.ErrorMessage | None
 
 
-class ProductDateModifiedResponseV100(base.PSBaseModel):
+class ProductDateModifiedResponseV100(base.ErrorMessageResponse):
     ProductDateModifiedArray: ProductDateModifiedArray | None
-    ErrorMessage: base.ErrorMessage | None = None
 
 
-class GetProductSellableResponseV100(base.PSBaseModel):
+class GetProductSellableResponseV100(base.ErrorMessageResponse):
     ProductSellableArray: ProductSellableArray | None
-    ErrorMessage: base.ErrorMessage | None = None
-
-    @property
-    def is_ok(self):
-        return self.ErrorMessage is None

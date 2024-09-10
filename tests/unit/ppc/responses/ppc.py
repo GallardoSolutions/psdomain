@@ -1,6 +1,7 @@
 import datetime
 from decimal import Decimal
 
+null, true, false = None, True, False
 
 json_ppc_blank_response_ok = """{
     "Configuration": {
@@ -116,7 +117,6 @@ json_ppc_blank_response_ok = """{
     },
     "ErrorMessage": null
 }"""
-
 
 json_ppc_decorated_response_ok = """{
     "Configuration": {
@@ -481,7 +481,6 @@ json_ppc_decorated_response_ok = """{
     "ErrorMessage": null
 }"""
 
-
 json_ppc_kit_decorated_response_ok = """{
     "Configuration": {
         "PartArray": {
@@ -695,7 +694,6 @@ json_ppc_kit_decorated_response_ok = """{
     "ErrorMessage": null
 } """
 
-
 json_ppc_empty_response = """{
     "Configuration": {
         "PartArray": null,
@@ -708,7 +706,6 @@ json_ppc_empty_response = """{
     },
     "ErrorMessage": null
 }"""
-
 
 ppc_inch_instead_of_inches_response = {
     'Configuration': {
@@ -1273,7 +1270,6 @@ ppc_inch_instead_of_inches_response = {
     },
     'ErrorMessage': None
 }
-
 
 ppc_decoration_arr_non_existing = {
     'Configuration': {

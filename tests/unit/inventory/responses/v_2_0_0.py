@@ -891,3 +891,16 @@ inventory_2_0_0_ok_response = {
 }
 
 inventory_2_0_0_error_response = b'{"Inventory":null,"ServiceMessageArray":{"ServiceMessage":[{"code":610,"description":"Data violation","severity":"Error"}]}}'  # noqa
+
+inventory_2_0_0_error_response_2 = {
+    'Inventory': None,
+    'ServiceMessageArray': {
+        'ServiceMessage': [
+            {
+                'code': 160,
+                'description': 'No Results Found',
+                'severity': 'Error'
+            }
+        ]
+    }
+}

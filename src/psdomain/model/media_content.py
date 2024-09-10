@@ -308,9 +308,20 @@ class MediaContentArray(base.PSBaseModel):
     MediaContent: list[MediaContent]
 
 
-class MediaContentDetailsResponse(base.PSBaseModel):
-    MediaContentArray: MediaContentArray | None
+class MediaResponse(base.PSBaseModel):
     errorMessage: base.ErrorMessage | None
+
+    @property
+    def is_ok(self):
+        return self.errorMessage is None
+
+    @property
+    def errors(self):
+        return str(self.errorMessage) if self.errorMessage else None
+
+
+class MediaContentDetailsResponse(MediaResponse):
+    MediaContentArray: MediaContentArray | None
 
     def _get_media_content(self) -> list[MediaContent]:
         return self.MediaContentArray.MediaContent if self.MediaContentArray else []
@@ -330,10 +341,6 @@ class MediaContentDetailsResponse(base.PSBaseModel):
 
     def get_unique_urls(self) -> set[str]:
         return {mc.url for mc in self.MediaContent}
-
-    @property
-    def is_ok(self):
-        return self.errorMessage is None
 
 
 # Media Content Modified Since
@@ -355,10 +362,5 @@ class MediaDateModifiedArray(base.PSBaseModel):
     MediaDateModified: list[MediaDateModified]
 
 
-class GetMediaDateModifiedResponse(base.PSBaseModel):
+class GetMediaDateModifiedResponse(MediaResponse):
     MediaDateModifiedArray: MediaDateModifiedArray | None
-    ErrorMessage: base.ErrorMessage | None
-
-    @property
-    def is_ok(self):
-        return self.ErrorMessage is None
