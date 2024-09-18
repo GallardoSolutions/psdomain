@@ -8,7 +8,7 @@ class ProductV100(Product):
     pass
 
 
-class ProductResponseV100(base.ErrorMessage):
+class ProductResponseV100(base.ErrorMessageResponse):
     Product: ProductV100 | None = Field(None, alias='Product', description='Product Information',
                                         title='Product')
 

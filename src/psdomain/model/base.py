@@ -101,6 +101,10 @@ class ErrorMessage(PSBaseModel):
     def __str__(self):
         return f'{self.code} - {self.description}'
 
+    @classmethod
+    def not_supported(cls):
+        return cls(code=125, description='Not Supported')
+
 
 def normalize_severity(values):
     try:
@@ -122,12 +126,21 @@ class ServiceMessage(PSBaseModel):
     def __str__(self):
         return f'{self.code} - {self.description} - {self.severity}'
 
+    @classmethod
+    def not_supported(cls):
+        return cls(code=125, description='Not Supported', severity=Severity.ERROR)
+
 
 class ServiceMessageArray(PSBaseModel):
     ServiceMessage: list[ServiceMessage]
 
     def __str__(self):
         return '\n'.join(str(msg) for msg in self.ServiceMessage)
+
+    @classmethod
+    def not_supported(cls):
+        msg = ServiceMessage.not_supported()
+        return cls(ServiceMessage=[msg])
 
 
 class Fob(PSBaseModel):
@@ -692,6 +705,11 @@ class ErrorMessageResponse(PSBaseModel):
     def errors(self):
         return str(self.ErrorMessage) if self.ErrorMessage else None
 
+    @classmethod
+    def not_supported(cls):
+        field_name = [k for k in cls.model_fields.keys() if k != 'ErrorMessage'][0]
+        return cls(**{field_name: None, 'ErrorMessage': ErrorMessage.not_supported()})
+
 
 class ServiceMessageResponse(PSBaseModel):
     ServiceMessageArray: ServiceMessageArray | None
@@ -703,3 +721,8 @@ class ServiceMessageResponse(PSBaseModel):
     @property
     def errors(self):
         return str(self.ServiceMessageArray) if self.ServiceMessageArray else None
+
+    @classmethod
+    def not_supported(cls):
+        field_name = [k for k in cls.model_fields.keys() if k != 'ServiceMessageArray'][0]
+        return cls(**{field_name: None, 'ServiceMessageArray': ServiceMessageArray.not_supported()})
