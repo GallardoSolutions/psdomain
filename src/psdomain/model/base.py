@@ -104,7 +104,7 @@ class ErrorMessage(PSBaseModel):
 
 def normalize_severity(values):
     try:
-        values['severity'] = Severity(values['severity'].capitalize())
+        values['severity'] = values['severity'].capitalize()
     except ValueError:
         raise ValueError(f"Invalid severity value: {values['severity']}")
     return values

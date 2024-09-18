@@ -15,6 +15,12 @@ def test_service_message():
     assert err.description == "Test Error"
     #
     assert str(err) == '223 - Test Error - Error'
+    # with severity in lowercase
+    err_str = '{"code": 223, "description": "Test Error", "severity": "error"}'
+    err = ServiceMessage.model_validate_json(err_str)
+    assert err.code == 223
+    assert err.description == "Test Error"
+    assert err.severity == Severity.ERROR
 
 
 def test_service_message_array():
