@@ -7,7 +7,7 @@ from pydantic import ValidationError
 
 from .fixtures import ppc_blank_ok, ppc_decorated_ok  # noqa
 from .responses.ppc import json_ppc_empty_response, ppc_inch_instead_of_inches_response, \
-    ppc_decoration_arr_non_existing, ppc_unknown_price_uom_response
+    ppc_decoration_arr_non_existing, ppc_unknown_price_uom_response, ppc_square_inches_response
 
 from psdomain.model.ppc import DecorationGeometryType, DecorationUomType, ConfigurationAndPricingResponse
 
@@ -143,3 +143,11 @@ def test_ppc_unknown_price_uom_response():
     # priceUom = "C" is not a valid value
     with pytest.raises(ValidationError):
         ConfigurationAndPricingResponse.model_validate(ppc_unknown_price_uom_response)
+
+
+def test_square_inches_decoration():
+    response = ConfigurationAndPricingResponse.model_validate_json(ppc_square_inches_response)
+    assert response.ErrorMessage is None
+    assert response.is_ok
+    decoration = response.locations[0].decorations[1]
+    assert decoration.decorationUnitsIncludedUom == DecorationUomType.SQUARE_INCHES

@@ -12,7 +12,7 @@ def normalize_uom(values, field_name):
         try:
             if values[field_name]:
                 val = values[field_name].capitalize()
-                if val == 'Square inches':
+                if val in ['Square inches', 'Squareinches']:
                     values[field_name] = DecorationUomType.SQUARE_INCHES
                 elif val == 'Inch':
                     values[field_name] = DecorationUomType.INCHES
