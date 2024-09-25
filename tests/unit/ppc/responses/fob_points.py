@@ -65,6 +65,35 @@ snugz_fob_point_china_response = {
     'ErrorMessage': None
 }
 
+snugs_fob_point_united_states_response = {
+    "ErrorMessage": None,
+    "FobPointArray": {
+        "FobPoint": [
+            {
+                "fobId": "23",
+                "fobPostalCode": "79906",
+                "fobCity": "El Paso",
+                "fobState": "TX",
+                "fobCountry": "UNITED STATES",
+                "CurrencySupportedArray": {
+                    "CurrencySupported": [
+                        {
+                            "currency": "USD"
+                        }
+                    ]
+                },
+                "ProductArray": {
+                    "Product": [
+                        {
+                            "productId": "LP12P-PB1"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
+
 
 pcna_fob_point_usa_response = {
     "ErrorMessage": None,

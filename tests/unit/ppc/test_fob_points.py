@@ -1,6 +1,7 @@
 # flake8: noqa F811
 from .fixtures import fob_points_ok  # noqa
-from .responses.fob_points import snugz_fob_point_china_response, pcna_fob_point_usa_response
+from .responses.fob_points import snugz_fob_point_china_response, snugs_fob_point_united_states_response, \
+    pcna_fob_point_usa_response
 
 from psdomain.model.ppc import FobPointsResponse
 from psdomain.model.base import Currency
@@ -47,6 +48,16 @@ def test_snugz_china():
     assert fp.fobCity is None
     assert fp.fobState == 'China'
     assert fp.fobCountry == 'CN'
+
+
+def test_snugz_united_states():
+    resp = FobPointsResponse.model_validate(snugs_fob_point_united_states_response)
+    fp = resp.fob_points[0]
+    assert fp.fobId == '23'
+    assert fp.fobPostalCode == '79906'
+    assert fp.fobCity == 'El Paso'
+    assert fp.fobState == 'TX'
+    assert fp.fobCountry == 'US'
 
 
 def test_pcna_usa():

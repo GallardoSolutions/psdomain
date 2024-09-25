@@ -4,7 +4,7 @@ def normalize_country(values, field='fobCountry'):
             values[field] = values[field].upper()
             if values[field] == 'CHINA':
                 values[field] = 'CN'
-            elif values[field] == 'USA':
+            elif values[field] in ['USA', 'UNITED STATES']:
                 values[field] = 'US'
     except ValueError:
         raise ValueError(f"Invalid country value: {values[field]}")
