@@ -35,3 +35,32 @@ json_response_ok = """{
     },
     "ErrorMessage": null
 }"""
+
+snugz_fob_point_china_response = {
+    'FobPointArray': {
+        'FobPoint': [
+            {
+                'fobId': '5',
+                'fobCity': None,
+                'fobState': 'China',
+                'fobPostalCode': 'Direct',
+                'fobCountry': 'CHINA',
+                'CurrencySupportedArray': {
+                    'CurrencySupported': [
+                        {
+                            'currency': 'USD'
+                        }
+                    ]
+                },
+                'ProductArray': {
+                    'Product': [
+                        {
+                            'productId': 'ILRP34MST'
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    'ErrorMessage': None
+}

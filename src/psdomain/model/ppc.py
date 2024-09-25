@@ -5,6 +5,7 @@ from pydantic import Field, model_validator
 
 from .product_data import common as product_data
 from . import base
+from .countries import normalize_country
 
 
 def normalize_uom(values, field_name):
@@ -116,12 +117,16 @@ class CurrencySupportedArray(base.PSBaseModel):
 
 class FobPoint(base.PSBaseModel):
     fobId: str
-    fobPostalCode: str
-    fobCity: str
-    fobState: str
-    fobCountry: str
+    fobPostalCode: str | None
+    fobCity: str | None
+    fobState: str | None
+    fobCountry: str | None
     CurrencySupportedArray: CurrencySupportedArray | None  # HIT error
     ProductArray: ProductArray | None  # Spector error
+
+    @model_validator(mode='before')
+    def normalize_dob_country(cls, values):
+        return normalize_country(values, 'fobCountry')
 
     def __str__(self):
         fob_id = f'{self.fobId[:10]}...' if self.fobId and len(self.fobId) > 10 else self.fobId
@@ -339,6 +344,51 @@ class Decoration(base.PSBaseModel):
     def has_extra_stitch_charge(self):
         return any(ch for ch in self.charges if ch.is_extra_stitch)
 
+    def get_set_up_price(self, decorations_included: int, qty: int, qty_dec: int,
+                         dec_uom: DecorationUomType, no_locs: int, repeat: bool = False) -> Decimal | None:
+        """
+        :param decorations_included: how many decorations are included in the price
+        :param qty: amount of units ordered
+        :param qty_dec: how many decorations are ordered
+        :param dec_uom: decorations unit of measure
+        :param no_locs: number of locations
+        :param repeat: is already a repeat order
+        :return: setup price if it exists, None otherwise
+        """
+        assert dec_uom == self.decorationUom
+        if self.itemPartQuantityLTM:
+            assert qty_dec >= self.itemPartQuantityLTM
+        for charge in self.charges:
+            if charge.is_setup:
+                ret = charge.get_charge_price(qty, repeat, qty_dec)
+                if no_locs > 1:
+                    ret *= no_locs
+                return ret
+
+    def get_run_price(self, decorations_included: int, qty: int, qty_dec: int,
+                      dec_uom: DecorationUomType, no_locs: int, repeat: bool = False):
+        """
+        :param decorations_included: how many decorations are included in the price
+        :param qty: amount of units ordered
+        :param qty_dec: how many decorations are ordered
+        :param dec_uom: decorations unit of measure
+        :param no_locs: number of locations
+        :param repeat: is already a repeat order
+        :return: run charge if it exists, None otherwise
+        """
+        assert dec_uom == self.decorationUom
+        if self.itemPartQuantityLTM:
+            assert qty_dec >= self.itemPartQuantityLTM
+        for charge in self.charges:
+            if charge.is_run:
+                # todo: add ChargesPerLocation and ChargesPerColor logic
+                new_qty_dec = qty_dec - decorations_included if decorations_included else qty_dec
+                ret = charge.get_charge_price(qty, repeat, new_qty_dec)
+                if no_locs > 1:
+                    other_locs_price = charge.get_charge_price(qty, repeat, qty_dec)
+                    ret + other_locs_price * (no_locs - 1)
+                return ret
+
 
 class DecorationArray(base.PSBaseModel):
     Decoration: list[Decoration]
@@ -357,6 +407,22 @@ class Location(base.PSBaseModel):
     @property
     def decorations(self):
         return self.DecorationArray.Decoration if self.DecorationArray else []
+
+    def get_prices(self, method: int, qty: int, qty_dec: int, dec_uom: DecorationUomType,
+                   no_locs: int = 1, repeat=False) -> (Decimal | None, Decimal | None):
+        # returns setup price, run charge for the given quantity if it exists, None otherwise
+        assert qty >= 0
+        assert qty_dec >= self.minDecoration
+        assert qty_dec < self.maxDecoration
+        assert no_locs >= 1
+
+        for decoration in self.decorations:
+            if decoration.decorationId != method:
+                continue
+            setup_price = decoration.get_set_up_price(self.decorationsIncluded, qty, qty_dec, dec_uom, no_locs, repeat)
+            run_price = decoration.get_run_price(self.decorationsIncluded, qty, qty_dec, dec_uom, no_locs, repeat)
+            return setup_price, run_price
+        return None, None
 
 
 class LocationArray(base.PSBaseModel):

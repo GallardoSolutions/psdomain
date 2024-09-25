@@ -1,5 +1,8 @@
 # flake8: noqa F811
 from .fixtures import fob_points_ok  # noqa
+from .responses.fob_points import snugz_fob_point_china_response
+
+from psdomain.model.ppc import FobPointsResponse
 
 
 def test_get_fob_points(fob_points_ok):
@@ -34,3 +37,12 @@ def test_currencies_in_response(fob_points_ok):
     got = fob_points_ok.currencies
     assert got == {'USD', 'CAD'}
 
+
+def test_snugz_china():
+    resp = FobPointsResponse.model_validate(snugz_fob_point_china_response)
+    fp = resp.fob_points[0]
+    assert fp.fobId == '5'
+    assert fp.fobPostalCode == 'Direct'
+    assert fp.fobCity is None
+    assert fp.fobState == 'China'
+    assert fp.fobCountry == 'CN'
