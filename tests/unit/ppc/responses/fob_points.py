@@ -64,3 +64,36 @@ snugz_fob_point_china_response = {
     },
     'ErrorMessage': None
 }
+
+
+pcna_fob_point_usa_response = {
+    "ErrorMessage": None,
+    "FobPointArray": {
+        "FobPoint": [
+            {
+                "fobId": "15068",
+                "fobPostalCode": "15068",
+                "fobCity": "New Kensington",
+                "fobState": "PA",
+                "fobCountry": "USA",
+                "CurrencySupportedArray": {
+                    "CurrencySupported": [
+                        {
+                            "currency": "CAD"
+                        },
+                        {
+                            "currency": "USD"
+                        }
+                    ]
+                },
+                "ProductArray": {
+                    "Product": [
+                        {
+                            "productId": "0011-86"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
