@@ -9,3 +9,18 @@ json_locations_response_ok = """{
     },
     "ErrorMessage": null
 }"""
+
+start_location_name_empty_response = {
+    'AvailableLocationArray': {
+        'AvailableLocation': [
+            {
+                'locationId': 0,
+                'locationName': None
+            }
+        ]
+    },
+    'ErrorMessage': {
+        'code': 204,
+        'description': '204: No Content Found'
+    }
+}

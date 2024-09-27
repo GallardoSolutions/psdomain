@@ -299,7 +299,7 @@ class Product(base.PSBaseModel):
 
 class Location(base.PSBaseModel):
     locationId: int
-    locationName: str
+    locationName: str | None
 
 
 class ProductSellable(base.PSBaseModel):
