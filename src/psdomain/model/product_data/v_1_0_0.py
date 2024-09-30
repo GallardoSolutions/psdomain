@@ -5,7 +5,9 @@ from .common import ProductCloseOutArray, ProductDateModifiedArray, Product, Pro
 
 
 class ProductV100(Product):
-    pass
+    def get_min_qty(self, currency='USD', configuration_type='Decorated'):
+        # because we don't have the information about the price group we will return None
+        return None
 
 
 class ProductResponseV100(base.ErrorMessageResponse):

@@ -173,6 +173,25 @@ class ProductPart(base.PSBaseModel):
 
     Color = property(_get_colors, _set_colors)
 
+    def get_size(self):
+        apparel_size = self.ApparelSize
+        if apparel_size:
+            label_size = apparel_size.labelSize or ''
+            if label_size.upper() == 'CUSTOM':
+                return apparel_size.customSize
+            return label_size
+        return ''
+
+    def get_primary_color(self):
+        arr = self.ColorArray
+        if arr:
+            primary_color = arr.Color[0]
+        else:
+            primary_color = self.primaryColor
+            if primary_color:
+                primary_color = primary_color.Color
+        return primary_color.colorName if primary_color else ''
+
 
 class ProductPartArray(base.PSBaseModel):
     ProductPart: list[ProductPart]
@@ -296,6 +315,81 @@ class Product(base.PSBaseModel):
 
         return sizes_list
 
+    @property
+    def name(self):
+        return self.productName
+
+    @property
+    def brand(self):
+        return self.productBrand
+
+    @property
+    def is_caution(self):
+        return self.isCaution or any(pp.isCaution for pp in self.ProductPartArray.ProductPart if pp.isCaution)
+
+    @property
+    def is_closeout(self):
+        return self.isCloseout or any(pp.isCloseout for pp in self.ProductPartArray.ProductPart if pp.isCloseout)
+
+    @property
+    def line_name(self):
+        return self.lineName
+
+    @property
+    def primary_image_url(self):
+        return self.primaryImageURL
+
+    @property
+    def country_of_origin(self):
+        return self.first_part.countryOfOrigin
+
+    @property
+    def primary_material(self):
+        return self.first_part.primaryMaterial
+
+    @property
+    def lead_time(self):
+        lead_times = [pp.leadTime for pp in self.ProductPartArray.ProductPart if pp.leadTime is not None]
+        if lead_times:
+            return min(lead_times)
+        return None
+
+    @property
+    def is_rush_service(self):
+        return self.first_part.isRushService
+
+    @property
+    def is_on_demand(self):
+        return self.first_part.isOnDemand
+
+    def get_description(self):
+        return '/n'.join([desc for desc in self.description])
+
+    def get_html_description(self):
+        return '<br>'.join([desc for desc in self.description])
+
+    @property
+    def first_part(self):
+        return self.ProductPartArray.ProductPart[0]
+
+    def get_variant(self, part_id):
+        for variant in self.get_variants():
+            if variant['partId'] == part_id:
+                return variant
+        return None
+
+    def get_variants(self):
+        variants = getattr(self, '_variants', None)
+        if variants is None:
+            variants = self.ProductPartArray.ProductPart
+            if self.has_sizes():
+                variants = sort_sizes(variants)
+            setattr(self, '_variants', variants)
+        return variants
+
+    def has_sizes(self):
+        return any(part.ApparelSize for part in self.ProductPartArray.ProductPart)
+
 
 class Location(base.PSBaseModel):
     locationId: int
@@ -328,3 +422,16 @@ class ProductCloseOut(base.PSBaseModel):
 
 class ProductCloseOutArray(base.PSBaseModel):
     ProductCloseOut: list[ProductCloseOut]
+
+
+SIZES = ["OSFA", "6XS", "5XS", "4XS", "3XS", "2XS", "XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL", "6XL",
+         "CUSTOM"]
+
+SIZES_INDEX = {size: i for i, size in enumerate(SIZES)} | {'': 1000}
+
+
+def sort_sizes(variants: list[ProductPart]) -> list[ProductPart]:
+    try:
+        return sorted(variants, key=lambda v: SIZES_INDEX.get(v.get_size(), v.get_primary_color()))
+    except TypeError:  # noqa
+        return variants

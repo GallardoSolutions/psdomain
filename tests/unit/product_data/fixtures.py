@@ -1,5 +1,9 @@
 import pytest
 
+from psdomain.model import ProductResponseV200
+
+from .responses.products import resp01940E1 as resp01940E1_dict
+
 null = None
 
 
@@ -27,3 +31,8 @@ def sellable_response():
         },
         "ServiceMessageArray": null
     }
+
+
+@pytest.fixture
+def resp_alpha():
+    yield ProductResponseV200.model_validate(resp01940E1_dict)

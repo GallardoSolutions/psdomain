@@ -4,8 +4,11 @@ from psdomain.model.product_data.v_2_0_0 import GetProductSellableResponseV200, 
     ProductDateModifiedResponseV200, ProductResponseV200
 from psdomain.model.product_data.v_1_0_0 import ProductCloseOutResponseV100, ProductDateModifiedResponseV100, \
     GetProductSellableResponseV100, ProductResponseV100
-from psdomain.model.base import Severity # noqa
-from .fixtures import sellable_response  # noqa
+from psdomain.model.base import Severity
+from psdomain.model.product_data.common import ProductPartArray, sort_sizes
+
+from .responses.product_parts import product_part_array
+from .fixtures import sellable_response, resp_alpha  # noqa
 
 
 def test_get_product_sellable_response_v200(sellable_response):
@@ -47,3 +50,65 @@ def test_not_supported_v100():
         msg = resp.ErrorMessage
         assert msg.code == 125
         assert msg.description == 'Not Supported'
+
+
+def test_sort_sizes():
+    """
+    Test sort_sizes function for product parts
+    """
+    product_parts = ProductPartArray.model_validate(product_part_array).ProductPart
+    sorted_parts = sort_sizes(product_parts)
+    for pp in sorted_parts[:8]:
+        assert pp.get_size() == 'XS'
+    for pp in sorted_parts[8:8+6]:
+        assert pp.get_size() == 'S'
+    for pp in sorted_parts[14:14+6]:
+        assert pp.get_size() == 'M'
+    for pp in sorted_parts[20:20+6]:
+        assert pp.get_size() == 'L'
+    for pp in sorted_parts[26:26+7]:
+        assert pp.get_size() == 'XL'
+    for pp in sorted_parts[33:33+7]:
+        assert pp.get_size() == '2XL'
+
+
+def test_html_description(resp_alpha):
+    """
+    Test html_description property for product
+    """
+    desc = resp_alpha.Product.get_html_description()
+    want = "4.1 oz., 20 singles; 50% recycled polyester, 38% cotton, 12% rayon;Bound self neckband; Blind hem <br>" \
+           "stitching detail on sleeves and bottom hem; Ladies' contemporary fit; Imperfectly knit to create <br>" \
+           "vintage striations; A- list status from CDP (Carbon Disclosure Project); Energy Star Partner of the <br>" \
+           "Year (14 consecutive years); Every piece of Alternative apparel purchased from our company qualifies <br>" \
+           "for Hanes4Education;"
+    assert desc == want
+
+
+def test_is_on_demand(resp_alpha):
+    """
+    Test is_on_demand property for product
+    """
+    assert resp_alpha.Product.is_on_demand is False
+
+
+def test_is_closeout(resp_alpha):
+    """
+    Test is_closeout property for product
+    """
+    assert resp_alpha.Product.is_closeout is False
+
+
+def test_brand(resp_alpha):
+    """
+    Test brand property for product
+    """
+    assert resp_alpha.Product.brand == 'Alternative'
+
+
+def test_get_min_qty(resp_alpha):
+    """
+    Test get_min_qty method for product
+    """
+    assert resp_alpha.Product.get_min_qty() == 1
+    assert resp_alpha.Product.get_min_qty('USD', 'Blank') == 1
