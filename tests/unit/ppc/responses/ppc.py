@@ -170,7 +170,7 @@ json_ppc_decorated_response_ok = """{
                                 "decorationUom": "Inches",
                                 "allowSubForDefaultLocation": false,
                                 "allowSubForDefaultMethod": false,
-                                "itemPartQuantityLTM": 0,
+                                "itemPartQuantityLTM": 50,
                                 "ChargeArray": {
                                     "Charge": [
                                         {

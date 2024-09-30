@@ -78,7 +78,7 @@ def test_decorations(ppc_decorated_ok):
     assert decoration.decorationUom == DecorationUomType.INCHES
     assert not decoration.allowSubForDefaultLocation
     assert not decoration.allowSubForDefaultMethod
-    assert decoration.itemPartQuantityLTM == 0
+    assert decoration.itemPartQuantityLTM == 50
 
 
 def test_decoration_charges(ppc_decorated_ok):
@@ -151,3 +151,26 @@ def test_square_inches_decoration():
     assert response.is_ok
     decoration = response.locations[0].decorations[1]
     assert decoration.decorationUnitsIncludedUom == DecorationUomType.SQUARE_INCHES
+
+
+def test_min_part_qty():
+    # because parts is empty, min_part_qty should return None
+    response = ConfigurationAndPricingResponse.model_validate_json(json_ppc_empty_response)
+    assert response.min_part_qty is None
+    #
+    resp = ConfigurationAndPricingResponse.model_validate(ppc_decoration_arr_non_existing)
+    assert resp.min_part_qty == 50
+
+
+def test_first_rush_lead_time(ppc_decorated_ok):
+    response = ConfigurationAndPricingResponse.model_validate_json(json_ppc_empty_response)
+    assert response.first_rush_lead_time is None
+    #
+    resp = ConfigurationAndPricingResponse.model_validate(ppc_decoration_arr_non_existing)
+    assert resp.first_rush_lead_time is None
+    #
+    assert ppc_decorated_ok.first_rush_lead_time == 1
+
+
+def test_ltm_qty(ppc_decorated_ok):
+    assert ppc_decorated_ok.ltm_qty == 50

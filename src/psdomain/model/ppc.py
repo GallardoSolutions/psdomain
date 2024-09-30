@@ -570,5 +570,39 @@ class ConfigurationAndPricingResponse(base.ErrorMessageResponse):
         return self.Configuration.parts if self.Configuration else []
 
     @property
+    def min_part_qty(self):
+        """
+        When pricing is called with Blank will return the minimum quantity for the first part for blank
+        When called with decorated we expect the minimum quantity for the first part for decorated
+        """
+        first_part = self.parts[0] if self.parts else None
+        if first_part:
+            return min(p.minQuantity for p in first_part.prices)
+        return None
+
+    @property
+    def ltm_qty(self):
+        """
+        :return: Less than minimum quantity
+        """
+        minimums = []
+        for loc in self.locations:
+            for dec in loc.decorations:
+                if dec.itemPartQuantityLTM:
+                    minimums.append(dec.itemPartQuantityLTM)
+        return min(minimums) if minimums else None
+
+    @property
     def fob_points(self):
         return self.Configuration.fob_points if self.Configuration else []
+
+    @property
+    def first_rush_lead_time(self):
+        """
+        :return: the first rush lead time
+        """
+        for loc in self.locations:
+            for dec in loc.decorations:
+                if dec.rushLeadTime:
+                    return dec.rushLeadTime
+        return None
