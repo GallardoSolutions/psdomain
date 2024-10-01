@@ -112,3 +112,11 @@ def test_get_min_qty(resp_alpha):
     """
     assert resp_alpha.Product.get_min_qty() == 1
     assert resp_alpha.Product.get_min_qty('USD', 'Blank') == 1
+
+
+def test_categories(resp_alpha):
+    """
+    Test categories property for product
+    """
+    assert resp_alpha.Product.categories == 'T-Shirts'
+

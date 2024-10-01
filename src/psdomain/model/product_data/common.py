@@ -390,6 +390,21 @@ class Product(base.PSBaseModel):
     def has_sizes(self):
         return any(part.ApparelSize for part in self.ProductPartArray.ProductPart)
 
+    @property
+    def categories(self):
+        # todo: check if this is what you want
+        cat_set = set()
+        for c in self.product_category_list:
+            if c.category:
+                cat_set.add(c.category)
+            if c.subCategory:
+                cat_set.add(c.subCategory)
+        return '|'.join(list(cat_set)) if cat_set else ''
+
+    @property
+    def product_category_list(self):
+        return self.ProductCategoryArray.ProductCategory if self.ProductCategoryArray else []
+
 
 class Location(base.PSBaseModel):
     locationId: int
