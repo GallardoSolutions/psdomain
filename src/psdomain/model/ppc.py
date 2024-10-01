@@ -597,6 +597,17 @@ class ConfigurationAndPricingResponse(base.ErrorMessageResponse):
         return self.Configuration.fob_points if self.Configuration else []
 
     @property
+    def first_lead_time(self):
+        """
+        :return: the first lead time
+        """
+        for loc in self.locations:
+            for dec in loc.decorations:
+                if dec.leadTime:
+                    return dec.leadTime
+        return None
+
+    @property
     def first_rush_lead_time(self):
         """
         :return: the first rush lead time
