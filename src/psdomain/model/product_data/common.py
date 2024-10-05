@@ -291,6 +291,10 @@ class Product(base.PSBaseModel):
     ProductMarketingPointArray:  typing.Optional[ProductMarketingPointArray] | None
 
     @property
+    def pk(self):
+        return self.productId  # primary key
+
+    @property
     def available_colors(self) -> list[Color]:
         colors_list = []
 
