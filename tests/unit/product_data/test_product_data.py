@@ -120,3 +120,12 @@ def test_categories(resp_alpha):
     """
     assert resp_alpha.Product.categories == 'T-Shirts'
 
+
+def test_variants_per_color(resp_alpha):
+    """
+    Test variants_per_color property for product
+    """
+    variants = resp_alpha.Product.variants_per_color
+    assert len(variants) > 0
+    parts = variants['ECO BLACK']
+    assert parts == ['B30924517', 'B30924516', 'B30924512']

@@ -308,6 +308,17 @@ class Product(base.PSBaseModel):
         return colors_list
 
     @property
+    def variants_per_color(self):
+        # useful for detecting variants per color in S&S Activewear and SanMar because they don't send part ids
+        ret = {}
+        for part in self.ProductPartArray.ProductPart:
+            color = part.get_primary_color()
+            if color not in ret:
+                ret[color] = []
+            ret[color].append(part.partId)
+        return ret
+
+    @property
     def sizes(self) -> list[str]:
         sizes_list = []
 
