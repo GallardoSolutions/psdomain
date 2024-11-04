@@ -155,3 +155,19 @@ def test_common_groups(resp_alpha):
     """
     common = resp_alpha.Product.common_groupings
     assert len(common) == 0
+
+
+def test_age_group(resp_alpha):
+    """
+    Test age_group property for product.ApparelSize
+    """
+    first_part = resp_alpha.Product.first_part
+    assert first_part.ApparelSize.google_age_group == 'adult'
+
+
+def test_google_gender(resp_alpha):
+    """
+    Test google_gender property for product.ApparelSize
+    """
+    first_part = resp_alpha.Product.first_part
+    assert first_part.ApparelSize.google_gender == 'female'

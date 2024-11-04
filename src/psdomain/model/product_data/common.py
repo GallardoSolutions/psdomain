@@ -53,13 +53,13 @@ class ApparelStyle(StrEnum):
     Mens = 'Mens'
     MensTall = 'MensTall'
 
-    @property
-    def kids(self):
-        return self in (ApparelStyle.Youth, ApparelStyle.Boys, ApparelStyle.Girls)
+    @classmethod
+    def kids(cls):
+        return ApparelStyle.Youth, ApparelStyle.Boys, ApparelStyle.Girls
 
-    @property
-    def adults(self):
-        return self in (ApparelStyle.Womens, ApparelStyle.WomensTall, ApparelStyle.Mens, ApparelStyle.MensTall)
+    @classmethod
+    def adults(cls):
+        return ApparelStyle.Womens, ApparelStyle.WomensTall, ApparelStyle.Mens, ApparelStyle.MensTall
 
     @property
     def is_unisex(self):
@@ -89,9 +89,9 @@ class ApparelSize(base.PSBaseModel):
         adult
         unisex can be kids or adult however we will use adult by default
         """
-        if self.apparelStyle in ApparelStyle.kids:
+        if self.apparelStyle in ApparelStyle.kids():
             return 'kids'
-        if self.apparelStyle in ApparelStyle.adults:
+        if self.apparelStyle in ApparelStyle.adults():
             return 'adult'
         return 'adult'
 
