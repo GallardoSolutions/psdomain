@@ -15,10 +15,28 @@ class ProductCategoryArray(base.PSBaseModel):
     ProductCategory: list[ProductCategory]
 
 
+class RelationTye(StrEnum):
+    Substitute = 'Substitute'
+    CompanionSell = 'Companion Sell'
+    CommonGrouping = 'Common Grouping'
+
+
 class RelatedProduct(base.PSBaseModel):
-    relationType: str
+    relationType: RelationTye
     productId: str
     partId: str | None
+
+    @property
+    def is_substitute(self):
+        return self.relationType == RelationTye.Substitute
+
+    @property
+    def is_companion_sell(self):
+        return self.relationType == RelationTye.CompanionSell
+
+    @property
+    def is_common_grouping(self):
+        return self.relationType == RelationTye.CommonGrouping
 
 
 class RelatedProductArray(base.PSBaseModel):
@@ -35,11 +53,63 @@ class ApparelStyle(StrEnum):
     Mens = 'Mens'
     MensTall = 'MensTall'
 
+    @property
+    def kids(self):
+        return self in (ApparelStyle.Youth, ApparelStyle.Boys, ApparelStyle.Girls)
+
+    @property
+    def adults(self):
+        return self in (ApparelStyle.Womens, ApparelStyle.WomensTall, ApparelStyle.Mens, ApparelStyle.MensTall)
+
+    @property
+    def is_unisex(self):
+        return self == ApparelStyle.Unisex
+
+    @property
+    def is_male(self):
+        return self in (ApparelStyle.Mens, ApparelStyle.MensTall)
+
+    @property
+    def is_female(self):
+        return self in (ApparelStyle.Womens, ApparelStyle.WomensTall)
+
 
 class ApparelSize(base.PSBaseModel):
-    apparelStyle: str
+    apparelStyle: ApparelStyle
     labelSize: str
     customSize: str | None
+
+    @property
+    def google_age_group(self) -> str:
+        """
+        newborn
+        infant
+        toddler
+        kids
+        adult
+        unisex can be kids or adult however we will use adult by default
+        """
+        if self.apparelStyle in ApparelStyle.kids:
+            return 'kids'
+        if self.apparelStyle in ApparelStyle.adults:
+            return 'adult'
+        return 'adult'
+
+    @property
+    def google_gender(self) -> str:
+        """
+        Male [male]
+        Female [female]
+        Unisex [unisex]
+        :return:
+        """
+        if self.apparelStyle.is_female:
+            return 'female'
+        if self.apparelStyle.is_male:
+            return 'male'
+        if self.apparelStyle.is_unisex:
+            return 'unisex'
+        return ''
 
 
 class Dimension(base.PSBaseModel):
@@ -419,6 +489,22 @@ class Product(base.PSBaseModel):
     @property
     def product_category_list(self):
         return self.ProductCategoryArray.ProductCategory if self.ProductCategoryArray else []
+
+    @property
+    def substitutes(self):
+        return [rp for rp in self.related_products if rp.is_substitute]
+
+    @property
+    def companions(self):
+        return [rp for rp in self.related_products if rp.is_companion_sell]
+
+    @property
+    def common_groupings(self):
+        return [rp for rp in self.related_products if rp.is_common_grouping]
+
+    @property
+    def related_products(self):
+        return self.RelatedProductArray.RelatedProduct if self.RelatedProductArray else []
 
 
 class Location(base.PSBaseModel):

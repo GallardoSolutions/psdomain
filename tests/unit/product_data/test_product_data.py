@@ -129,3 +129,29 @@ def test_variants_per_color(resp_alpha):
     assert len(variants) > 0
     parts = variants['ECO BLACK']
     assert parts == ['B30924517', 'B30924516', 'B30924512']
+
+
+def test_substitutes(resp_alpha):
+    """
+    Test substitutes property for product
+    """
+    substitutes = resp_alpha.Product.substitutes
+    assert len(substitutes) > 0
+    substitute_product_ids = {sub.productId for sub in substitutes}
+    assert substitute_product_ids == {'AA1973', 'EC3800'}
+
+
+def test_companion_sells(resp_alpha):
+    """
+    Test companion_sells property for product
+    """
+    companions = resp_alpha.Product.companions
+    assert len(companions) == 0
+
+
+def test_common_groups(resp_alpha):
+    """
+    Test common_groupings property for product
+    """
+    common = resp_alpha.Product.common_groupings
+    assert len(common) == 0
