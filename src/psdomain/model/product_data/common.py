@@ -10,6 +10,16 @@ class ProductCategory(base.PSBaseModel):
     category: str | None
     subCategory: str | None
 
+    @property
+    def full_category(self):
+        category = self.category
+        sub_category = self.subCategory
+        if category:
+            if sub_category:
+                return f'{category} > {sub_category}'.title()
+            return category.title()
+        return sub_category.title() if sub_category else 'Unknown'
+
 
 class ProductCategoryArray(base.PSBaseModel):
     ProductCategory: list[ProductCategory]
@@ -489,6 +499,15 @@ class Product(base.PSBaseModel):
     @property
     def product_category_list(self):
         return self.ProductCategoryArray.ProductCategory if self.ProductCategoryArray else []
+
+    @property
+    def main_category(self):
+        ret = 'Unknown'
+        lst = self.product_category_list
+        if lst:
+            return lst[0].full_category
+        # use keywords for these cases
+        return ret
 
     @property
     def substitutes(self):

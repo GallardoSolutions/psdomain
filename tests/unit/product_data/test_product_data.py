@@ -5,7 +5,8 @@ from psdomain.model.product_data.v_2_0_0 import GetProductSellableResponseV200, 
 from psdomain.model.product_data.v_1_0_0 import ProductCloseOutResponseV100, ProductDateModifiedResponseV100, \
     GetProductSellableResponseV100, ProductResponseV100
 from psdomain.model.base import Severity
-from psdomain.model.product_data.common import ProductPartArray, sort_sizes
+from psdomain.model.product_data.common import ProductPartArray, sort_sizes, ProductCategory, Product, \
+    ProductCategoryArray, RelatedProductArray, ProductKeywordArray, ProductMarketingPointArray
 
 from .responses.product_parts import product_part_array
 from .fixtures import sellable_response, resp_alpha  # noqa
@@ -60,15 +61,15 @@ def test_sort_sizes():
     sorted_parts = sort_sizes(product_parts)
     for pp in sorted_parts[:8]:
         assert pp.get_size() == 'XS'
-    for pp in sorted_parts[8:8+6]:
+    for pp in sorted_parts[8:8 + 6]:
         assert pp.get_size() == 'S'
-    for pp in sorted_parts[14:14+6]:
+    for pp in sorted_parts[14:14 + 6]:
         assert pp.get_size() == 'M'
-    for pp in sorted_parts[20:20+6]:
+    for pp in sorted_parts[20:20 + 6]:
         assert pp.get_size() == 'L'
-    for pp in sorted_parts[26:26+7]:
+    for pp in sorted_parts[26:26 + 7]:
         assert pp.get_size() == 'XL'
-    for pp in sorted_parts[33:33+7]:
+    for pp in sorted_parts[33:33 + 7]:
         assert pp.get_size() == '2XL'
 
 
@@ -171,3 +172,20 @@ def test_google_gender(resp_alpha):
     """
     first_part = resp_alpha.Product.first_part
     assert first_part.ApparelSize.google_gender == 'female'
+
+
+def test_full_category():
+    pc = ProductCategory(category='apparel', subCategory='t-shirts')
+    assert pc.full_category == 'Apparel > T-Shirts'
+    pc = ProductCategory(category='Drinkware', subCategory='tumblers')
+    assert pc.full_category == 'Drinkware > Tumblers'
+    #
+    product = Product(
+        productId='1035', productName='Tumbler',
+        ProductCategoryArray=ProductCategoryArray(ProductCategory=[pc]),
+        ProductPartArray=ProductPartArray(ProductPart=[]),
+        RelatedProductArray=RelatedProductArray(RelatedProduct=[]),
+        ProductKeywordArray=ProductKeywordArray(ProductKeyword=[]),
+        ProductMarketingPointArray=ProductMarketingPointArray(ProductMarketingPoint=[]),
+    )
+    assert product.main_category == 'Drinkware > Tumblers'
