@@ -294,6 +294,10 @@ class ProductPriceGroup(base.PSBaseModel):
     description: str | None
     ProductPriceArray: ProductPriceArray
 
+    @property
+    def prices(self):
+        return self.ProductPriceArray.ProductPrice if self.ProductPriceArray else []
+
 
 class ProductPriceGroupArray(base.PSBaseModel):
     ProductPriceGroup: list[ProductPriceGroup]
@@ -525,6 +529,58 @@ class Product(base.PSBaseModel):
     def related_products(self):
         return self.RelatedProductArray.RelatedProduct if self.RelatedProductArray else []
 
+    def get_price_and_cost(self, currency='USD', configuration_type='Decorated',
+                           variant: dict | None = None):
+        """
+        "ProductPriceGroupArray": {
+            "ProductPriceGroup": [
+                {
+                    "groupName": "USD-List-Blank_1",
+                    "currency": "USD",
+                    "description": "USD-List-Blank_1081-41BK,1081-41BL",
+                    "ProductPriceArray": {
+                        "ProductPrice": [
+                            {
+                                "quantityMax": null,
+                                "quantityMin": 1,
+                                "price": "30.980000000",
+                                "discountCode": "C"
+                            },
+                        ]
+                    }
+                }
+            ]
+        }
+        variant will be used for PPC, we can get the correct price for variants like Sanmar t-shirts
+        """
+        product_price_array = self.get_product_price_array(currency, configuration_type)
+        price = product_price_array[0].price if product_price_array else None
+        cost = get_cost(price, product_price_array[0].discountCode) if price else None
+        return price, cost
+
+    def get_list_price(self, currency='USD', configuration_type='Decorated'):
+        return self.get_price_and_cost(currency, configuration_type)[0]
+
+    @property
+    def price_groups(self):
+        return self.ProductPriceGroupArray.ProductPriceGroup if self.ProductPriceGroupArray else []
+
+    def get_product_price_array(self, currency, configuration_type):
+        conf_type = configuration_type.lower()
+        price_groups = self.price_groups
+        filtered_by_currency = [pg for pg in price_groups if pg.currency == currency]
+        for price_group in filtered_by_currency:
+            if price_group.description and conf_type in price_group.description.lower():
+                return price_group.prices
+        #
+        if filtered_by_currency:
+            price_group = filtered_by_currency[0]
+        elif price_groups:
+            price_group = price_groups[0]
+        else:
+            return []
+        return price_group.prices
+
 
 class Location(base.PSBaseModel):
     locationId: int
@@ -570,3 +626,31 @@ def sort_sizes(variants: list[ProductPart]) -> list[ProductPart]:
         return sorted(variants, key=lambda v: SIZES_INDEX.get(v.get_size(), v.get_primary_color()))
     except TypeError:  # noqa
         return variants
+
+
+def get_cost(price, discount_code: str = 'C'):
+    if isinstance(price, str):
+        price = Decimal(price)
+    discount_code = discount_code.upper() if discount_code else 'C'
+    factors = {
+        'A': 50,
+        'B': 45,
+        'C': 40,
+        'D': 35,
+        'E': 30,
+        'F': 25,
+        'G': 20,
+        'H': 15,
+        'I': 10,
+        'P': 50,
+        'Q': 45,
+        'R': 40,
+        'S': 35,
+        'T': 30,
+        'U': 25,
+        'V': 20,
+        'W': 15,
+        'X': 10,
+    }
+    ret = price * Decimal(1 - factors[discount_code]/100)
+    return ret.quantize(Decimal('.01'))

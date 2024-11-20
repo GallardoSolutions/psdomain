@@ -1,4 +1,5 @@
 # flake8: noqa F811
+from decimal import Decimal
 
 from psdomain.model.product_data.v_2_0_0 import GetProductSellableResponseV200, ProductCloseOutResponseV200, \
     ProductDateModifiedResponseV200, ProductResponseV200
@@ -189,3 +190,9 @@ def test_full_category():
         ProductMarketingPointArray=ProductMarketingPointArray(ProductMarketingPoint=[]),
     )
     assert product.main_category == 'Drinkware > Tumblers'
+
+
+def test_get_list_price(resp_alpha):
+    price = resp_alpha.Product.get_list_price()
+    assert price == Decimal('23.10')
+
