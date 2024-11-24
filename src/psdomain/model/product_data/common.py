@@ -387,7 +387,7 @@ class Product(base.PSBaseModel):
     def available_colors(self) -> list[Color]:
         colors_list = []
 
-        for part in self.ProductPartArray.ProductPart:
+        for part in self.parts or []:
             if part.ColorArray and part.ColorArray.Color:
                 colors = part.ColorArray.Color
                 for color in colors:
@@ -400,7 +400,7 @@ class Product(base.PSBaseModel):
     def variants_per_color(self):
         # useful for detecting variants per color in S&S Activewear and SanMar because they don't send part ids
         ret = {}
-        for part in self.ProductPartArray.ProductPart:
+        for part in self.parts:
             color = part.get_primary_color()
             if color not in ret:
                 ret[color] = []
@@ -411,7 +411,7 @@ class Product(base.PSBaseModel):
     def sizes(self) -> list[str]:
         sizes_list = []
 
-        for part in self.ProductPartArray.ProductPart:
+        for part in self.parts:
             if part.ApparelSize:
                 size_name = part.ApparelSize.labelSize
                 if size_name not in sizes_list:
@@ -429,11 +429,11 @@ class Product(base.PSBaseModel):
 
     @property
     def is_caution(self):
-        return self.isCaution or any(pp.isCaution for pp in self.ProductPartArray.ProductPart if pp.isCaution)
+        return self.isCaution or any(pp.isCaution for pp in self.parts if pp.isCaution)
 
     @property
     def is_closeout(self):
-        return self.isCloseout or any(pp.isCloseout for pp in self.ProductPartArray.ProductPart if pp.isCloseout)
+        return self.isCloseout or any(pp.isCloseout for pp in self.parts if pp.isCloseout)
 
     @property
     def line_name(self):
@@ -445,26 +445,30 @@ class Product(base.PSBaseModel):
 
     @property
     def country_of_origin(self):
-        return self.first_part.countryOfOrigin
+        fp = self.first_part
+        return fp.countryOfOrigin if fp else None
 
     @property
     def primary_material(self):
-        return self.first_part.primaryMaterial
+        fp = self.first_part
+        return fp.primaryMaterial if fp else None
 
     @property
     def lead_time(self):
-        lead_times = [pp.leadTime for pp in self.ProductPartArray.ProductPart if pp.leadTime is not None]
+        lead_times = [pp.leadTime for pp in self.parts if pp.leadTime is not None]
         if lead_times:
             return min(lead_times)
         return None
 
     @property
     def is_rush_service(self):
-        return self.first_part.isRushService
+        fp = self.first_part
+        return fp.isRushService if fp else None
 
     @property
     def is_on_demand(self):
-        return self.first_part.isOnDemand
+        fp = self.first_part
+        return fp.isOnDemand if fp else None
 
     def get_description(self):
         return '/n'.join([desc for desc in self.description])
@@ -474,7 +478,12 @@ class Product(base.PSBaseModel):
 
     @property
     def first_part(self):
-        return self.ProductPartArray.ProductPart[0]
+        parts = self.parts
+        return parts[0] if parts else None
+
+    @property
+    def parts(self):
+        return self.ProductPartArray.ProductPart or []
 
     def get_variant(self, part_id):
         for variant in self.get_variants():
@@ -485,14 +494,14 @@ class Product(base.PSBaseModel):
     def get_variants(self):
         variants = getattr(self, '_variants', None)
         if variants is None:
-            variants = self.ProductPartArray.ProductPart
+            variants = self.parts
             if self.has_sizes():
                 variants = sort_sizes(variants)
             setattr(self, '_variants', variants)
         return variants
 
     def has_sizes(self):
-        return any(part.ApparelSize for part in self.ProductPartArray.ProductPart)
+        return any(part.ApparelSize for part in self.parts)
 
     @property
     def categories(self):
