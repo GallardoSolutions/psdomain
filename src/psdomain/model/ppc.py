@@ -576,7 +576,7 @@ class ConfigurationAndPricingResponse(base.ErrorMessageResponse):
         When called with decorated we expect the minimum quantity for the first part for decorated
         """
         first_part = self.parts[0] if self.parts else None
-        if first_part:
+        if first_part and first_part.prices:
             return min(p.minQuantity for p in first_part.prices)
         return None
 
