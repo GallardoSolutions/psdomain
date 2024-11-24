@@ -178,6 +178,10 @@ def test_google_gender(resp_alpha):
 def test_full_category():
     pc = ProductCategory(category='apparel', subCategory='t-shirts')
     assert pc.full_category == 'Apparel > T-Shirts'
+    #
+    pc.subCategory = '-'
+    assert pc.full_category == 'Apparel'
+    #
     pc = ProductCategory(category='Drinkware', subCategory='tumblers')
     assert pc.full_category == 'Drinkware > Tumblers'
     #

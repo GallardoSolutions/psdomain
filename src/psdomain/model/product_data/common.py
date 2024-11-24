@@ -6,19 +6,24 @@ from .. import base
 from ..base import StrEnum
 
 
+def get_normalized_category(category: str) -> str:
+    ret = category.strip().title().replace('&Amp;', '&amp;') if category else ''
+    return ret if ret != '-' else ''
+
+
 class ProductCategory(base.PSBaseModel):
     category: str | None
     subCategory: str | None
 
     @property
     def full_category(self):
-        category = self.category
-        sub_category = self.subCategory
+        category = get_normalized_category(self.category)
+        sub_category = get_normalized_category(self.subCategory)
         if category:
             if sub_category:
-                return f'{category} > {sub_category}'.title()
-            return category.title()
-        return sub_category.title() if sub_category else 'Unknown'
+                return f'{category} > {sub_category}'
+            return category
+        return sub_category if sub_category else 'Unknown'
 
 
 class ProductCategoryArray(base.PSBaseModel):
