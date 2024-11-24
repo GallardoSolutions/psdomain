@@ -7,9 +7,10 @@ from pydantic import ValidationError
 
 from .fixtures import ppc_blank_ok, ppc_decorated_ok  # noqa
 from .responses.ppc import json_ppc_empty_response, ppc_inch_instead_of_inches_response, \
-    ppc_decoration_arr_non_existing, ppc_unknown_price_uom_response, ppc_square_inches_response
+    ppc_decoration_arr_non_existing, ppc_unknown_price_uom_response, ppc_square_inches_response, cutter_example
 
-from psdomain.model.ppc import DecorationGeometryType, DecorationUomType, ConfigurationAndPricingResponse
+from psdomain.model.ppc import DecorationGeometryType, DecorationUomType, ConfigurationAndPricingResponse, \
+    Part
 
 
 def test_is_ok(ppc_blank_ok):
@@ -174,3 +175,10 @@ def test_first_rush_lead_time(ppc_decorated_ok):
 
 def test_ltm_qty(ppc_decorated_ok):
     assert ppc_decorated_ok.ltm_qty == 50
+
+
+def test_part_group_required():
+    part = Part.model_validate(cutter_example)
+    assert part.partGroupRequired
+    assert part.partGroup == 1
+    assert part.partGroupDescription is None

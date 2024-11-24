@@ -1,7 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 
-from pydantic import Field, model_validator
+from pydantic import Field, model_validator, field_validator
 
 from .product_data import common as product_data
 from . import base
@@ -293,7 +293,7 @@ class DecorationGeometryType(base.StrEnum):
     RECTANGLE = "Rectangle"
     OTHER = "Other"
     NOT_AVAILABLE = "Not available"  # BIC/Koozie added this one in their response
-    IRREGULAR = "Irregular"          # BIC/Koozie added this one in their response
+    IRREGULAR = "Irregular"  # BIC/Koozie added this one in their response
 
 
 class Decoration(base.PSBaseModel):
@@ -504,8 +504,8 @@ class Part(base.PSBaseModel):
     partGroupRequired: bool = Field(description='A boolean value specifying if this partGroup is required for the '
                                                 'product configuration. If set to TRUE, a selection in the partGroup '
                                                 'is required for ordering')
-    partGroupDescription: str = Field(description='A description of the partGroup: Optional Lid`, `Straw',
-                                      examples=['Main Product', 'Optional Lid', 'Straw'])
+    partGroupDescription: str | None = Field(description='A description of the partGroup: Optional Lid`, `Straw',
+                                             examples=['Main Product', 'Optional Lid', 'Straw'])
     ratio: Decimal = Field(description='Describes how the amount of partIds that need to be added to the order '
                                        'based on the number of products ordered',
                            examples=[
@@ -515,6 +515,18 @@ class Part(base.PSBaseModel):
     defaultPart: bool | None = Field(description='This part is included in the “Basic Pricing Configuration” service '
                                                  'price. This field is optional, but highly encouraged')
     LocationIdArray: LocationIdArray | None
+
+    @field_validator('partGroupRequired', mode="before")
+    def check_part_group_required(cls, v, values, **kwargs):
+        if v is None:
+            return True  # default value based on Cutter & Buck
+        return v
+
+    @field_validator('ratio', mode="before")
+    def check_ratio(cls, v, values, **kwargs):
+        if v is None:
+            return 1  # default value
+        return v
 
     @property
     def prices(self) -> list[PartPrice]:

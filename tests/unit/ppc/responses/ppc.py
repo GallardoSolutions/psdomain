@@ -1569,5 +1569,27 @@ ppc_unknown_price_uom_response = {
     'ErrorMessage': None
 }
 
-
 ppc_square_inches_response = b'{"ErrorMessage":null,"Configuration":{"PartArray":{"Part":[{"partId":"EL225-47-00","partDescription":"EL225-10W FSC WOOD SPKR, Wood","PartPriceArray":{"PartPrice":[{"minQuantity":4,"discountCode":"C","price":"74.09","priceUom":"EA","priceEffectiveDate":"2024-01-01T00:00:00","priceExpiryDate":"2024-12-31T00:00:00"},{"minQuantity":12,"discountCode":"C","price":"71.82","priceUom":"EA","priceEffectiveDate":"2024-01-01T00:00:00","priceExpiryDate":"2024-12-31T00:00:00"},{"minQuantity":36,"discountCode":"C","price":"69.54","priceUom":"EA","priceEffectiveDate":"2024-01-01T00:00:00","priceExpiryDate":"2024-12-31T00:00:00"},{"minQuantity":72,"discountCode":"C","price":"64.99","priceUom":"EA","priceEffectiveDate":"2024-01-01T00:00:00","priceExpiryDate":"2024-12-31T00:00:00"}]},"partGroup":1,"nextPartGroup":null,"partGroupRequired":true,"partGroupDescription":"Main Part, EL225-10W FSC WOOD SPKR","ratio":"1.0","defaultPart":true,"LocationIdArray":{"LocationId":[{"locationId":130}]}}]},"LocationArray":{"Location":[{"locationId":130,"locationName":"Top","DecorationArray":{"Decoration":[{"decorationId":3,"decorationName":"Laser","decorationGeometry":"Rectangle","decorationHeight":"2.0000","decorationWidth":"4.0000","decorationDiameter":"0","decorationUom":"Inches","allowSubForDefaultLocation":true,"allowSubForDefaultMethod":true,"itemPartQuantityLTM":2,"ChargeArray":{"Charge":[{"chargeId":24,"chargeName":"Setup Charge: Laser","chargeType":"Setup","chargeDescription":"Setup Charge: Laser","ChargePriceArray":{"ChargePrice":[{"xMinQty":1,"xUom":"EA","yMinQty":1,"yUom":"Locations","price":"60.00","discountCode":"G","repeatPrice":"0","repeatDiscountCode":"G","priceEffectiveDate":"2024-01-01T00:00:00","priceExpiryDate":"2024-12-31T00:00:00"}]},"chargesAppliesLTM":false,"chargesPerLocation":0,"chargesPerColor":0},{"chargeId":26,"chargeName":"Laser Additional Location Charge","chargeType":"Run","chargeDescription":"Laser Additional Location Charge","ChargePriceArray":{"ChargePrice":[{"xMinQty":1,"xUom":"EA","yMinQty":1,"yUom":"Other","price":"1.20","discountCode":"G","repeatPrice":"1.20","repeatDiscountCode":"G","priceEffectiveDate":"2024-01-01T00:00:00","priceExpiryDate":"2024-12-31T00:00:00"}]},"chargesAppliesLTM":false,"chargesPerLocation":0,"chargesPerColor":0}]},"decorationUnitsIncluded":1,"decorationUnitsIncludedUom":"Colors","decorationUnitsMax":2,"defaultDecoration":true,"leadTime":3,"rushLeadTime":1},{"decorationId":20,"decorationName":"TruColor","decorationGeometry":"Rectangle","decorationHeight":"2.0000","decorationWidth":"6.0000","decorationDiameter":"0","decorationUom":"Inches","allowSubForDefaultLocation":true,"allowSubForDefaultMethod":true,"itemPartQuantityLTM":2,"ChargeArray":{"Charge":[{"chargeId":134,"chargeName":"Set-up TruColor","chargeType":"Setup","chargeDescription":"Set-up TruColor","ChargePriceArray":{"ChargePrice":[{"xMinQty":1,"xUom":"EA","yMinQty":1,"yUom":"Locations","price":"60.00","discountCode":"G","repeatPrice":"0","repeatDiscountCode":"G","priceEffectiveDate":"2024-01-01T00:00:00","priceExpiryDate":"2024-12-31T00:00:00"}]},"chargesAppliesLTM":false,"chargesPerLocation":0,"chargesPerColor":0},{"chargeId":137,"chargeName":"TruColor Large Imprint","chargeType":"Run","chargeDescription":"TruColor Large Imprint","ChargePriceArray":{"ChargePrice":[{"xMinQty":1,"xUom":"EA","yMinQty":1,"yUom":"Inches","price":"0.24","discountCode":"G","repeatPrice":"0.24","repeatDiscountCode":"G","priceEffectiveDate":"2024-01-01T00:00:00","priceExpiryDate":"2024-12-31T00:00:00"}]},"chargesAppliesLTM":false,"chargesPerLocation":0,"chargesPerColor":0}]},"decorationUnitsIncluded":3,"decorationUnitsIncludedUom":"SquareInches","decorationUnitsMax":12,"defaultDecoration":false,"leadTime":3,"rushLeadTime":1}]},"decorationsIncluded":1,"defaultLocation":true,"maxDecoration":1,"minDecoration":1,"locationRank":1}]},"productId":"EL225","currency":"USD","FobArray":{"Fob":[{"fobId":"1","fobPostalCode":"14072"}]},"fobPostalCode":null,"priceType":"List"}}'  # noqa
+
+cutter_example = {
+    'partId': '193804968925',
+    'partDescription': 'M',
+    'PartPriceArray': {
+        'PartPrice': [
+            {
+                'minQuantity': 1,
+                'price': 75.00,
+                'discountCode': None,
+                'priceUom': 'EA',
+                'priceEffectiveDate': datetime.datetime(2024, 11, 24, 22, 54, 3, 659293),
+                'priceExpiryDate': datetime.datetime(2025, 6, 30, 7, 0)
+            }
+        ]
+    },
+    'partGroup': 1,
+    'partGroupRequired': None,
+    'partGroupDescription': None,
+    'ratio': None,
+    'defaultPart': None,
+    'LocationIdArray': None,
+}
