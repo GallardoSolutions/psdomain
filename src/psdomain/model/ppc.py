@@ -293,6 +293,7 @@ class DecorationGeometryType(base.StrEnum):
     RECTANGLE = "Rectangle"
     OTHER = "Other"
     NOT_AVAILABLE = "Not available"  # BIC/Koozie added this one in their response
+    IRREGULAR = "Irregular"          # BIC/Koozie added this one in their response
 
 
 class Decoration(base.PSBaseModel):
