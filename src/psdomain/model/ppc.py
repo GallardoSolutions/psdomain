@@ -292,6 +292,7 @@ class DecorationGeometryType(base.StrEnum):
     CIRCLE = "Circle"
     RECTANGLE = "Rectangle"
     OTHER = "Other"
+    NOT_AVAILABLE = "Not available"  # BIC/Koozie added this one in their response
 
 
 class Decoration(base.PSBaseModel):
