@@ -646,6 +646,7 @@ def get_cost(price, discount_code: str = 'C'):
     if isinstance(price, str):
         price = Decimal(price)
     discount_code = discount_code.upper() if discount_code else 'C'
+    # https://cdn.asicentral.com/MKTGemails/401-12988/Codes.pdf
     factors = {
         'A': 50,
         'B': 45,
@@ -656,6 +657,12 @@ def get_cost(price, discount_code: str = 'C'):
         'G': 20,
         'H': 15,
         'I': 10,
+        'J': 5,
+        # 'X': 0,  ABC system
+        'L': 70,  # PQR system
+        'M': 65,
+        'N': 60,
+        'O': 55,
         'P': 50,
         'Q': 45,
         'R': 40,
@@ -665,6 +672,8 @@ def get_cost(price, discount_code: str = 'C'):
         'V': 20,
         'W': 15,
         'X': 10,
+        'Y': 5,
+        'Z': 0,
     }
     ret = price * Decimal(1 - factors[discount_code]/100)
     return ret.quantize(Decimal('.01'))
