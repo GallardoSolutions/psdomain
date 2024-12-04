@@ -675,5 +675,6 @@ def get_cost(price, discount_code: str = 'C'):
         'Y': 5,
         'Z': 0,
     }
-    ret = price * Decimal(1 - factors[discount_code]/100)
+    discount = factors.get(discount_code, 0)
+    ret = price * Decimal(1 - discount/100)
     return ret.quantize(Decimal('.01'))
