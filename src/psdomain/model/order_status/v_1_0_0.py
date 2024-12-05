@@ -12,8 +12,8 @@ The service has two endpoints:
 
 class RespondTo(PSBaseModel):
     name: str | None
-    email_address: str | None
-    phone_number: str | None
+    emailAddress: str | None
+    phoneNumber: str | None
 
 
 class ResponseToArray(PSBaseModel):
