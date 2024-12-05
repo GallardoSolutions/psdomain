@@ -10,14 +10,14 @@ The service has two endpoints:
 """
 
 
-class ResponseTo(PSBaseModel):
+class RespondTo(PSBaseModel):
     name: str | None
     email_address: str | None
     phone_number: str | None
 
 
 class ResponseToArray(PSBaseModel):
-    ResponseTo: list[ResponseTo]
+    RespondTo: list[RespondTo]
 
 
 class OrderStatusDetail(PSBaseModel):
@@ -94,3 +94,11 @@ class OrderStatusTypesResponse(PSBaseModel):
     """
     StatusArray: StatusArray | None
     errorMessage: str | None
+
+    @property
+    def is_ok(self):
+        return self.errorMessage is None or self.errorMessage == ''
+
+    @property
+    def errors(self) -> str | None:
+        return self.errorMessage if self.errorMessage else None
