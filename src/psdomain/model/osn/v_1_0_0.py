@@ -52,7 +52,7 @@ class PackageArray(base.PSBaseModel):
 
 
 class Address(base.PSBaseModel):
-    address1: base.String64
+    address1: base.String64 | None
     address2: base.String64 | None
     address3: base.String64 | None
     address4: base.String64 | None
