@@ -10,6 +10,7 @@ Function: getOrderShipmentNotification()
 """
 from datetime import datetime
 
+from pydantic import Field
 
 from .. import base
 from . import common
@@ -30,7 +31,7 @@ class ItemArray(base.PSBaseModel):
 
 
 class Package(base.PSBaseModel):
-    id: int | None
+    id: int | None = Field(default=None)
     trackingNumber: base.String128
     shipmentDate: datetime
     dimUOM: common.DimUOM | None
@@ -41,7 +42,7 @@ class Package(base.PSBaseModel):
     weight: float | None
     carrier: base.String128 | None
     shipmentMethod: str | None
-    shippingAccount: str | None
+    shippingAccount: str | None = Field(default=None)
     shipmentTerms: str | None
     ItemArray: ItemArray | None
 
