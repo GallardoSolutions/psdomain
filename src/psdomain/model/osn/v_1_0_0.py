@@ -56,9 +56,9 @@ class Address(base.PSBaseModel):
     address2: base.String64 | None
     address3: base.String64 | None
     address4: base.String64 | None
-    city: base.String64
-    region: base.String2
-    postalCode: base.String10
+    city: base.String64 | None
+    region: base.String2 | None
+    postalCode: base.String10 | None
     country: base.String128 | None
 
 
