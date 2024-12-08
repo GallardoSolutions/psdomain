@@ -10,7 +10,7 @@ Function: getOrderShipmentNotification()
 """
 from datetime import datetime
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from .. import base
 from . import common
@@ -28,6 +28,12 @@ class Item(base.PSBaseModel):
 
 class ItemArray(base.PSBaseModel):
     Item: list[Item]
+
+    @model_validator(mode='before')
+    def remove_empy_items(cls, values):
+        if 'Item' in values:
+            values['Item'] = [x for x in values['Item'] if x]
+        return values
 
 
 class Package(base.PSBaseModel):
@@ -57,7 +63,7 @@ class Address(base.PSBaseModel):
     address3: base.String64 | None
     address4: base.String64 | None
     city: base.String64 | None
-    region: base.String2 | None
+    region: str | None
     postalCode: base.String10 | None
     country: base.String128 | None
 
