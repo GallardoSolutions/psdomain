@@ -48,18 +48,21 @@ class MediaContentService:
         MediaContent.__lt__ = method  # MediaContent.lt_blank_thumbnail
         filtered_images = self.filter_by_product_id(product_id)
         new_medias = sorted(filtered_images) if filtered_images else sorted(self.images)
+        new_medias = [mc for mc in new_medias if mc.url]
         return new_medias[0].url if new_medias else ''
 
     def _get_blank_image_for_part(self, part_id: str, method) -> str:
         MediaContent.__lt__ = method  # MediaContent.lt_blank_thumbnail
         filtered_images = self.filter_by_part_id(part_id)
         new_medias = sorted(filtered_images)
+        new_medias = [mc for mc in new_medias if mc.url]
         return new_medias[0].url if new_medias else ''
 
     def _get_blank_image_for_part_color(self, color: str, method) -> str:
         MediaContent.__lt__ = method  # MediaContent.lt_blank_thumbnail
         filtered_images = self.filter_by_color(color)
         new_medias = sorted(filtered_images)
+        new_medias = [mc for mc in new_medias if mc.url]
         return new_medias[0].url if new_medias else ''
 
     def filter_by_part_id(self, part_id: str, only_highest_resolution=False) -> list[MediaContent]:
