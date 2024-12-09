@@ -331,7 +331,7 @@ class LocationDecorationArray(base.PSBaseModel):
 class FobPoint(base.PSBaseModel):
     fobId: str
     fobPostalCode: str
-    fobCity: str
+    fobCity: str | None  # SNUGZ is returning None for products from China
     fobState: str
     fobCountry: str
 
