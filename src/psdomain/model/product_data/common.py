@@ -170,7 +170,7 @@ class ShippingPackageArray(base.PSBaseModel):
 
 
 class Color(base.PSBaseModel):
-    colorName: str
+    colorName: str | None  # The color name is not required in the WSDL and SNUGZ have some products with None
     hex: str | None = None
     approximatePms: str | None = None
     standardColorName: str | None = None
