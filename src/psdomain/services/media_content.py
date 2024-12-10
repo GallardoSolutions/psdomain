@@ -49,7 +49,7 @@ class MediaContentService:
 
     def _get_blank_image_for_product(self, product_id: str, method) -> str:
         MediaContent.__lt__ = method  # MediaContent.lt_blank_thumbnail
-        filtered_images = self.filter_by_product_id(product_id)
+        filtered_images = [mc for mc in self.filter_by_product_id(product_id) if mc.is_displayable]
         new_medias = sorted(filtered_images) if filtered_images else sorted(self.images)
         new_medias = [mc for mc in new_medias if mc.url]
         return new_medias[0].url if new_medias else ''
