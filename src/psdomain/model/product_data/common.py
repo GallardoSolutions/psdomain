@@ -2,6 +2,8 @@ import typing
 from datetime import datetime
 from decimal import Decimal
 
+from pydantic import Field, model_validator
+
 from .. import base
 from ..base import StrEnum
 
@@ -245,7 +247,7 @@ class ProductPart(base.PSBaseModel):
     nmfcNumber: str | None
     isOnDemand: bool | None
     isHazmat: bool | None
-    primaryColor: PrimaryColor | None = None   # in V1 is not required
+    primaryColor: PrimaryColor | None = None  # in V1 is not required
     ColorArray: ColorArray | None
     ProductPackagingArray: ProductPackagingArray | None
     ShippingPackageArray: ShippingPackageArray | None
@@ -317,11 +319,19 @@ class ProductKeywordArray(base.PSBaseModel):
 
 
 class LocationDecoration(base.PSBaseModel):
-    locationName: str
-    maxImprintColors: int | None
-    decorationName: str
-    locationDecorationComboDefault: bool
-    priceIncludes: bool
+    locationName: str | None = Field(default=None)
+    maxImprintColors: int | None = Field(default=None)
+    decorationName: str | None = Field(default=None)
+    locationDecorationComboDefault: bool = Field(default=False)
+    priceIncludes: bool = Field(default=False)
+
+    @model_validator(mode='before')
+    def before(cls, values):
+        if values.get('priceIncludes') is None:
+            values['priceIncludes'] = False
+        if values.get('locationDecorationComboDefault') is None:
+            values['locationDecorationComboDefault'] = False
+        return values
 
 
 class LocationDecorationArray(base.PSBaseModel):
@@ -377,7 +387,7 @@ class Product(base.PSBaseModel):
     LocationDecorationArray: typing.Optional[LocationDecorationArray] = None  # in V1 is not required
     ProductPriceGroupArray: typing.Optional[ProductPriceGroupArray] = None  # in V1 is not required
     FobPointArray: typing.Optional[FobPointArray] = None  # in V1 is not required
-    ProductMarketingPointArray:  typing.Optional[ProductMarketingPointArray] | None
+    ProductMarketingPointArray: typing.Optional[ProductMarketingPointArray] | None
 
     @property
     def pk(self):
@@ -676,5 +686,5 @@ def get_cost(price, discount_code: str = 'C'):
         'Z': 0,
     }
     discount = factors.get(discount_code, 0)
-    ret = price * Decimal(1 - discount/100)
+    ret = price * Decimal(1 - discount / 100)
     return ret.quantize(Decimal('.01'))
