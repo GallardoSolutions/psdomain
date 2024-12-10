@@ -501,3 +501,6 @@ def test_gold():
 
     resp = ProductResponseV200.model_validate(data)
     assert resp.Product.productId == 'TWIST'
+    #
+    resp = ProductResponseV200.model_validate(resp)
+    assert resp.Product.productId == 'TWIST'

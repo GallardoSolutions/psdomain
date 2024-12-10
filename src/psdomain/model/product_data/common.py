@@ -327,10 +327,15 @@ class LocationDecoration(base.PSBaseModel):
 
     @model_validator(mode='before')
     def before(cls, values):
-        if values.get('priceIncludes') is None:
-            values['priceIncludes'] = False
-        if values.get('locationDecorationComboDefault') is None:
-            values['locationDecorationComboDefault'] = False
+        fields = ('priceIncludes', 'locationDecorationComboDefault')
+        if isinstance(values, dict):
+            for f in fields:
+                if values.get(f) is None:
+                    values[f] = False
+        else:
+            for f in fields:
+                if getattr(values, f) is None:
+                    setattr(values, f, False)
         return values
 
 
