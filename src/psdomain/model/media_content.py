@@ -294,6 +294,10 @@ class MediaContent(base.PSBaseModel):
     def is_swatch(self):
         return SWATCH in self.get_class_types()
 
+    @property
+    def is_displayable(self):
+        return self.is_image and self.url and not self.url.lower().endswith(('.psd', '.pdf'))
+
     def lt_blank_thumbnail(self, other: 'MediaContent'):
         return self.lt_single_part_blank_size(other, THUMBNAIL_SIZE)
 

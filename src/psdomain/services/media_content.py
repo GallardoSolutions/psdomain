@@ -32,6 +32,9 @@ class MediaContentService:
     def get_blank_base_for_product(self, product_id: str) -> str:
         return self._get_blank_image_for_product(product_id, MediaContent.lt_blank_base)
 
+    def get_displayable_blank_base_for_product(self, product_id: str) -> str:
+        return self._get_displayable_blank_image_for_product(product_id, MediaContent.lt_blank_base)
+
     def get_blank_thumbnail_for_part(self, part_id: str) -> str:
         return self._get_blank_image_for_part(part_id, MediaContent.lt_blank_thumbnail)
 
@@ -49,6 +52,13 @@ class MediaContentService:
         filtered_images = self.filter_by_product_id(product_id)
         new_medias = sorted(filtered_images) if filtered_images else sorted(self.images)
         new_medias = [mc for mc in new_medias if mc.url]
+        return new_medias[0].url if new_medias else ''
+
+    def _get_displayable_blank_image_for_product(self, product_id: str, method) -> str:
+        MediaContent.__lt__ = method  # MediaContent.lt_blank_thumbnail
+        filtered_images = self.filter_by_product_id(product_id)
+        new_medias = sorted(filtered_images) if filtered_images else sorted(self.images)
+        new_medias = [mc for mc in new_medias if mc.is_displayable]
         return new_medias[0].url if new_medias else ''
 
     def _get_blank_image_for_part(self, part_id: str, method) -> str:

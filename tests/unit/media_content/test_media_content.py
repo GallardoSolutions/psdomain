@@ -81,3 +81,40 @@ def test_get_unique_urls():
     response = MediaContentDetailsResponse(MediaContentArray=arr, errorMessage=None)
     unique_urls = response.get_unique_urls()
     assert unique_urls == {'http://www.example.com/1', 'http://www.example.com/2'}
+
+
+def test_is_displayable():
+    img_prefix = 'http://www.example.com/'
+    core_dict = dict(productId='2',
+                     ClassTypeArray=ClassTypeArray(ClassType=[]),
+                     DecorationArray=None,
+                     LocationArray=None,
+                     singlePart=True)
+    # Non Image are not displayable
+    for mt in ('Video', 'Audio', 'Document'):
+        mc = MediaContent(url=f'{img_prefix}/1',
+                          mediaType=mt,
+                          **core_dict)
+        assert not mc.is_displayable
+    # Image are displayable
+    mc = MediaContent(url=f'{img_prefix}/1',
+                      mediaType='Image',
+                      **core_dict)
+    assert mc.is_displayable
+    # Image with no URL are not displayable
+    mc = MediaContent(url=None,
+                      mediaType='Image',
+                      **core_dict)
+    assert not mc.is_displayable
+    # pdfs and psds are not displayable
+    for ext in ('pdf', 'psd', 'PSD', 'PDF'):
+        mc = MediaContent(url=f'{img_prefix}/1.{ext}',
+                          mediaType='Image',
+                          **core_dict)
+        assert not mc.is_displayable
+    # jpgs, pngs, gifs are displayable
+    for ext in ('jpg', 'png', 'gif', 'JPG', 'PNG', 'GIF'):
+        mc = MediaContent(url=f'{img_prefix}/1.{ext}',
+                          mediaType='Image',
+                          **core_dict)
+        assert mc.is_displayable
