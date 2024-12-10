@@ -214,7 +214,7 @@ class SpecificationType(StrEnum):
 
 class Specification(base.PSBaseModel):
     specificationType: SpecificationType
-    SpecificationUom: str
+    SpecificationUom: str | None  # The doc & wsdl says it is required but Sun Joy is returning None for some products
     measurementValue: str | None
 
 
