@@ -398,7 +398,7 @@ class DecorationArray(base.PSBaseModel):
 
 class Location(base.PSBaseModel):
     locationId: int
-    locationName: str
+    locationName: str | None = Field(description='The name of the location', default=None)
     DecorationArray: DecorationArray | None
     decorationsIncluded: int
     defaultLocation: bool
