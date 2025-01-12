@@ -225,6 +225,7 @@ class SpecificationArray(base.PSBaseModel):
 
 
 class ProductPart(base.PSBaseModel):
+    websiteUrl: str | None = Field(default=None, description='The URL of the product part in the supplier website')
     partId: str
     description: list[str]
     countryOfOrigin: str | None
@@ -365,6 +366,7 @@ class ProductMarketingPointArray(base.PSBaseModel):
 
 
 class Product(base.PSBaseModel):
+    websiteUrl: str | None = Field(default=None, description='The URL of the product in the supplier website')
     productId: str
     productName: str
     description: list[str] | None = None
