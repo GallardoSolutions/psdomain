@@ -228,7 +228,7 @@ class MediaContent(base.PSBaseModel):
     def is_blank(self):
         ret = BLANK in self.get_class_types()
         if ret:
-            return True
+            return not self.is_decorated  # Sometimes HIT has BLANK and Laser Engraving
         # hit has a Blank decoration
         return self.only_blank_decoration()
 
