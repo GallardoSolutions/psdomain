@@ -269,6 +269,22 @@ class MediaContent(base.PSBaseModel):
 
         return mc1_height_diff < mc2_height_diff
 
+    def lt_single_part_primary_size(self, other: 'MediaContent', size: int):
+        # Compare single part and primary
+        if self.singlePart != other.singlePart:
+            return True if self.singlePart else False
+        # Compare is_primary
+        if self.is_primary != other.is_primary:
+            return True if self.is_primary else False
+        # compare front
+        if self.is_front and not other.is_front:
+            return True
+        # Compare height difference from size
+        mc1_height_diff = abs(self.height - size) if self.height is not None else float('inf')
+        mc2_height_diff = abs(other.height - size) if other.height is not None else float('inf')
+
+        return mc1_height_diff < mc2_height_diff
+
     def lt_dimension(self, other: 'MediaContent'):
         mc1_height = self.height or float('inf')
         mc2_height = other.height or float('inf')
@@ -306,6 +322,9 @@ class MediaContent(base.PSBaseModel):
 
     def lt_blank_base(self, other: 'MediaContent'):
         return self.lt_single_part_blank_size(other, BASE_SIZE)
+
+    def lt_primary_base(self, other: 'MediaContent'):
+        return self.lt_single_part_primary_size(other, BASE_SIZE)
 
 
 class MediaContentArray(base.PSBaseModel):
