@@ -10,8 +10,17 @@ class MediaContentService:
         return [mc for mc in self.media_content_response.MediaContent if mc.is_image]
 
     @property
-    def different_dimensions(self):
-        return any((mc.height for mc in self.images))
+    def different_dimensions(self) -> bool:
+        all_heights = {mc.height for mc in self.images}
+        if len(all_heights) > 1:
+            ordered_heights = sorted(all_heights)
+            for height in ordered_heights:
+                # GEMLINE has different dimensions but they are not unique
+                if len([mc for mc in self.images if mc.height == height]) == 1:
+                    return False
+            return True
+        else:
+            return False
 
     @property
     def highest_resolution(self):
