@@ -118,3 +118,17 @@ def test_is_displayable():
                           mediaType='Image',
                           **core_dict)
         assert mc.is_displayable
+
+
+def test_is_too_big():
+    img_prefix = 'https://www.example.com/'
+    core_dict = dict(productId='2',
+                     ClassTypeArray=ClassTypeArray(ClassType=[]),
+                     DecorationArray=None,
+                     LocationArray=None,
+                     singlePart=True)
+    # if no filesize, no height, or no with, it is not too big
+    mc = MediaContent(url=f'{img_prefix}/1',
+                      mediaType='Image',
+                      **core_dict)
+    assert not mc.is_too_big

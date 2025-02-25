@@ -70,7 +70,7 @@ class MediaContentService:
         filtered_images = [mc for mc in self.filter_by_product_id(product_id) if mc.is_displayable]
         new_medias = sorted(filtered_images) if filtered_images else sorted(self.images)
         new_medias = [mc for mc in new_medias if mc.url]
-        return new_medias[0].url if new_medias else ''
+        return new_medias[0].standard_url if new_medias else ''
 
     def _get_primary_image_for_product(self, product_id: str) -> str:
         return self._get_blank_image_for_product(product_id, MediaContent.lt_primary_base)
@@ -80,21 +80,21 @@ class MediaContentService:
         filtered_images = self.filter_by_product_id(product_id)
         new_medias = sorted(filtered_images) if filtered_images else sorted(self.images)
         new_medias = [mc for mc in new_medias if mc.is_displayable]
-        return new_medias[0].url if new_medias else ''
+        return new_medias[0].standard_url if new_medias else ''
 
     def _get_blank_image_for_part(self, part_id: str, method) -> str:
         MediaContent.__lt__ = method  # MediaContent.lt_blank_thumbnail
         filtered_images = self.filter_by_part_id(part_id)
         new_medias = sorted(filtered_images)
         new_medias = [mc for mc in new_medias if mc.url]
-        return new_medias[0].url if new_medias else ''
+        return new_medias[0].standard_url if new_medias else ''
 
     def _get_blank_image_for_part_color(self, color: str, method) -> str:
         MediaContent.__lt__ = method  # MediaContent.lt_blank_thumbnail
         filtered_images = self.filter_by_color(color)
         new_medias = sorted(filtered_images)
         new_medias = [mc for mc in new_medias if mc.url]
-        return new_medias[0].url if new_medias else ''
+        return new_medias[0].standard_url if new_medias else ''
 
     def filter_by_part_id(self, part_id: str, only_highest_resolution=False) -> list[MediaContent]:
         images = self.best_images if only_highest_resolution else self.images
@@ -112,22 +112,18 @@ class MediaContentService:
                 if mc.productId == product_id and (mc.partId is None or mc.partId == product_id)]
 
     def rest_of_images_for_product(self, product_id: str, url: str) -> list[MediaContent]:
-        return [
-            mc
-            for mc in self.filter_by_product_id(product_id, only_highest_resolution=True)
-            if mc.url != url
-        ]
+        return self._rest_of_images_by(self.filter_by_product_id, product_id, url)
 
     def rest_of_images_for_part(self, part_id: str, url: str) -> list[MediaContent]:
-        return [
-            mc
-            for mc in self.filter_by_part_id(part_id, only_highest_resolution=True)
-            if mc.url != url
-        ]
+        return self._rest_of_images_by(self.filter_by_part_id, part_id, url)
 
     def rest_of_images_for_color(self, color: str, url: str) -> list[MediaContent]:
+        return self._rest_of_images_by(self.filter_by_color, color, url)
+
+    @staticmethod
+    def _rest_of_images_by(method, value, url):
         return [
             mc
-            for mc in self.filter_by_color(color, only_highest_resolution=True)
-            if mc.url != url
+            for mc in method(value, only_highest_resolution=True)
+            if mc.standard_url != url
         ]

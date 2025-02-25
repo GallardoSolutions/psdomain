@@ -1,12 +1,15 @@
+import os
 from datetime import datetime
 
 # reference https://tools.promostandards.org/media-content-1-1-0
 from . import base
 
-
 THUMBNAIL_SIZE = 50
 SMALL_SIZE = 470
 BASE_SIZE = 1100
+BEST_SIZE = 1900
+
+PS_MEDX_HOST = os.getenv('PS_MEDX_HOST', 'https://psmedx.com/')
 
 
 class MediaType(base.StrEnum):
@@ -131,34 +134,34 @@ INTERNAL = 900  # Internal Use
 # classType	Class Name	Description
 # 0-499	    Reserved	Reserved for future use
 # 500-999	Custom	    Custom class types for implementation specific use.
-FRONT = 1007    # Front view
-REAR = 1008    # Rear view
+FRONT = 1007  # Front view
+REAR = 1008  # Rear view
 UNSPECIFIED = 1000  # Unspecified, Unknown or unspecified shot. This value means the shot type is unavailable for
-                    # the media type.  # noqa
-BLANK = 1001    # The shot is of blank media
+# the media type.  # noqa
+BLANK = 1001  # The shot is of blank media
 DECORATED = 1002  # The shot is of decorated media
 ALTERNATE = 1003  # The shot is alternate. This may indicate the product is combined with other media to stage a scene.
-SWATCH = 1004    # The shot is of a swatch
-CUSTOM = 1005    # The shot is custom which does not fall into any specific type
-PRIMARY = 1006    # The primary image
-RIGHT = 1009    # Right view
-LEFT = 1010    # Left view
-TOP = 1011    # Top view
-BOTTOM = 1012    # Bottom view
-INSIDE = 1013    # Inside view
-OUTSIDE = 1014    # Outside view
+SWATCH = 1004  # The shot is of a swatch
+CUSTOM = 1005  # The shot is custom which does not fall into any specific type
+PRIMARY = 1006  # The primary image
+RIGHT = 1009  # Right view
+LEFT = 1010  # Left view
+TOP = 1011  # Top view
+BOTTOM = 1012  # Bottom view
+INSIDE = 1013  # Inside view
+OUTSIDE = 1014  # Outside view
 # The next ones are mostly for videos
-STANDARD = 2000    # Standard Definition
-HIGH = 2001    # High definition
+STANDARD = 2000  # Standard Definition
+HIGH = 2001  # High definition
 #
-PODCAST = 3000    # Podcast
+PODCAST = 3000  # Podcast
 #
-SPECS = 4000    # Specification sheets
-PRODUCT_SAFETY = 4001    # Product safety information
-FACTS = 4002    # Fact sheets
-COMPLIANCE = 4003    # Compliance documents
-ART_TEMPLATE = 4004    # Art templates
-MARKETING = 4005    # Marketing material
+SPECS = 4000  # Specification sheets
+PRODUCT_SAFETY = 4001  # Product safety information
+FACTS = 4002  # Fact sheets
+COMPLIANCE = 4003  # Compliance documents
+ART_TEMPLATE = 4004  # Art templates
+MARKETING = 4005  # Marketing material
 
 
 class MediaContent(base.PSBaseModel):
@@ -177,6 +180,7 @@ class MediaContent(base.PSBaseModel):
     ClassTypeArray: ClassTypeArray
     DecorationArray: DecorationArray | None
     LocationArray: LocationArray | None
+
     # decorationId: int | None  # Appears in the WSDL but Deprecated. Use DecorationArray.
 
     def __lt__(self, other):
@@ -325,6 +329,20 @@ class MediaContent(base.PSBaseModel):
 
     def lt_primary_base(self, other: 'MediaContent'):
         return self.lt_single_part_primary_size(other, BASE_SIZE)
+
+    @property
+    def standard_url(self):
+        # if size > 25 MG, return resize from psmedx
+        if self.is_too_big:
+            return f'{PS_MEDX_HOST}resize/?image_url={self.url}&width={BEST_SIZE}'
+        return self.url
+
+    @property
+    def is_too_big(self):
+        # 25 MG
+        max_size = 25000000
+        return (self.fileSize and self.fileSize >= max_size) or (self.width and self.width > 2000) \
+            or (self.height and self.height > 2000)
 
 
 class MediaContentArray(base.PSBaseModel):
