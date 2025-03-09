@@ -28,8 +28,12 @@ class MediaContentService:
 
     @property
     def best_images(self):
+        def is_highest_resolution(mc, hr):
+            return mc.height and abs(mc.height - hr) < 10
+
         if self.different_dimensions:
-            return [mc for mc in self.images if mc.height == self.highest_resolution]
+            highest_resolution = self.highest_resolution
+            return [mc for mc in self.images if is_highest_resolution(mc, highest_resolution)]
         return self.images
 
     def get_blank_thumbnail_for_product(self, product_id: str) -> str:
