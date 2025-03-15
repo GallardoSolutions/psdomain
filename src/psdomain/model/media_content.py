@@ -248,6 +248,12 @@ class MediaContent(base.PSBaseModel):
         return PRIMARY in self.get_class_types()
 
     @property
+    def is_high_res(self):
+        return (self.height and self.height >= 1000) or \
+            (self.dpi and self.dpi > 300) or \
+            HIGH in self.get_class_types()
+
+    @property
     def decorations(self):
         return self.DecorationArray.Decoration if self.DecorationArray else []
 

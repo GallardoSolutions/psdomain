@@ -1106,3 +1106,412 @@ ARIEL_RESPONSE = MediaContentDetailsResponse.model_validate({
     },
     "errorMessage": null
 })
+
+
+SANMAR_RESPONSE = MediaContentDetailsResponse.model_validate({
+    "errorMessage": null,
+    "MediaContentArray": {
+        "MediaContent": [
+            {
+                "productId": "NF0A3LH1",
+                "partId": null,
+                "url": "https://cdnm.sanmar.com/imglib/mresjpg/2017/f20/NF0A3LH1_black_form_back.jpg",
+                "mediaType": "Image",
+                "fileSize": 216340.0,
+                "width": 1200,
+                "height": 1799,
+                "dpi": 300,
+                "color": "TNF Black",
+                "description": null,
+                "singlePart": true,
+                "changeTimeStamp": null,
+                "ClassTypeArray": {
+                    "ClassType": [
+                        {
+                            "classTypeId": 1008,
+                            "classTypeName": "Rear"
+                        }
+                    ]
+                },
+                "DecorationArray": null,
+                "LocationArray": null
+            },
+            {
+                "productId": "NF0A3LH1",
+                "partId": null,
+                "url": "https://cdnm.sanmar.com/imglib/mresjpg/2017/f20/NF0A3LH1_darkgreyhthr_form_back.jpg",
+                "mediaType": "Image",
+                "fileSize": 399537.0,
+                "width": 1200,
+                "height": 1800,
+                "dpi": 300,
+                "color": "TNF Dk Grey He",
+                "description": null,
+                "singlePart": true,
+                "changeTimeStamp": null,
+                "ClassTypeArray": {
+                    "ClassType": [
+                        {
+                            "classTypeId": 1008,
+                            "classTypeName": "Rear"
+                        }
+                    ]
+                },
+                "DecorationArray": null,
+                "LocationArray": null
+            },
+            {
+                "productId": "NF0A3LH1",
+                "partId": null,
+                "url": "https://cdnm.sanmar.com/imglib/mresjpg/2017/f20/NF0A3LH1_black_form_front.jpg",
+                "mediaType": "Image",
+                "fileSize": 170162.0,
+                "width": 1200,
+                "height": 1800,
+                "dpi": 300,
+                "color": "TNF Black",
+                "description": null,
+                "singlePart": true,
+                "changeTimeStamp": null,
+                "ClassTypeArray": {
+                    "ClassType": [
+                        {
+                            "classTypeId": 1007,
+                            "classTypeName": "Front"
+                        }
+                    ]
+                },
+                "DecorationArray": null,
+                "LocationArray": null
+            },
+            {
+                "productId": "NF0A3LH1",
+                "partId": null,
+                "url": "https://cdnm.sanmar.com/imglib/mresjpg/2017/f20/NF0A3LH1_darkgreyhthr_form_front.jpg",
+                "mediaType": "Image",
+                "fileSize": 419778.0,
+                "width": 1200,
+                "height": 1800,
+                "dpi": 300,
+                "color": "TNF Dk Grey He",
+                "description": null,
+                "singlePart": true,
+                "changeTimeStamp": null,
+                "ClassTypeArray": {
+                    "ClassType": [
+                        {
+                            "classTypeId": 1007,
+                            "classTypeName": "Front"
+                        }
+                    ]
+                },
+                "DecorationArray": null,
+                "LocationArray": null
+            },
+            {
+                "productId": "NF0A3LH1",
+                "partId": null,
+                "url": "https://cdnm.sanmar.com/catalog/images/NF0A3LH1.jpg",
+                "mediaType": "Image",
+                "fileSize": 12702.0,
+                "width": 300,
+                "height": 450,
+                "dpi": null,
+                "color": "TNF Black",
+                "description": null,
+                "singlePart": true,
+                "changeTimeStamp": null,
+                "ClassTypeArray": {
+                    "ClassType": [
+                        {
+                            "classTypeId": 1006,
+                            "classTypeName": "Primary"
+                        }
+                    ]
+                },
+                "DecorationArray": null,
+                "LocationArray": null
+            },
+            {
+                "productId": "NF0A3LH1",
+                "partId": null,
+                "url": "https://cdnm.sanmar.com/catalog/images/NF0A3LH1.jpg",
+                "mediaType": "Image",
+                "fileSize": 12702.0,
+                "width": 300,
+                "height": 450,
+                "dpi": null,
+                "color": "TNF Dk Grey He",
+                "description": null,
+                "singlePart": true,
+                "changeTimeStamp": null,
+                "ClassTypeArray": {
+                    "ClassType": [
+                        {
+                            "classTypeId": 1006,
+                            "classTypeName": "Primary"
+                        }
+                    ]
+                },
+                "DecorationArray": null,
+                "LocationArray": null
+            },
+            {
+                "productId": "NF0A3LH1",
+                "partId": null,
+                "url": "https://cdnm.sanmar.com/catalog/images/NF0A3LH1sw.jpg",
+                "mediaType": "Image",
+                "fileSize": 3333.0,
+                "width": 141,
+                "height": 94,
+                "dpi": null,
+                "color": "TNF Black",
+                "description": null,
+                "singlePart": true,
+                "changeTimeStamp": null,
+                "ClassTypeArray": {
+                    "ClassType": [
+                        {
+                            "classTypeId": 1004,
+                            "classTypeName": "Swatch"
+                        }
+                    ]
+                },
+                "DecorationArray": null,
+                "LocationArray": null
+            },
+            {
+                "productId": "NF0A3LH1",
+                "partId": null,
+                "url": "https://cdnm.sanmar.com/catalog/images/NF0A3LH1sw.jpg",
+                "mediaType": "Image",
+                "fileSize": 3333.0,
+                "width": 141,
+                "height": 94,
+                "dpi": null,
+                "color": "TNF Dk Grey He",
+                "description": null,
+                "singlePart": true,
+                "changeTimeStamp": null,
+                "ClassTypeArray": {
+                    "ClassType": [
+                        {
+                            "classTypeId": 1004,
+                            "classTypeName": "Swatch"
+                        }
+                    ]
+                },
+                "DecorationArray": null,
+                "LocationArray": null
+            },
+            {
+                "productId": "NF0A3LH1",
+                "partId": null,
+                "url": "https://cdnm.sanmar.com/imglib/mresjpg/2024/f11/NF0A3LH1_tnfblack_model_side.jpg",
+                "mediaType": "Image",
+                "fileSize": 362100.0,
+                "width": 1200,
+                "height": 1800,
+                "dpi": 300,
+                "color": "TNF Black",
+                "description": null,
+                "singlePart": true,
+                "changeTimeStamp": null,
+                "ClassTypeArray": {
+                    "ClassType": [
+                        {
+                            "classTypeId": 500,
+                            "classTypeName": "Custom"
+                        }
+                    ]
+                },
+                "DecorationArray": null,
+                "LocationArray": null
+            },
+            {
+                "productId": "NF0A3LH1",
+                "partId": null,
+                "url": "https://cdnm.sanmar.com/imglib/mresjpg/2024/f11/NF0A3LH1_tnfdarkgreyheather_model_side.jpg",
+                "mediaType": "Image",
+                "fileSize": 378151.0,
+                "width": 1200,
+                "height": 1800,
+                "dpi": 300,
+                "color": "TNF Dk Grey He",
+                "description": null,
+                "singlePart": true,
+                "changeTimeStamp": null,
+                "ClassTypeArray": {
+                    "ClassType": [
+                        {
+                            "classTypeId": 500,
+                            "classTypeName": "Custom"
+                        }
+                    ]
+                },
+                "DecorationArray": null,
+                "LocationArray": null
+            },
+            {
+                "productId": "NF0A3LH1",
+                "partId": null,
+                "url": "https://cdnm.sanmar.com/imglib/mresjpg/2024/f11/NF0A3LH1_tnfblack_model_back.jpg",
+                "mediaType": "Image",
+                "fileSize": 353211.0,
+                "width": 1200,
+                "height": 1800,
+                "dpi": 300,
+                "color": "TNF Black",
+                "description": null,
+                "singlePart": true,
+                "changeTimeStamp": null,
+                "ClassTypeArray": {
+                    "ClassType": [
+                        {
+                            "classTypeId": 502,
+                            "classTypeName": "Custom"
+                        }
+                    ]
+                },
+                "DecorationArray": null,
+                "LocationArray": null
+            },
+            {
+                "productId": "NF0A3LH1",
+                "partId": null,
+                "url": "https://cdnm.sanmar.com/imglib/mresjpg/2024/f11/NF0A3LH1_tnfdarkgreyheather_model_back.jpg",
+                "mediaType": "Image",
+                "fileSize": 484076.0,
+                "width": 1200,
+                "height": 1800,
+                "dpi": 300,
+                "color": "TNF Dk Grey He",
+                "description": null,
+                "singlePart": true,
+                "changeTimeStamp": null,
+                "ClassTypeArray": {
+                    "ClassType": [
+                        {
+                            "classTypeId": 502,
+                            "classTypeName": "Custom"
+                        }
+                    ]
+                },
+                "DecorationArray": null,
+                "LocationArray": null
+            },
+            {
+                "productId": "NF0A3LH1",
+                "partId": null,
+                "url": "https://cdnm.sanmar.com/swatch/gifs/TNF_H1_Black.gif",
+                "mediaType": "Image",
+                "fileSize": 1062.0,
+                "width": 35,
+                "height": 35,
+                "dpi": null,
+                "color": "TNF Black",
+                "description": null,
+                "singlePart": true,
+                "changeTimeStamp": null,
+                "ClassTypeArray": {
+                    "ClassType": [
+                        {
+                            "classTypeId": 504,
+                            "classTypeName": "Custom"
+                        }
+                    ]
+                },
+                "DecorationArray": null,
+                "LocationArray": null
+            },
+            {
+                "productId": "NF0A3LH1",
+                "partId": null,
+                "url": "https://cdnm.sanmar.com/swatch/gifs/TNF_H1_DarkGreyHthr.gif",
+                "mediaType": "Image",
+                "fileSize": 2232.0,
+                "width": 35,
+                "height": 35,
+                "dpi": null,
+                "color": "TNF Dk Grey He",
+                "description": null,
+                "singlePart": true,
+                "changeTimeStamp": null,
+                "ClassTypeArray": {
+                    "ClassType": [
+                        {
+                            "classTypeId": 504,
+                            "classTypeName": "Custom"
+                        }
+                    ]
+                },
+                "DecorationArray": null,
+                "LocationArray": null
+            },
+            {
+                "productId": "NF0A3LH1",
+                "partId": null,
+                "url": "https://cdnm.sanmar.com/imglib/mresjpg/2024/f11/NF0A3LH1_tnfblack_model_front.jpg",
+                "mediaType": "Image",
+                "fileSize": 455793.0,
+                "width": 1200,
+                "height": 1800,
+                "dpi": 300,
+                "color": "TNF Black",
+                "description": null,
+                "singlePart": true,
+                "changeTimeStamp": null,
+                "ClassTypeArray": {
+                    "ClassType": [
+                        {
+                            "classTypeId": 2001,
+                            "classTypeName": "High"
+                        },
+                        {
+                            "classTypeId": 1006,
+                            "classTypeName": "Primary"
+                        },
+                        {
+                            "classTypeId": 1007,
+                            "classTypeName": "Front"
+                        }
+                    ]
+                },
+                "DecorationArray": null,
+                "LocationArray": null
+            },
+            {
+                "productId": "NF0A3LH1",
+                "partId": null,
+                "url": "https://cdnm.sanmar.com/imglib/mresjpg/2024/f11/NF0A3LH1_tnfdarkgreyheather_model_front.jpg",
+                "mediaType": "Image",
+                "fileSize": 500012.0,
+                "width": 1200,
+                "height": 1800,
+                "dpi": 300,
+                "color": "TNF Dk Grey He",
+                "description": null,
+                "singlePart": true,
+                "changeTimeStamp": null,
+                "ClassTypeArray": {
+                    "ClassType": [
+                        {
+                            "classTypeId": 2001,
+                            "classTypeName": "High"
+                        },
+                        {
+                            "classTypeId": 1006,
+                            "classTypeName": "Primary"
+                        },
+                        {
+                            "classTypeId": 1007,
+                            "classTypeName": "Front"
+                        }
+                    ]
+                },
+                "DecorationArray": null,
+                "LocationArray": null
+            }
+        ]
+    }
+})

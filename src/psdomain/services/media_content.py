@@ -7,20 +7,11 @@ class MediaContentService:
 
     @property
     def images(self) -> list[MediaContent]:
-        return [mc for mc in self.media_content_response.MediaContent if mc.is_image]
-
-    @property
-    def different_dimensions(self) -> bool:
-        all_heights = {mc.height for mc in self.images}
-        if len(all_heights) > 1:
-            ordered_heights = sorted(all_heights)
-            for height in ordered_heights:
-                # GEMLINE has different dimensions but they are not unique
-                if len([mc for mc in self.images if mc.height == height]) == 1:
-                    return False
-            return True
-        else:
-            return False
+        _images = getattr(self, '_images', None)
+        if _images is None:
+            _images = [mc for mc in self.media_content_response.MediaContent if mc.is_image]
+            setattr(self, '_images', _images)
+        return _images
 
     @property
     def highest_resolution(self):
@@ -28,13 +19,7 @@ class MediaContentService:
 
     @property
     def best_images(self):
-        def is_highest_resolution(mc, hr):
-            return mc.height and abs(mc.height - hr) < 10
-
-        if self.different_dimensions:
-            highest_resolution = self.highest_resolution
-            return [mc for mc in self.images if is_highest_resolution(mc, highest_resolution)]
-        return self.images
+        return [mc for mc in self.images if mc.is_high_res]
 
     def get_blank_thumbnail_for_product(self, product_id: str) -> str:
         return self._get_blank_image_for_product(product_id, MediaContent.lt_blank_thumbnail)
