@@ -214,7 +214,7 @@ class FilterValuesResponseV200(PSBaseModel):
     ServiceMessageArray: base.ServiceMessageArray | None
 
 
-class InventoryLevelsResponseV200(PSBaseModel):
+class InventoryLevelsResponseV200(base.ServiceMessageResponse):
     Inventory: Inventory | None  # An object containing the inventory levels for the given product
     ServiceMessageArray: base.ServiceMessageArray | None
 

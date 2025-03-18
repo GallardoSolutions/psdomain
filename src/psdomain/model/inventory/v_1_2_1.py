@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from pydantic import constr, field_validator
 
-from ..base import PSBaseModel, ZERO
+from ..base import PSBaseModel, ZERO, ErrorMessageResponse
 
 
 class AttributeFlex(PSBaseModel):
@@ -70,7 +70,7 @@ class ProductCompanionInventoryArray(PSBaseModel):
     ProductCompanionInventory: List[ProductCompanionInventory]
 
 
-class InventoryLevelsResponseV121(PSBaseModel):
+class InventoryLevelsResponseV121(ErrorMessageResponse):
     productID: constr(max_length=64)
     ProductVariationInventoryArray: Optional[ProductVariationInventoryArray]
     ProductCompanionInventoryArray: Optional[ProductCompanionInventoryArray] | None = None
