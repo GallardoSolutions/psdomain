@@ -75,9 +75,10 @@ class DecorationMethodArray(base.PSBaseModel):
 class DecorationColors(base.PSBaseModel):
     productId: str
     locationId: int
-    pmsMatch: bool
-    fullColor: bool = Field(description="Set to true if the decoration method is full color process; False implies "
-                                        "that number of colors is irrelevant")
+    pmsMatch: bool | None = Field(None, description="TRUE, if PMS match is possible"),
+    fullColor: bool | None = Field(None,
+                                   description="Set to true if the decoration method is full color process; "
+                                               "False implies that number of colors is irrelevant")
     ColorArray: ColorArray | None  # the docs say this is required, but HIT does not have it
     DecorationMethodArray: DecorationMethodArray | None  # # the docs say this is required but not sure
 

@@ -1,6 +1,7 @@
 # flake8: noqa F811
-
+from psdomain.model import DecorationColorResponse
 from .fixtures import decoration_colors_ok  # noqa
+from .responses.decoration_colors import decoration_colors_response_pms_match_and_full_color_null
 
 
 def test_colors(decoration_colors_ok):
@@ -26,3 +27,12 @@ def test_decoration_methods(decoration_colors_ok):
     decoration_method = decoration_methods[1]
     assert decoration_method.decorationId == 2
     assert decoration_method.decorationName == 'Imprinted'
+
+
+def test_decoration_colors_pms_match_and_full_color_null():
+    # although the documentation says that pmsMatch and fullColor are required boolean values,
+    # the wsdl says they are optional and can be null
+    resp = DecorationColorResponse.model_validate(decoration_colors_response_pms_match_and_full_color_null)
+    assert resp.ErrorMessage is None
+    assert resp.DecorationColors.pmsMatch is None
+    assert resp.DecorationColors.fullColor is None
