@@ -2,7 +2,7 @@ import typing
 from datetime import datetime
 from decimal import Decimal
 
-from pydantic import Field, model_validator
+from pydantic import Field, model_validator, field_validator
 
 from .. import base
 from ..base import StrEnum
@@ -54,6 +54,14 @@ class RelatedProduct(base.PSBaseModel):
     @property
     def is_common_grouping(self):
         return self.relationType == RelationTye.CommonGrouping
+
+    @field_validator('relationType', mode='before')
+    @classmethod
+    def map_invalid_relation_type(cls, v):
+        if isinstance(v, str):
+            if v.strip().lower() == "you may also like":
+                return RelationTye.Substitute
+        return v
 
 
 class RelatedProductArray(base.PSBaseModel):

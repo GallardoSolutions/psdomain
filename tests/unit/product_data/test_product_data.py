@@ -7,7 +7,7 @@ from psdomain.model.product_data.v_1_0_0 import ProductCloseOutResponseV100, Pro
     GetProductSellableResponseV100, ProductResponseV100
 from psdomain.model.base import Severity
 from psdomain.model.product_data.common import ProductPartArray, sort_sizes, ProductCategory, Product, \
-    ProductCategoryArray, RelatedProductArray, ProductKeywordArray, ProductMarketingPointArray
+    ProductCategoryArray, RelatedProductArray, ProductKeywordArray, ProductMarketingPointArray, RelatedProduct
 
 from .responses.product_parts import product_part_array
 from .fixtures import sellable_response, resp_alpha  # noqa
@@ -200,3 +200,22 @@ def test_get_list_price(resp_alpha):
     price = resp_alpha.Product.get_list_price()
     assert price == Decimal('23.10')
 
+
+def test_relation_type():
+    """
+    <RelatedProduct>
+        <relationType>You may also like</relationType>
+        <productId>332222</productId>
+        <partId />
+    </RelatedProduct>
+    :return:
+    """
+    data = {
+        'relationType': 'You may also like',
+        'productId': '332222',
+        'partId': None
+    }
+    product = RelatedProduct(**data)
+    assert product.is_substitute is True
+    assert product.is_companion_sell is False
+    assert product.is_common_grouping is False

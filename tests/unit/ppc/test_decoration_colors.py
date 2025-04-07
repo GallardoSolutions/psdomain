@@ -36,3 +36,31 @@ def test_decoration_colors_pms_match_and_full_color_null():
     assert resp.ErrorMessage is None
     assert resp.DecorationColors.pmsMatch is None
     assert resp.DecorationColors.fullColor is None
+    response = {
+        'DecorationColors': {
+            'ColorArray': {
+                'Color': [
+                    {
+                        'colorId': '563',
+                        'colorName': 'CMYK'
+                    }
+                ]
+            },
+            'productId': 'AM01',
+            'locationId': 16986,
+            'DecorationMethodArray': {
+                'DecorationMethod': [
+                    {
+                        'decorationId': 115,
+                        'decorationName': '4 Color'
+                    }
+                ]
+            },
+            'pmsMatch': None,
+            'fullColor': None
+        },
+        'ErrorMessage': None
+    }
+    resp = DecorationColorResponse.model_validate(response)
+    assert resp.DecorationColors.pmsMatch is None
+    assert resp.DecorationColors.fullColor is None
