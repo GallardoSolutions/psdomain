@@ -6,7 +6,7 @@ from psdomain.model.product_data.v_2_0_0 import GetProductSellableResponseV200, 
 from psdomain.model.product_data.v_1_0_0 import ProductCloseOutResponseV100, ProductDateModifiedResponseV100, \
     GetProductSellableResponseV100, ProductResponseV100
 from psdomain.model.base import Severity
-from psdomain.model.product_data.common import ProductPartArray, sort_sizes, ProductCategory, Product, \
+from psdomain.model.product_data.common import ProductPartArray, sort_sizes, ProductCategory, Product, ApparelSize, \
     ProductCategoryArray, RelatedProductArray, ProductKeywordArray, ProductMarketingPointArray, RelatedProduct
 
 from .responses.product_parts import product_part_array
@@ -219,3 +219,15 @@ def test_relation_type():
     assert product.is_substitute is True
     assert product.is_companion_sell is False
     assert product.is_common_grouping is False
+
+
+def test_apparel_size_fallback():
+    data = {
+        'apparelStyle': 'Unisex',
+        'labelSize': '',  # blank label
+    }
+
+    size = ApparelSize(**data)
+
+    assert size.labelSize == '-'
+    assert size.customSize == 'CUSTOM'

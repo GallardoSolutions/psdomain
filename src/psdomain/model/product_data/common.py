@@ -104,6 +104,16 @@ class ApparelSize(base.PSBaseModel):
     labelSize: str
     customSize: str | None
 
+    @model_validator(mode='before')
+    @classmethod
+    def fill_missing_label_size(cls, data):
+        # Showdown Displays is sending empty labelSize
+        label = data.get('labelSize')
+        if not label or not str(label).strip():
+            data['labelSize'] = '-'
+            data['customSize'] = 'CUSTOM'
+        return data
+
     @property
     def google_age_group(self) -> str:
         """
