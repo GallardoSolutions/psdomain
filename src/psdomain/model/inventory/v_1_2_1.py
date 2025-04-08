@@ -73,7 +73,7 @@ class ProductCompanionInventoryArray(PSBaseModel):
 class InventoryLevelsResponseV121(PSBaseModel):
     productID: constr(max_length=64)
     ProductVariationInventoryArray: Optional[ProductVariationInventoryArray]
-    ProductCompanionInventoryArray: Optional[ProductCompanionInventoryArray] | None = None
+    ProductCompanionInventoryArray: Optional[ProductCompanionInventoryArray]
     errorMessage: Optional[constr(max_length=256)] = None
     CustomMessageArray: Optional[List[CustomMessage]] = None
     errorMessage: str | None
