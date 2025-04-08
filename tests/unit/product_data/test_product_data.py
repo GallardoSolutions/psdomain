@@ -1,5 +1,6 @@
 # flake8: noqa F811
 from decimal import Decimal
+from dataclasses import dataclass
 
 from psdomain.model.product_data.v_2_0_0 import GetProductSellableResponseV200, ProductCloseOutResponseV200, \
     ProductDateModifiedResponseV200, ProductResponseV200
@@ -229,5 +230,18 @@ def test_apparel_size_fallback():
 
     size = ApparelSize(**data)
 
+    assert size.labelSize == '-'
+    assert size.customSize == 'CUSTOM'
+    #
+    @dataclass
+    class Obj:
+        apparelStyle: str
+        labelSize: str | None
+        customSize: str | None
+
+
+    obj = Obj(apparelStyle='Unisex', labelSize=None, customSize=None)
+    size = ApparelSize.model_validate(obj)
+    assert size.apparelStyle == 'Unisex'
     assert size.labelSize == '-'
     assert size.customSize == 'CUSTOM'

@@ -108,10 +108,16 @@ class ApparelSize(base.PSBaseModel):
     @classmethod
     def fill_missing_label_size(cls, data):
         # Showdown Displays is sending empty labelSize
-        label = data.get('labelSize')
-        if not label or not str(label).strip():
-            data['labelSize'] = '-'
-            data['customSize'] = 'CUSTOM'
+        if isinstance(data, dict):
+            label = data.get('labelSize')
+            if not label or not label.strip():
+                data['labelSize'] = '-'
+                data['customSize'] = 'CUSTOM'
+        else:
+            label = data.labelSize
+            if not label or not label.strip():
+                data.labelSize = '-'
+                data.customSize = 'CUSTOM'
         return data
 
     @property
