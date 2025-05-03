@@ -528,7 +528,7 @@ class Product(base.PSBaseModel):
 
     def get_variant(self, part_id):
         for variant in self.get_variants():
-            if variant['partId'] == part_id:
+            if variant.partId == part_id:
                 return variant
         return None
 

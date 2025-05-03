@@ -68,9 +68,10 @@ class ServiceCode(StrEnum):
 
 
 class ServiceVersion(StrEnum):
-    V1 = 'v1.0.0'
-    V121 = 'v1.2.1'
-    V2 = 'v2.0.0'
+    V_1_0_0 = 'v1.0.0'
+    V_1_1_0 = 'v1.1.0'
+    V_1_2_1 = 'v1.2.1'
+    V_2_0_0 = 'v2.0.0'
 
 
 class ConfigurationType(StrEnum):
