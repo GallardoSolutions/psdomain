@@ -11,6 +11,9 @@ from .countries import normalize_country
 def normalize_uom(values, field_name):
     if field_name in values:
         try:
+            if values[field_name] is None and field_name == 'decorationUom':
+                if values.get('decorationName')  == 'Full Color':
+                    values[field_name] = 'Colors'
             if values[field_name]:
                 val = values[field_name].capitalize()
                 if val in ['Square inches', 'Squareinches']:

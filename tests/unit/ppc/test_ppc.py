@@ -7,7 +7,8 @@ from pydantic import ValidationError
 
 from .fixtures import ppc_blank_ok, ppc_decorated_ok  # noqa
 from .responses.ppc import json_ppc_empty_response, ppc_inch_instead_of_inches_response, bambams_example, \
-    ppc_decoration_arr_non_existing, ppc_unknown_price_uom_response, ppc_square_inches_response, cutter_example
+    ppc_decoration_arr_non_existing, ppc_unknown_price_uom_response, ppc_square_inches_response, cutter_example, \
+    bambams_decoration_uom_none
 
 from psdomain.model.ppc import DecorationGeometryType, DecorationUomType, ConfigurationAndPricingResponse, \
     Part
@@ -191,3 +192,12 @@ def test_bambams_ppc_decorated():
     location = locations[0]
     assert location.minDecoration == 0
     assert location.maxDecoration == 10
+
+
+def test_bambams_ppc_decoration_uom_is_none():
+    response = ConfigurationAndPricingResponse.model_validate_json(bambams_decoration_uom_none)
+    assert response.ErrorMessage is None
+    locations = response.Configuration.LocationArray.Location
+    location = locations[0]
+    decoration = location.decorations[0]
+    assert decoration.decorationUom == DecorationUomType.COLORS
