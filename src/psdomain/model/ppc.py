@@ -427,6 +427,18 @@ class Location(base.PSBaseModel):
             return setup_price, run_price
         return None, None
 
+    @field_validator('minDecoration', mode="before")
+    def check_min_decoration(cls, v, values, **kwargs):
+        if v is None:
+            return 0  # default value so BamBams don't return error
+        return v
+
+    @field_validator('maxDecoration', mode="before")
+    def check_max_decoration(cls, v, values, **kwargs):
+        if v is None:
+            return 10  # default value so BamBams don't return error
+        return v
+
 
 class LocationArray(base.PSBaseModel):
     Location: list[Location]

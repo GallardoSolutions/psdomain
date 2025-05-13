@@ -6,7 +6,7 @@ import pytest
 from pydantic import ValidationError
 
 from .fixtures import ppc_blank_ok, ppc_decorated_ok  # noqa
-from .responses.ppc import json_ppc_empty_response, ppc_inch_instead_of_inches_response, \
+from .responses.ppc import json_ppc_empty_response, ppc_inch_instead_of_inches_response, bambams_example, \
     ppc_decoration_arr_non_existing, ppc_unknown_price_uom_response, ppc_square_inches_response, cutter_example
 
 from psdomain.model.ppc import DecorationGeometryType, DecorationUomType, ConfigurationAndPricingResponse, \
@@ -182,3 +182,12 @@ def test_part_group_required():
     assert part.partGroupRequired
     assert part.partGroup == 1
     assert part.partGroupDescription is None
+
+
+def test_bambams_ppc_decorated():
+    response = ConfigurationAndPricingResponse.model_validate(bambams_example)
+    assert response.ErrorMessage is None
+    locations = response.Configuration.LocationArray.Location
+    location = locations[0]
+    assert location.minDecoration == 0
+    assert location.maxDecoration == 10
