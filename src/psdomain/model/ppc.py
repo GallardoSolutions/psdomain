@@ -20,6 +20,8 @@ def normalize_uom(values, field_name):
                     values[field_name] = DecorationUomType.SQUARE_INCHES
                 elif val == 'Inch':
                     values[field_name] = DecorationUomType.INCHES
+                elif val == 'Location':  # Evans added this one in their response
+                    values[field_name] = DecorationUomType.LOCATIONS
                 else:
                     values[field_name] = DecorationUomType(val)
         except ValueError:
