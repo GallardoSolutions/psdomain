@@ -8,7 +8,7 @@ from pydantic import ValidationError
 from .fixtures import ppc_blank_ok, ppc_decorated_ok  # noqa
 from .responses.ppc import json_ppc_empty_response, ppc_inch_instead_of_inches_response, bambams_example, \
     ppc_decoration_arr_non_existing, ppc_unknown_price_uom_response, ppc_square_inches_response, cutter_example, \
-    bambams_decoration_uom_none
+    bambams_decoration_uom_none, evans_geometry
 
 from psdomain.model.ppc import DecorationGeometryType, DecorationUomType, ConfigurationAndPricingResponse, \
     Part
@@ -201,3 +201,21 @@ def test_bambams_ppc_decoration_uom_is_none():
     location = locations[0]
     decoration = location.decorations[0]
     assert decoration.decorationUom == DecorationUomType.COLORS
+
+
+def test_evans_geometry_na_and_square():
+    response = ConfigurationAndPricingResponse.model_validate_json(evans_geometry)
+    assert response.ErrorMessage is None
+    loc = response.locations[0]
+    decoration = loc.decorations[0]
+    assert decoration.decorationGeometry == DecorationGeometryType.NOT_AVAILABLE
+    #
+    new_text = evans_geometry.replace('"Na"', '"n/a"')
+    response = ConfigurationAndPricingResponse.model_validate_json(new_text)
+    decoration = response.locations[0].decorations[0]
+    assert decoration.decorationGeometry == DecorationGeometryType.NOT_AVAILABLE
+    # Test for square geometry
+    new_text = evans_geometry.replace('"Na"', '"Square"')
+    response = ConfigurationAndPricingResponse.model_validate_json(new_text)
+    decoration = response.locations[0].decorations[0]
+    assert decoration.decorationGeometry == DecorationGeometryType.SQUARE

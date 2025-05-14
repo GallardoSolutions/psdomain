@@ -296,8 +296,10 @@ class DecorationGeometryType(base.StrEnum):
     CIRCLE = "Circle"
     RECTANGLE = "Rectangle"
     OTHER = "Other"
+    # Non-Standard types
     NOT_AVAILABLE = "Not available"  # BIC/Koozie added this one in their response
     IRREGULAR = "Irregular"  # BIC/Koozie added this one in their response
+    SQUARE = "Square"  # Evans added this one in their response
 
 
 class Decoration(base.PSBaseModel):
@@ -336,6 +338,14 @@ class Decoration(base.PSBaseModel):
     @model_validator(mode='before')
     def normalize_decoration_uom(cls, values):
         return normalize_uom(values, 'decorationUom')
+
+    @field_validator('decorationGeometry', mode="before")
+    def normalize_decoration_geometry(cls, value):
+        if value is None:
+            return DecorationGeometryType.OTHER
+        if value in ['Na', 'NA', 'N/A', 'n/a']:
+            return DecorationGeometryType.NOT_AVAILABLE
+        return value
 
     @property
     def charges(self):
