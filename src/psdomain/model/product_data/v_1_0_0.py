@@ -9,6 +9,11 @@ class ProductV100(Product):
         # because we don't have the information about the price group we will return None
         return None
 
+    @property
+    def fob_points(self):
+        # there is no fob information in this version
+        return []
+
 
 class ProductResponseV100(base.ErrorMessageResponse):
     Product: ProductV100 | None = Field(None, alias='Product', description='Product Information',

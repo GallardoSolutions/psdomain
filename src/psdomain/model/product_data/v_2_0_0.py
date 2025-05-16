@@ -32,6 +32,10 @@ class ProductV200(Product):
             return []
         return price_group.ProductPriceArray.ProductPrice
 
+    @property
+    def fob_points(self):
+        return self.FobPointArray.FobPoint if self.FobPointArray else []
+
 
 class ProductResponseV200(base.ServiceMessageResponse):
     Product: ProductV200 | None = Field(None, alias='Product', description='Product Information',
