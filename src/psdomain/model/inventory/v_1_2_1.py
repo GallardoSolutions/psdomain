@@ -103,7 +103,10 @@ class InventoryLevelsResponseV121(PSBaseModel):
         return []
 
     def get_available_inventory(self, part_id: str) -> Decimal:
-        return sum([int(pi.value) for pi in self.part_inventory if pi.partID == part_id], ZERO)
+        return sum([int(pi.value)
+                    for pi in self.part_inventory
+                    if pi.partID and pi.partID.upper() == part_id.upper()],
+                   ZERO)
 
     @staticmethod
     def get_incoming_inventory(part_id: str) -> Decimal:

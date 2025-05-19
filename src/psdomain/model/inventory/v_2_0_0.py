@@ -219,11 +219,11 @@ class InventoryLevelsResponseV200(base.ServiceMessageResponse):
     ServiceMessageArray: base.ServiceMessageArray | None
 
     def get_available_inventory(self, part_id: str) -> Decimal:
-        pi = self.part_inventory_dict.get(part_id)
+        pi = self.part_inventory_dict.get(part_id.upper())
         return pi.current_availability if pi else ZERO
 
     def get_incoming_inventory(self, part_id: str) -> Decimal:
-        pi = self.part_inventory_dict.get(part_id)
+        pi = self.part_inventory_dict.get(part_id.upper())
         return pi.future_availability if pi else ZERO
 
     @property
@@ -235,7 +235,8 @@ class InventoryLevelsResponseV200(base.ServiceMessageResponse):
         return ret
 
     def gen_part_inventory_dict(self):
-        return {pi.partId: pi for pi in self.part_inventory}
+        # Some suppliers like Quickey have different casing in the Product data and Inventory data
+        return {pi.partId.upper(): pi for pi in self.part_inventory if pi.partId is not None}
 
     @property
     def part_inventory(self) -> list[PartInventory]:
@@ -246,5 +247,5 @@ class InventoryLevelsResponseV200(base.ServiceMessageResponse):
         return list({pi.partId for pi in self.part_inventory})
 
     def is_manufactured(self, part_id: str) -> bool:
-        pi = self.part_inventory_dict.get(part_id)
+        pi = self.part_inventory_dict.get(part_id.upper())
         return pi.manufacturedItem if pi else False
