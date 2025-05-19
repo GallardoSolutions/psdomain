@@ -244,3 +244,7 @@ class InventoryLevelsResponseV200(base.ServiceMessageResponse):
     @property
     def parts(self) -> list[str]:
         return list({pi.partId for pi in self.part_inventory})
+
+    def is_manufactured(self, part_id: str) -> bool:
+        pi = self.part_inventory_dict.get(part_id)
+        return pi.manufacturedItem if pi else False

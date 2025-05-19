@@ -91,3 +91,17 @@ def test_error_in_inventory_2_0_0_2():
     #
     obj1 = InventoryLevelsResponseV200.model_validate(obj)
     assert obj1 == obj
+
+
+def test_is_manufactured_2_0_0(inventory_2_0_0_ok_obj):
+    parts = {'50078RBLK', '50078RWHT', '50078RNAV', '50078RRED', '50078RBLU', '50078RLIM', '50078RORN',
+             '50078RPNK', '50078RPUR'}
+    for part_id in parts:
+        assert inventory_2_0_0_ok_obj.is_manufactured(part_id) is False
+
+
+def test_is_manufactured_1_2_1(inventory_1_2_1_ok_obj):
+    parts = {'50078RBLK', '50078RWHT', '50078RNAV', '50078RRED', '50078RBLU', '50078RLIM', '50078RORN',
+             '50078RPNK', '50078RPUR'}
+    for part_id in parts:
+        assert inventory_1_2_1_ok_obj.is_manufactured(part_id) is False

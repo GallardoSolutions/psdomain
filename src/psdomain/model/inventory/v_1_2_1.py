@@ -105,5 +105,10 @@ class InventoryLevelsResponseV121(PSBaseModel):
     def get_available_inventory(self, part_id: str) -> Decimal:
         return sum([int(pi.value) for pi in self.part_inventory if pi.partID == part_id], ZERO)
 
-    def get_incoming_inventory(self, part_id: str) -> Decimal:
+    @staticmethod
+    def get_incoming_inventory(part_id: str) -> Decimal:
         return ZERO
+
+    @staticmethod
+    def is_manufactured(part_id: str) -> bool:
+        return False  # In this version, we don't know
