@@ -276,6 +276,7 @@ class ProductPart(base.PSBaseModel):
     ColorArray: ColorArray | None
     ProductPackagingArray: ProductPackagingArray | None
     ShippingPackageArray: ShippingPackageArray | None
+    map: Decimal | None = Field(default=None, description='Minimum Advertised Price for the product part(Extra API)')
 
     def _get_colors(self) -> list[Color]:
         return self.ColorArray.Color if self.ColorArray else []

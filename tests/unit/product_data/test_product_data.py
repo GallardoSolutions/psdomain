@@ -75,6 +75,14 @@ def test_sort_sizes():
         assert pp.get_size() == '2XL'
 
 
+def test_map_can_be_added_to_product():
+    for part in product_part_array['ProductPart']:
+        part['map'] = Decimal('10.00')
+    product_parts = ProductPartArray.model_validate(product_part_array).ProductPart
+    for part in product_parts:
+        assert part.map == Decimal('10.00')
+
+
 def test_html_description(resp_alpha):
     """
     Test html_description property for product
@@ -232,13 +240,13 @@ def test_apparel_size_fallback():
 
     assert size.labelSize == '-'
     assert size.customSize == 'CUSTOM'
+
     #
     @dataclass
     class Obj:
         apparelStyle: str
         labelSize: str | None
         customSize: str | None
-
 
     obj = Obj(apparelStyle='Unisex', labelSize=None, customSize=None)
     size = ApparelSize.model_validate(obj)

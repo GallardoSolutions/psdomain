@@ -538,7 +538,7 @@ class Part(base.PSBaseModel):
                                        'based on the number of products ordered',
                            examples=[
                                'If 8 partIds would be required per 1 product ordered, then 8 should be '
-                               'used as the ratio. If one partId is required for every 8 products, than '
+                               'used as the ratio. If one partId is required for every 8 products, then '
                                'use .125'])
     defaultPart: bool | None = Field(description='This part is included in the “Basic Pricing Configuration” service '
                                                  'price. This field is optional, but highly encouraged')
