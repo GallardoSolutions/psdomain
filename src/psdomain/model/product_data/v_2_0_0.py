@@ -1,8 +1,9 @@
 from pydantic import Field
 
-from .. import base
+from .. import base, GetProductSellableResponseV100
 from .common import ProductCloseOutArray, ProductDateModifiedArray, ProductSellableArray, \
     Product, LocationDecorationArray, ProductPriceGroupArray, FobPointArray
+from ..base import ServiceMessage, Severity, ServiceMessageArray
 
 
 class ProductV200(Product):
@@ -52,3 +53,20 @@ class ProductDateModifiedResponseV200(base.ServiceMessageResponse):
 
 class GetProductSellableResponseV200(base.ServiceMessageResponse):
     ProductSellableArray: ProductSellableArray | None
+
+    @classmethod
+    def from_v100(cls, v100_response: GetProductSellableResponseV100) -> 'GetProductSellableResponseV200':
+        """
+        Convert a V1.0.0 response to a V2.0.0 response.
+        """
+        error_msg = v100_response.ErrorMessage
+        if error_msg:
+            msg = ServiceMessage(
+                code=error_msg.code,
+                description=error_msg.description,
+                severity=Severity.ERROR
+            )
+            arr = ServiceMessageArray(ServiceMessage=[msg])
+        else:
+            arr = None
+        return cls(ProductSellableArray=v100_response.ProductSellableArray, ServiceMessageArray=arr)
