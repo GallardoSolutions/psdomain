@@ -1,6 +1,6 @@
 from pydantic import Field
 
-from .. import base, GetProductSellableResponseV100
+from .. import base, GetProductSellableResponseV100, ProductDateModifiedResponseV100, ProductCloseOutResponseV100
 from .common import ProductCloseOutArray, ProductDateModifiedArray, ProductSellableArray, \
     Product, LocationDecorationArray, ProductPriceGroupArray, FobPointArray
 from ..base import ServiceMessage, Severity, ServiceMessageArray
@@ -46,9 +46,25 @@ class ProductResponseV200(base.ServiceMessageResponse):
 class ProductCloseOutResponseV200(base.ServiceMessageResponse):
     ProductCloseOutArray: ProductCloseOutArray | None
 
+    @classmethod
+    def from_v100(cls, v100_response: ProductCloseOutResponseV100) -> 'ProductCloseOutResponseV200':
+        """
+        Convert a V1.0.0 response to a V2.0.0 response.
+        """
+        arr = from_error_message_to_service_message_array(v100_response.ErrorMessage)
+        return cls(ProductCloseOutArray=v100_response.ProductCloseOutArray, ServiceMessageArray=arr)
+
 
 class ProductDateModifiedResponseV200(base.ServiceMessageResponse):
     ProductDateModifiedArray: ProductDateModifiedArray | None
+
+    @classmethod
+    def from_v100(cls, v100_response: ProductDateModifiedResponseV100) -> 'ProductDateModifiedResponseV200':
+        """
+        Convert a V1.0.0 response to a V2.0.0 response.
+        """
+        arr = from_error_message_to_service_message_array(v100_response.ErrorMessage)
+        return cls(ProductDateModifiedArray=v100_response.ProductDateModifiedArray, ServiceMessageArray=arr)
 
 
 class GetProductSellableResponseV200(base.ServiceMessageResponse):
@@ -59,14 +75,20 @@ class GetProductSellableResponseV200(base.ServiceMessageResponse):
         """
         Convert a V1.0.0 response to a V2.0.0 response.
         """
-        error_msg = v100_response.ErrorMessage
-        if error_msg:
-            msg = ServiceMessage(
-                code=error_msg.code,
-                description=error_msg.description,
-                severity=Severity.ERROR
-            )
-            arr = ServiceMessageArray(ServiceMessage=[msg])
-        else:
-            arr = None
+        arr = from_error_message_to_service_message_array(v100_response.ErrorMessage)
         return cls(ProductSellableArray=v100_response.ProductSellableArray, ServiceMessageArray=arr)
+
+
+def from_error_message_to_service_message_array(error_message: base.ErrorMessage) -> ServiceMessageArray:
+    """
+    Convert an ErrorMessage to a ServiceMessageArray.
+    """
+    if error_message is None:
+        return None
+    #
+    service_message = ServiceMessage(
+        code=error_message.code,
+        description=error_message.description,
+        severity=Severity.ERROR
+    )
+    return ServiceMessageArray(ServiceMessage=[service_message])
