@@ -254,6 +254,10 @@ class MediaContent(base.PSBaseModel):
             HIGH in self.get_class_types()
 
     @property
+    def is_art_template(self):
+        return ART_TEMPLATE in self.get_class_types()
+
+    @property
     def decorations(self):
         return self.DecorationArray.Decoration if self.DecorationArray else []
 
