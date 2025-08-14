@@ -295,7 +295,12 @@ class ProductPart(base.PSBaseModel):
             return label_size
         return ''
 
-    def get_primary_color(self):
+    def get_primary_color(self, color_field: str = 'colorName') -> str:
+        """
+        Returns the primary color of the product part.
+        :param color_field: colorName or standardColorName
+        :return:
+        """
         arr = self.ColorArray
         if arr:
             primary_color = arr.Color[0]
@@ -303,7 +308,7 @@ class ProductPart(base.PSBaseModel):
             primary_color = self.primaryColor
             if primary_color:
                 primary_color = primary_color.Color
-        return primary_color.colorName if primary_color else ''
+        return getattr(primary_color, color_field) if primary_color else ''
 
 
 class ProductPartArray(base.PSBaseModel):
