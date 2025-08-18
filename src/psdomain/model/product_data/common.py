@@ -314,6 +314,26 @@ class ProductPart(base.PSBaseModel):
 class ProductPartArray(base.PSBaseModel):
     ProductPart: list[ProductPart]
 
+    def get_number_of_colors(self) -> int:
+        """
+        Returns the number of colors available for the product parts.
+        :return: int
+        """
+        if not self.ProductPart:
+            return 0
+        colors = {part.get_primary_color() for part in self.ProductPart}
+        return len(colors)
+
+    def get_number_of_sizes(self) -> int:
+        """
+        Returns the number of sizes available for the product parts.
+        :return: int
+        """
+        if not self.ProductPart:
+            return 0
+        sizes = {part.get_size() for part in self.ProductPart if part.get_size()}
+        return len(sizes)
+
 
 class ProductPrice(base.PSBaseModel):
     quantityMax: int | None
