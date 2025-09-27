@@ -1,6 +1,8 @@
 # flake8: noqa F811
 from decimal import Decimal
 
+import xmltodict
+
 from psdomain.model import InventoryLevelsResponseV121
 from psdomain.model.inventory.v_2_0_0 import ZERO, InventoryLevelsResponseV200
 from psdomain.model.base import Severity
@@ -8,6 +10,13 @@ from psdomain.model.base import Severity
 from .fixtures import inventory_2_0_0_ok_obj, inventory_1_2_1_ok_obj  # noqa
 from .responses.v_2_0_0 import inventory_2_0_0_error_response, inventory_2_0_0_error_response_2
 from .responses.v_1_2_1 import storm_tech_response
+
+
+def parse_xml(text: str):
+    return xmltodict.parse(
+            text, encoding='utf-8', process_namespaces=False,
+            namespaces={f'ns{i}': None for i in range(20)}
+        )
 
 
 def test_parts_2_0_0(inventory_2_0_0_ok_obj):
@@ -112,3 +121,91 @@ def test_is_manufactured_1_2_1(inventory_1_2_1_ok_obj):
 def test_storm_tech_response():
     obj = InventoryLevelsResponseV121.model_validate(storm_tech_response)
     assert obj.errorMessage is None
+
+
+def test_inventory_121():
+    xml = """
+    <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+        xmlns:ns1="http://www.promostandards.org/WSDL/InventoryService/1.0.0/">
+        <SOAP-ENV:Body>
+            <ns1:Reply>
+                <ns1:productID>10R801</ns1:productID>
+                <ns1:ProductVariationInventoryArray>
+                    <ns1:ProductVariationInventory>
+                        <ns1:partID>10R80100BLK                   </ns1:partID>
+                        <ns1:partDescription>
+                            Premec tip brass plated 0.7mm medium tip rollerball ink refill (black  blue ink color)
+                        </ns1:partDescription>
+                        <ns1:quantityAvailable>0</ns1:quantityAvailable>
+                        <ns1:attributeColor>Black</ns1:attributeColor>
+                        <ns1:validTimestamp>2024-01-13T02:09:43Z</ns1:validTimestamp>
+                        </ns1:ProductVariationInventory><ns1:ProductVariationInventory>
+                        <ns1:partID>10R80100BLU                   </ns1:partID>
+                        <ns1:partDescription>
+                        Premec tip brass plated 0.7mm medium tip rollerball ink refill (black  blue ink color)
+                        </ns1:partDescription>
+                        <ns1:quantityAvailable>2974</ns1:quantityAvailable>
+                        <ns1:attributeColor>Blue</ns1:attributeColor>
+                        <ns1:validTimestamp>2024-01-13T02:09:43Z</ns1:validTimestamp>
+                    </ns1:ProductVariationInventory>
+                </ns1:ProductVariationInventoryArray>
+                </ns1:Reply>
+            </SOAP-ENV:Body>
+        </SOAP-ENV:Envelope>
+    """
+    parsed = parse_xml(xml)
+    data = parsed['SOAP-ENV:Envelope']['SOAP-ENV:Body']['Reply']
+    resp = InventoryLevelsResponseV121.model_validate(data)
+    assert resp.productID == '10R801'
+    first = resp.ProductVariationInventoryArray.ProductVariationInventory[0]
+    assert first.partID == '10R80100BLK'
+    assert first.partDescription == 'Premec tip brass plated 0.7mm medium tip rollerball ink refill (black  blue ink color)'  # noqa
+    assert first.quantityAvailable == '0'
+
+
+def test_inventory_v121_soap_client():
+    data = {
+        'productID': '10P901',
+        'ProductVariationInventoryArray': {
+            'ProductVariationInventory': [
+                {
+                    'partID': '10P90100BLK',
+                    'partDescription': 'Brass plated metal premec 1.0mm ink medium tip refill (black  blue ink color)',
+                    'partBrand': None,
+                    'priceVariance': None,
+                    'quantityAvailable': '10004',
+                    'attributeColor': 'Black',
+                    'attributeSize': None,
+                    'attributeSelection': None,
+                    'AttributeFlexArray': None,
+                    'customProductMessage': None,
+                    'entryType': None,
+                    'validTimestamp': '2024-01-13T02:56:49+00:00'
+                },
+                {
+                    'partID': '10P90100BLU',
+                    'partDescription': 'Brass plated metal premec 1.0mm ink medium tip refill (black  blue ink color)',
+                    'partBrand': None,
+                    'priceVariance': None,
+                    'quantityAvailable': '9000',
+                    'attributeColor': 'Blue',
+                    'attributeSize': None,
+                    'attributeSelection': None,
+                    'AttributeFlexArray': None,
+                    'customProductMessage': None,
+                    'entryType': None,
+                    'validTimestamp': '2024-01-13T02:56:49+00:00'
+                }
+            ]
+        }
+    }
+    resp = InventoryLevelsResponseV121.model_validate(data)
+    assert resp.productID == '10P901'
+    first = resp.ProductVariationInventoryArray.ProductVariationInventory[0]
+    assert first.partID == '10P90100BLK'
+    assert first.quantityAvailable == '10004'
+    assert first.attributeColor == 'Black'
+    second = resp.ProductVariationInventoryArray.ProductVariationInventory[1]
+    assert second.partID == '10P90100BLU'
+    assert second.quantityAvailable == '9000'
+    assert second.attributeColor == 'Blue'

@@ -1,8 +1,8 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Annotated
 from decimal import Decimal
 
-from pydantic import constr, field_validator
+from pydantic import constr, field_validator, Field
 
 from ..base import PSBaseModel, ZERO
 
@@ -16,6 +16,14 @@ class AttributeFlex(PSBaseModel):
 class AttributeFlexArray(PSBaseModel):
     AttributeFlex: List[AttributeFlex]
 
+    @field_validator('AttributeFlex', mode="before")
+    def validate_attribute_flex(cls, v):
+        if v is None:
+            return []
+        if not isinstance(v, list):
+            return [v]
+        return v
+
 
 class ProductVariationInventory(PSBaseModel):
     partID: constr(max_length=64)
@@ -26,10 +34,28 @@ class ProductVariationInventory(PSBaseModel):
     attributeColor: Optional[constr(max_length=64)] = None
     attributeSize: Optional[constr(max_length=64)] = None
     attributeSelection: Optional[constr(max_length=64)] = None
-    AttributeFlexArray: Optional[AttributeFlexArray]
+    AttributeFlexArray: Annotated[Optional[AttributeFlexArray], Field(None)]
     customProductMessage: Optional[constr(max_length=256)] = None
     entryType: Optional[constr(max_length=64)] = None
     validTimestamp: Optional[datetime] = None
+
+    @field_validator('AttributeFlexArray', mode="before")
+    def validate_attribute_flex_array(cls, v):
+        # Handle None values
+        if v is None:
+            return None
+        # Handle empty values that should be None
+        if isinstance(v, dict):
+            if not v or 'AttributeFlex' not in v:
+                return None
+            if v.get('AttributeFlex') in [None, [], {}]:
+                return None
+            # Valid data - pass through for AttributeFlexArray validation
+            return v
+        # Handle empty lists
+        if isinstance(v, list) and len(v) == 0:
+            return None
+        return v
 
     @property
     def value(self):
@@ -56,9 +82,27 @@ class ProductCompanionInventory(PSBaseModel):
     attributeSize: Optional[constr(max_length=64)] = None
     attributeSelection: Optional[constr(max_length=64)] = None
     entryType: Optional[constr(max_length=64)] = None
-    AttributeFlexArray: Optional[AttributeFlexArray] = None
+    AttributeFlexArray: Annotated[Optional[AttributeFlexArray], Field(None)]
     customProductMessage: Optional[constr(max_length=256)] = None
     validTimestamp: Optional[datetime] = None
+
+    @field_validator('AttributeFlexArray', mode="before")
+    def validate_attribute_flex_array(cls, v):
+        # Handle None values
+        if v is None:
+            return None
+        # Handle empty values that should be None
+        if isinstance(v, dict):
+            if not v or 'AttributeFlex' not in v:
+                return None
+            if v.get('AttributeFlex') in [None, [], {}]:
+                return None
+            # Valid data - pass through for AttributeFlexArray validation
+            return v
+        # Handle empty lists
+        if isinstance(v, list) and len(v) == 0:
+            return None
+        return v
 
 
 class CustomMessage(PSBaseModel):
@@ -73,7 +117,7 @@ class ProductCompanionInventoryArray(PSBaseModel):
 class InventoryLevelsResponseV121(PSBaseModel):
     productID: constr(max_length=64)
     ProductVariationInventoryArray: Optional[ProductVariationInventoryArray]
-    ProductCompanionInventoryArray: Optional[ProductCompanionInventoryArray]
+    ProductCompanionInventoryArray: Optional[ProductCompanionInventoryArray] = None
     errorMessage: Optional[constr(max_length=256)] = None
     CustomMessageArray: Optional[List[CustomMessage]] = None
     errorMessage: str | None
