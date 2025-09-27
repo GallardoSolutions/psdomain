@@ -351,8 +351,8 @@ class MediaContent(base.PSBaseModel):
 
     @property
     def is_too_big(self):
-        # 25 MG
-        max_size = 25000000
+        # 25 MB
+        max_size = 25 * 1000 * 1000
         return (self.fileSize and self.fileSize >= max_size) or (self.width and self.width > 2000) \
             or (self.height and self.height > 2000)
 

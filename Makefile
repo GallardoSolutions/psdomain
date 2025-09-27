@@ -1,0 +1,2 @@
+activate:
+	pyenv activate psdomain

@@ -136,3 +136,74 @@ inventory_1_2_1_ok_response = {
     "errorMessage": null,
     "CustomMessageArray": null
 }
+
+
+storm_tech_response = {
+    'productID': 'TWX-3',
+    'ProductVariationInventoryArray': {
+        'ProductVariationInventory': [
+            {
+                'partID': '1TWX003002',
+                'partDescription': "MEN'S MONASHEE PULLOVER HOODY",
+                'partBrand': 'Stormtech',
+                'priceVariance': '85.00',
+                'quantityAvailable': '54',
+                'attributeColor': 'BLACK',
+                'attributeSize': 'XS',
+                'attributeSelection': None,
+                'AttributeFlexArray': {
+                    'AttributeFlex': [
+                        {
+                            'id': '2',
+                            'name': 'IncomingQty',
+                            'value': '0'
+                        },
+                        {
+                            'id': '3',
+                            'name': 'UpcCode',
+                            'value': '794249015191'
+                        }
+                    ]
+                },
+                'customProductMessage': None,
+                'entryType': None,
+                'validTimestamp': "2024-08-26T10:41:30-04:00"
+            },
+            {
+                'partID': '1TWX003003',
+                'partDescription': "MEN'S MONASHEE PULLOVER HOODY",
+                'partBrand': 'Stormtech',
+                'priceVariance': '85.00',
+                'quantityAvailable': '373',
+                'attributeColor': 'BLACK',
+                'attributeSize': 'S',
+                'attributeSelection': None,
+                'AttributeFlexArray': {
+                    'AttributeFlex': [
+                        {
+                            'id': '1',
+                            'name': 'NextShipmentDate',
+                            'value': '9/29/2025 12:00:00 AM'
+                        },
+                        {
+                            'id': '2',
+                            'name': 'IncomingQty',
+                            'value': '42'
+                        },
+                        {
+                            'id': '3',
+                            'name': 'UpcCode',
+                            'value': '794249015207'
+                        }
+                    ]
+                },
+                'customProductMessage': None,
+                'entryType': None,
+                'validTimestamp': "2024-08-26T10:41:30-04:00"
+            }
+        ]
+    },
+    'ProductCompanionInventoryArray': None,
+    'errorMessage': None,
+    'CustomMessageArray': None
+}

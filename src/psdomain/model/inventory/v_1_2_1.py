@@ -8,9 +8,9 @@ from ..base import PSBaseModel, ZERO
 
 
 class AttributeFlex(PSBaseModel):
-    ID: constr(max_length=64)
-    Name: constr(max_length=64)
-    Value: constr(max_length=256)
+    id: constr(max_length=64)
+    name: constr(max_length=64)
+    value: constr(max_length=256)
 
 
 class AttributeFlexArray(PSBaseModel):
@@ -26,7 +26,7 @@ class ProductVariationInventory(PSBaseModel):
     attributeColor: Optional[constr(max_length=64)] = None
     attributeSize: Optional[constr(max_length=64)] = None
     attributeSelection: Optional[constr(max_length=64)] = None
-    AttributeFlexArray: Optional[AttributeFlexArray] = None
+    AttributeFlexArray: Optional[AttributeFlexArray]
     customProductMessage: Optional[constr(max_length=256)] = None
     entryType: Optional[constr(max_length=64)] = None
     validTimestamp: Optional[datetime] = None

@@ -1,11 +1,13 @@
 # flake8: noqa F811
 from decimal import Decimal
 
+from psdomain.model import InventoryLevelsResponseV121
 from psdomain.model.inventory.v_2_0_0 import ZERO, InventoryLevelsResponseV200
 from psdomain.model.base import Severity
 
 from .fixtures import inventory_2_0_0_ok_obj, inventory_1_2_1_ok_obj  # noqa
 from .responses.v_2_0_0 import inventory_2_0_0_error_response, inventory_2_0_0_error_response_2
+from .responses.v_1_2_1 import storm_tech_response
 
 
 def test_parts_2_0_0(inventory_2_0_0_ok_obj):
@@ -105,3 +107,8 @@ def test_is_manufactured_1_2_1(inventory_1_2_1_ok_obj):
              '50078RPNK', '50078RPUR'}
     for part_id in parts:
         assert inventory_1_2_1_ok_obj.is_manufactured(part_id) is False
+
+
+def test_storm_tech_response():
+    obj = InventoryLevelsResponseV121.model_validate(storm_tech_response)
+    assert obj.errorMessage is None
