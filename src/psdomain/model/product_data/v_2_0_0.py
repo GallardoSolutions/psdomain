@@ -23,7 +23,7 @@ class ProductV200(Product):
         filtered_by_currency = [pg for pg in price_groups if pg.currency == currency]
         for price_group in filtered_by_currency:
             if price_group.description and conf_type in price_group.description.lower():
-                return price_group.ProductPriceArray.ProductPrice
+                return price_group.prices
         #
         if filtered_by_currency:
             price_group = filtered_by_currency[0]
@@ -31,7 +31,7 @@ class ProductV200(Product):
             price_group = price_groups[0]
         else:
             return []
-        return price_group.ProductPriceArray.ProductPrice
+        return price_group.prices
 
     @property
     def fob_points(self):
