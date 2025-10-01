@@ -350,7 +350,7 @@ class ProductPriceGroup(base.PSBaseModel):
     groupName: str
     currency: str
     description: str | None
-    ProductPriceArray: ProductPriceArray
+    ProductPriceArray: typing.Annotated[typing.Optional[ProductPriceArray], Field(None)]
 
     @property
     def prices(self):
