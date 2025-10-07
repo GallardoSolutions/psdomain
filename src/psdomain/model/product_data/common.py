@@ -92,11 +92,11 @@ class ApparelStyle(StrEnum):
 
     @property
     def is_male(self):
-        return self in (ApparelStyle.Mens, ApparelStyle.MensTall)
+        return self in (ApparelStyle.Mens, ApparelStyle.MensTall, ApparelStyle.Boys)
 
     @property
     def is_female(self):
-        return self in (ApparelStyle.Womens, ApparelStyle.WomensTall)
+        return self in (ApparelStyle.Womens, ApparelStyle.WomensTall, ApparelStyle.Girls)
 
 
 class ApparelSize(base.PSBaseModel):
@@ -150,7 +150,7 @@ class ApparelSize(base.PSBaseModel):
             return 'male'
         if self.apparelStyle.is_unisex:
             return 'unisex'
-        return ''
+        return 'unisex'  # default to unisex
 
 
 class Dimension(base.PSBaseModel):

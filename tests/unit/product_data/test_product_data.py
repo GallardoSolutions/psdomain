@@ -184,6 +184,33 @@ def test_google_gender(resp_alpha):
     assert first_part.ApparelSize.google_gender == 'female'
 
 
+def test_google_gender_all_styles():
+    """
+    Test google_gender property for all ApparelStyle values using gender map
+    """
+    from psdomain.model.product_data.common import ApparelStyle
+
+    gender_map = {
+        ApparelStyle.Mens: 'male',
+        ApparelStyle.MensTall: 'male',
+        ApparelStyle.WomensTall: 'female',
+        ApparelStyle.Womens: 'female',
+        ApparelStyle.Boys: 'male',
+        ApparelStyle.Girls: 'female',
+        ApparelStyle.Youth: 'unisex',
+        ApparelStyle.Unisex: 'unisex',
+    }
+
+    for apparel_style, expected_gender in gender_map.items():
+        apparel_size = ApparelSize(
+            apparelStyle=apparel_style,
+            labelSize='M',
+            customSize=None
+        )
+        assert apparel_size.google_gender == expected_gender, \
+            f"Expected {expected_gender} for {apparel_style}, got {apparel_size.google_gender}"
+
+
 def test_full_category():
     pc = ProductCategory(category='apparel', subCategory='t-shirts')
     assert pc.full_category == 'Apparel > T-Shirts'
