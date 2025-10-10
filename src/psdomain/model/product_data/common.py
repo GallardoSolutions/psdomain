@@ -742,6 +742,6 @@ def get_cost(price, discount_code: str = 'C'):
         'Y': 5,
         'Z': 0,
     }
-    discount = factors.get(discount_code, 0)
+    discount = factors.get(discount_code, 40)  # default to 'C' if not found
     ret = price * Decimal(1 - discount / 100)
     return ret.quantize(Decimal('.01'))
