@@ -286,13 +286,19 @@ class ProductPart(base.PSBaseModel):
 
     Color = property(_get_colors, _set_colors)
 
-    def get_size(self):
+    def get_size(self) -> str:
         apparel_size = self.ApparelSize
         if apparel_size:
             label_size = apparel_size.labelSize or ''
             if label_size.upper() == 'CUSTOM':
                 return apparel_size.customSize
             return label_size
+        return ''
+
+    def get_apparel_style(self) -> str:
+        apparel_size = self.ApparelSize
+        if apparel_size:
+            return apparel_size.apparelStyle
         return ''
 
     def get_primary_color(self, color_field: str = 'colorName') -> str:
