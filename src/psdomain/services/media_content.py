@@ -2,14 +2,19 @@ from psdomain.model.media_content import MediaContentDetailsResponse, MediaConte
 
 
 class MediaContentService:
-    def __init__(self, media_content_response: MediaContentDetailsResponse, remove_broken_images=True):
+    def __init__(self, media_content_response: MediaContentDetailsResponse, remove_broken_images=True,
+                 excluded_class_types: set[int] | None = None):
         self.media_content_response = media_content_response
+        self.excluded_class_types = excluded_class_types or set()
 
     @property
     def images(self) -> list[MediaContent]:
         _images = getattr(self, '_images', None)
         if _images is None:
-            _images = [mc for mc in self.media_content_response.MediaContent if mc.is_image]
+            _images = [
+                mc for mc in self.media_content_response.MediaContent
+                if mc.is_image and not (mc.get_class_types() & self.excluded_class_types)
+            ]
             setattr(self, '_images', _images)
         return _images
 
