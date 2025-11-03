@@ -61,6 +61,14 @@ class ProductVariationInventory(PSBaseModel):
     def value(self):
         return Decimal(self.quantityAvailable) if self.quantityAvailable else ZERO
 
+    @property
+    def current_availability_v1(self) -> Decimal:
+        return self.value
+
+    @property
+    def current_availability_v2(self) -> Decimal:
+        return self.current_availability_v1
+
 
 class ProductVariationInventoryArray(PSBaseModel):
     ProductVariationInventory: List[ProductVariationInventory]
@@ -70,6 +78,10 @@ class ProductVariationInventoryArray(PSBaseModel):
         if isinstance(v, dict):
             return [v]
         return v
+
+    @property
+    def inventory_location(self):
+        return []
 
 
 class ProductCompanionInventory(PSBaseModel):
@@ -139,6 +151,18 @@ class InventoryLevelsResponseV121(PSBaseModel):
     @property
     def parts(self) -> list[str]:
         return list({pi.partID for pi in self.part_inventory})
+
+    @property
+    def part_inventory_dict(self):
+        ret = getattr(self, '_part_inventory_dict', None)
+        if ret is None:
+            setattr(self, '_part_inventory_dict', self.gen_part_inventory_dict())
+            ret = self._part_inventory_dict
+        return ret
+
+    def gen_part_inventory_dict(self):
+        # Some suppliers like Quickey have different casing in the Product data and Inventory data
+        return {pi.partID.upper(): pi for pi in self.part_inventory if pi.partID is not None}
 
     @property
     def part_inventory(self) -> List[ProductVariationInventory]:

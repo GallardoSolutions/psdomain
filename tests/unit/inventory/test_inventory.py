@@ -209,3 +209,203 @@ def test_inventory_v121_soap_client():
     assert second.partID == '10P90100BLU'
     assert second.quantityAvailable == '9000'
     assert second.attributeColor == 'Blue'
+
+
+def test_part_inventory_dict_1_2_1(inventory_1_2_1_ok_obj):
+    """Test that part_inventory_dict property works correctly in v1.2.1"""
+    # Access the part_inventory_dict property
+    part_dict = inventory_1_2_1_ok_obj.part_inventory_dict
+
+    # Verify it returns a dictionary
+    assert isinstance(part_dict, dict)
+
+    # Verify it has the expected parts (keys should be uppercase)
+    expected_parts = {'50078RBLK', '50078RWHT', '50078RNAV', '50078RRED', '50078RBLU', '50078RLIM', '50078RORN',
+                      '50078RPNK', '50078RPUR'}
+    assert set(part_dict.keys()).intersection(expected_parts) == expected_parts
+
+    # Verify we can look up items by part ID (uppercase)
+    black_part = part_dict.get('50078RBLK')
+    assert black_part is not None
+    assert black_part.partID == '50078RBLK'
+    assert black_part.quantityAvailable == '32717'
+
+    # Verify case-insensitive lookup works (keys are uppercase)
+    assert part_dict.get('50078RBLK') is not None
+    assert part_dict.get('50078rblk') is None  # lowercase should not work directly
+
+    # Test caching behavior - calling property again should return same object
+    part_dict_2 = inventory_1_2_1_ok_obj.part_inventory_dict
+    assert part_dict is part_dict_2  # Same object reference due to caching
+
+
+def test_part_inventory_dict_2_0_0(inventory_2_0_0_ok_obj):
+    """Test that part_inventory_dict property works correctly in v2.0.0"""
+    # Access the part_inventory_dict property
+    part_dict = inventory_2_0_0_ok_obj.part_inventory_dict
+
+    # Verify it returns a dictionary
+    assert isinstance(part_dict, dict)
+
+    # Verify it has the expected parts (keys should be uppercase)
+    expected_parts = {'50078RBLK', '50078RWHT', '50078RNAV', '50078RRED', '50078RBLU', '50078RLIM', '50078RORN',
+                      '50078RPNK', '50078RPUR'}
+    assert set(part_dict.keys()).intersection(expected_parts) == expected_parts
+
+    # Verify we can look up items by part ID (uppercase)
+    black_part = part_dict.get('50078RBLK')
+    assert black_part is not None
+    assert black_part.partId == '50078RBLK'
+    assert black_part.current_availability == Decimal(33018)
+
+    # Test caching behavior - calling property again should return same object
+    part_dict_2 = inventory_2_0_0_ok_obj.part_inventory_dict
+    assert part_dict is part_dict_2  # Same object reference due to caching
+
+
+def test_current_availability_v1_1_2_1(inventory_1_2_1_ok_obj):
+    """Test that current_availability_v1 works correctly in v1.2.1"""
+    # Get the part inventory items
+    part_inventory = inventory_1_2_1_ok_obj.part_inventory
+
+    # Test with items that have quantity
+    black_part = next(pi for pi in part_inventory if pi.partID == '50078RBLK')
+    assert black_part.current_availability_v1 == Decimal(32717)
+    assert black_part.current_availability_v1 == black_part.value
+
+    white_part = next(pi for pi in part_inventory if pi.partID == '50078RWHT')
+    assert white_part.current_availability_v1 == Decimal(32550)
+
+    # Test with items that have zero quantity
+    lime_part = next(pi for pi in part_inventory if pi.partID == '50078RLIM')
+    assert lime_part.current_availability_v1 == ZERO
+
+
+def test_current_availability_v2_1_2_1(inventory_1_2_1_ok_obj):
+    """Test that current_availability_v2 works in v1.2.1 (should match v1 since no location data)"""
+    # Get the part inventory items
+    part_inventory = inventory_1_2_1_ok_obj.part_inventory
+
+    # In v1.2.1, current_availability_v2 should equal current_availability_v1
+    # because inventory_location is not available (returns empty list)
+    black_part = next(pi for pi in part_inventory if pi.partID == '50078RBLK')
+    assert black_part.current_availability_v2 == black_part.current_availability_v1
+    assert black_part.current_availability_v2 == Decimal(32717)
+
+    white_part = next(pi for pi in part_inventory if pi.partID == '50078RWHT')
+    assert white_part.current_availability_v2 == white_part.current_availability_v1
+    assert white_part.current_availability_v2 == Decimal(32550)
+
+    lime_part = next(pi for pi in part_inventory if pi.partID == '50078RLIM')
+    assert lime_part.current_availability_v2 == lime_part.current_availability_v1
+    assert lime_part.current_availability_v2 == ZERO
+
+
+def test_current_availability_v2_2_0_0_with_locations(inventory_2_0_0_ok_obj):
+    """Test that current_availability_v2 calculates from inventory locations in v2.0.0"""
+    # Get a part that has inventory locations
+    black_part = inventory_2_0_0_ok_obj.part_inventory_dict.get('50078RBLK')
+    assert black_part is not None
+
+    # Verify this part has inventory locations
+    assert black_part.inventory_location is not None
+    assert len(black_part.inventory_location) > 0
+
+    # current_availability_v2 should sum all location quantities
+    expected_v2 = sum([loc.current_availability for loc in black_part.inventory_location], ZERO)
+    assert black_part.current_availability_v2 == expected_v2
+    assert black_part.current_availability_v2 == Decimal(33018)
+
+    # Test another part
+    white_part = inventory_2_0_0_ok_obj.part_inventory_dict.get('50078RWHT')
+    assert white_part is not None
+    assert len(white_part.inventory_location) > 0
+    assert white_part.current_availability_v2 == Decimal(33375)
+
+
+def test_current_availability_v2_2_0_0_without_locations():
+    """Test that current_availability_v2 falls back to quantityAvailable when no locations"""
+    from psdomain.model.inventory.v_2_0_0 import PartInventory, QuantityAvailable, Quantity
+    from psdomain.model.base import UOM
+
+    # Create a part with quantityAvailable but no inventory locations
+    part = PartInventory(
+        partId='TEST001',
+        mainPart=True,
+        quantityAvailable=QuantityAvailable(
+            Quantity=Quantity(value=Decimal(100), uom=UOM.BX)
+        ),
+        manufacturedItem=False,
+        buyToOrder=False,
+        attributeSelection=None,
+        InventoryLocationArray=None  # No location data
+    )
+
+    # current_availability_v2 should fall back to quantityAvailable
+    assert part.current_availability_v2 == Decimal(100)
+    assert part.inventory_location == []
+
+
+def test_current_availability_v2_2_0_0_priority():
+    """Test that current_availability_v2 prioritizes location data over quantityAvailable"""
+    from psdomain.model.inventory.v_2_0_0 import (
+        PartInventory, QuantityAvailable, Quantity, InventoryLocation, InventoryLocationArray
+    )
+    from psdomain.model.base import UOM
+
+    # Create a part with both quantityAvailable and location data
+    part = PartInventory(
+        partId='TEST002',
+        mainPart=True,
+        quantityAvailable=QuantityAvailable(
+            Quantity=Quantity(value=Decimal(100), uom=UOM.BX)
+        ),
+        manufacturedItem=False,
+        buyToOrder=False,
+        attributeSelection=None,
+        InventoryLocationArray=InventoryLocationArray(
+            InventoryLocation=[
+                InventoryLocation(
+                    inventoryLocationId='LOC1',
+                    inventoryLocationName='Warehouse 1',
+                    postalCode='12345',
+                    country='US',
+                    inventoryLocationQuantity=QuantityAvailable(
+                        Quantity=Quantity(value=Decimal(50), uom=UOM.BX)
+                    ),
+                    FutureAvailabilityArray=None
+                ),
+                InventoryLocation(
+                    inventoryLocationId='LOC2',
+                    inventoryLocationName='Warehouse 2',
+                    postalCode='67890',
+                    country='US',
+                    inventoryLocationQuantity=QuantityAvailable(
+                        Quantity=Quantity(value=Decimal(75), uom=UOM.BX)
+                    ),
+                    FutureAvailabilityArray=None
+                )
+            ]
+        )
+    )
+
+    # current_availability_v2 should use location sum (50 + 75 = 125) NOT quantityAvailable (100)
+    # This is the key difference - v2 prioritizes location data as it's more reliable
+    assert part.current_availability_v2 == Decimal(125)
+    assert part.quantityAvailable.value == Decimal(100)  # Original value is different
+
+
+def test_current_availability_v1_v2_comparison_1_2_1():
+    """Test that v1 and v2 are identical in version 1.2.1 API"""
+    from psdomain.model.inventory.v_1_2_1 import ProductVariationInventory
+
+    # Create a part with quantity available
+    part = ProductVariationInventory(
+        partID='TEST003',
+        quantityAvailable='500'
+    )
+
+    # In v1.2.1, both should be identical since no location support
+    assert part.current_availability_v1 == Decimal(500)
+    assert part.current_availability_v2 == Decimal(500)
+    assert part.current_availability_v1 == part.current_availability_v2

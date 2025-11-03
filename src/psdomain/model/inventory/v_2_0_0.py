@@ -129,6 +129,15 @@ class PartInventory(PSBaseModel):
         return sum([loc.current_availability for loc in self.inventory_location], ZERO)
 
     @property
+    def current_availability_v2(self) -> Decimal:
+        # some suppliers doesn't provide a reliable quantityAvailable so we calculate it
+        if self.inventory_location:
+            return sum([loc.current_availability for loc in self.inventory_location], ZERO)
+        if self.quantityAvailable:
+            return self.quantityAvailable.value
+        return ZERO
+
+    @property
     def future_availability(self) -> Decimal:
         return sum([loc.future_availability for loc in self.inventory_location], ZERO)
 
