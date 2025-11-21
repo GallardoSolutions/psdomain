@@ -355,15 +355,24 @@ class Artwork(PSBaseModel):
                                      default=None)
     description: str | None = Field(description="A textual description of the artwork being provided",
                                     default=None)
-    Dimensions: Dimensions | None = Field(description="Dimensions of the artwork being provided",
-                                          default=None)
-    ArtworkFileArray: ArtworkFileArray | None = Field(description="An array of artwork file data.",
-                                                      default=None)
+    Dimensions: Annotated[
+        Dimensions | None,
+        Field(description="Dimensions of the artwork being provided", default=None)
+    ]
+
+    ArtworkFileArray: Annotated[
+        ArtworkFileArray | None,
+        Field(description="An array of artwork file data.", default=None)
+    ]
+
     instructions: str | None = Field(description="Any instructions regarding the processing or modification of artwork."
                                                  " `Adding instructions will cause delays in processing`",
                                      default=None)
-    Layers: Layers | None = Field(description="An object that explains how the artwork layers or "
-                                              "stops will be handled.", default=None)
+    Layers: Annotated[
+        Layers | None,
+        Field(description="An object that explains how the artwork layers or stops will be handled.", default=None)
+    ]
+
     TypesetArray: list[Typeset] | None = Field(description="An array of typeset data.", default=None)
     totalStitchCount: int | None = Field(description="The total stitch count for the specified embroidery art",
                                          default=None)
@@ -470,14 +479,22 @@ class Configuration(PSBaseModel):
     referenceNumber: str | None = Field(description="The previous order number that this purchase order is referencing")
     referenceNumberType: ReferenceNuberType | None = Field(description="The type of the prior order reference")
     preProductionProof: bool = Field(description="Indicates that this line item is for a pre-production proof")
-    ChargeArray: ChargeArray | None = Field(
-        description="An array of product part information. This array should be populated with information from the "
-                    "supplier’s PromoStandards Product Pricing and Configuration service",
-        default=None)
-    LocationArray: LocationArray | None = Field(
-        description="An array of Decoration Location Information. This array should be populated with information "
-                    "from the supplier’s PromoStandards Product Pricing and Configuration service",
-        default=None)
+    ChargeArray: Annotated[
+        ChargeArray | None,
+        Field(
+            description="An array of product part information. This array should be populated with information from "
+                        "the supplier’s PromoStandards Product Pricing and Configuration service",
+            default=None)
+    ]
+
+    LocationArray: Annotated[
+        LocationArray | None,
+        Field(
+            description="An array of Decoration Location Information. This array should be populated with information "
+                        "from the supplier’s PromoStandards Product Pricing and Configuration service",
+            default=None
+        )
+    ]
 
 
 class Part(PSBaseModel):
@@ -499,10 +516,13 @@ class Part(PSBaseModel):
     unitPrice: decimal.Decimal | None = Field(description="The price of the part being referenced.", default=None)
     extendedPrice: decimal.Decimal | None = Field(description="The unitPrice multiplied by the Quantity value.",
                                                   default=None)
-    ShipmentLinkArray: ShipmentLinkArray | None = Field(
-        description="Link this part and a specified quantity to one or many shipments.",
-        default=None
-    )
+    ShipmentLinkArray: Annotated[
+        ShipmentLinkArray | None,
+        Field(
+            description="Link this part and a specified quantity to one or many shipments.",
+            default=None
+        )
+    ]
 
 
 class PartArray(PSBaseModel):
@@ -532,13 +552,20 @@ class LineItem(PSBaseModel):
                     '“Repeat” —An exact repeat of a previous purchase order with the vendor, '
                     '“Reference” –An order that has the same artwork as a previous order.',
     )
-    Quantity: Quantity | None = Field(description="The quantity object that contains the value and unit of measure.",
-                                      default=None)
+    Quantity: Annotated[
+        Quantity | None,
+        Field(description="The quantity object that contains the value and unit of measure.",
+              default=None)
+    ]
+
     fobId: str | None = Field(description="Used to indicate the FOB point.  Use fobId from the supplier’s Product "
                                           "Pricing and Configuration Service to populate this information",
                               default=None)
-    ToleranceDetails: ToleranceDetails = Field(
-        description="The object containing how tolerant this line is to overrun and underruns.")
+    ToleranceDetails: Annotated[
+        ToleranceDetails,
+        Field(description="The object containing how tolerant this line is to overrun and underruns.")
+    ]
+
     allowPartialShipments: bool = Field(description="Allow partial shipments of this line item.")
     unitPrice: decimal.Decimal | None = Field(
         description="The unit price of the line item.",
@@ -555,10 +582,14 @@ class LineItem(PSBaseModel):
     referenceSalesQuote: str | None = Field(description="The sales quote number associated with this purchase order "
                                                         "line (if applicable)",
                                             default=None)
-    Program: Program | None = Field(
-        description="Program pricing information.",
-        default=None
-    )
+    Program: Annotated[
+        Program | None,
+        Field(
+            description="Program pricing information.",
+            default=None
+        )
+    ]
+
     endCustomerSalesOrder: str | None = Field(description="The distributor’s order number provided to the end customer",
                                               default=None)
     productId: str | None = Field(description="The manufacturer’s product id associated with the configuration data",
@@ -572,15 +603,23 @@ class LineItem(PSBaseModel):
                     "should produce a unique `lineItemGroupingID` to the purchase "
                     "order",
         default=None)
-    PartArray: PartArray | None = Field(
-        description="An array of product part information. This array should be populated with information from the "
-                    "supplier’s PromoStandards Product Pricing and Configuration service.",
-        default=None
-    )
-    Configuration: Configuration | None = Field(
-        description="An object containing line item configuration data",
-        default=None
-    )
+
+    PartArray: Annotated[
+        PartArray | None,
+        Field(
+            description="An array of product part information. This array should be populated with information from "
+                        "the supplier’s PromoStandards Product Pricing and Configuration service.",
+            default=None
+        )
+    ]
+
+    Configuration: Annotated[
+        Configuration | None,
+        Field(
+            description="An object containing line item configuration data",
+            default=None
+        )
+    ]
 
 
 class LineItemArray(PSBaseModel):
@@ -618,13 +657,33 @@ class PO(PSBaseModel):
     totalAmount: decimal.Decimal = Field(description="The total amount of the purchase order")
     paymentTerms: str | None = Field(description="ie. NET15, NET30, etc.", examples=["NET30"], default=None)
     rush: bool = Field(default=False, description="Used to indicate a rush on the purchase order")
-    currency: Currency = Field(description="The currency the purchase order is transacted in ISO4217 format."
-                                           " ie. USD, CAD, EUR, JPY, GBP, etc.", examples=["USD"])
-    DigitalProof: DigitalProof | None = Field(description="An object containing preproduction digital "
-                                                          "proof information", default=None)
-    OrderContactArray: OrderContactArray | None = Field(description="An array of contact information", default=None)
-    ShipmentArray: ShipmentArray = Field(description="Any array of purchase order shipments")
-    LineItemArray: LineItemArray = Field(description="An array of purchase order line items")
+    currency: Annotated[
+        Currency,
+        Field(description="The currency the purchase order is transacted in ISO4217 format."
+                          " ie. USD, CAD, EUR, JPY, GBP, etc.", examples=["USD"])
+    ]
+
+    DigitalProof: Annotated[
+        DigitalProof | None,
+        Field(description="An object containing preproduction digital "
+                          "proof information", default=None)
+    ]
+
+    OrderContactArray: Annotated[
+        OrderContactArray | None,
+        Field(description="An array of contact information", default=None)
+    ]
+
+    ShipmentArray: Annotated[
+        ShipmentArray,
+        Field(description="Any array of purchase order shipments")
+    ]
+
+    LineItemArray: Annotated[
+        LineItemArray,
+        Field(description="An array of purchase order line items")
+    ]
+
     termsAndConditions: str = Field(
         description="The terms and conditions for this purchase order. Information that is order specific or "
                     "information dealing with the configuration or shipment of the order should not be entered here.",
@@ -633,10 +692,13 @@ class PO(PSBaseModel):
                                      examples=["SHOPIFYAPP"], default=None)
     promoCode: str | None = Field(default=None, description="The promotion code",
                                   examples=["SUMMER2023"])
-    TaxInformationArray: TaxInformationArray | None = Field(
-        description="An array of TaxInformation objects related to calculating taxes.",
-        default=None
-    )
+    TaxInformationArray: Annotated[
+        TaxInformationArray | None,
+        Field(
+            description="An array of TaxInformation objects related to calculating taxes.",
+            default=None
+        )
+    ]
 
 
 class SupportedOrderType(StrEnum):
@@ -654,7 +716,10 @@ class GetSupportedOrderTypesResponse(PSBaseModel):
     Response to a getSupportedOrderTypes method.
     """
     supportedOrderTypes: list[SupportedOrderType] | None
-    ServiceMessageArray: ServiceMessageArray | None
+    ServiceMessageArray: Annotated[
+        ServiceMessageArray | None,
+        Field(description="An array of ServiceMessage objects.", default=None)
+    ]
 
 
 class SendPOResponse(PSBaseModel):
@@ -662,4 +727,7 @@ class SendPOResponse(PSBaseModel):
     Response to a sendPO method.
     """
     transactionId: str | None
-    ServiceMessageArray: ServiceMessageArray | None
+    ServiceMessageArray: Annotated[
+        ServiceMessageArray | None,
+        Field(description="An array of ServiceMessage objects.", default=None)
+    ]
