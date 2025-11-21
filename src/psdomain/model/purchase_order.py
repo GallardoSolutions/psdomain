@@ -1,5 +1,6 @@
 import decimal
 from datetime import datetime, date
+from typing import Annotated
 
 from pydantic import Field
 
@@ -193,7 +194,10 @@ class ContactType(StrEnum):
 
 class Contact(PSBaseModel):
     contactType: ContactType
-    ContactDetails: ContactDetails = Field(description="The object that contains the details about the contact.", )
+    ContactDetails: Annotated[
+        ContactDetails,
+        Field(description="The object that contains the details about the contact.", )
+    ]
     accountName: str | None = Field(
         description="The name of the account that will be invoiced for the purchase order. Should be populated when "
                     "the contactType is Bill.",
