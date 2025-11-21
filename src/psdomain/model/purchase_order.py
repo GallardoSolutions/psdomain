@@ -238,22 +238,36 @@ class FreightDetails(PSBaseModel):
 
 class Shipment(PSBaseModel):
     # customerPickup: bool  # hit doesn't have this field here, but it's in the docs
-    ShipTo: ShipTo
+    ShipTo: Annotated[
+        ShipTo,
+        Field(description="The object containing the ship to information")
+    ]
+
     packingListRequired: bool = Field(description="Packing list required.")
     blindShip: bool = Field(description="Require blind shipping.")
     allowConsolidation: bool = Field(description="Allow consolidation of shipments.")
-    FreightDetails: FreightDetails = Field(description="The details on the freight: carrier and service.")
-    ThirdPartyAccount: ThirdPartyAccount | None = Field(
-        description="The object containing the third party information for the shipping account to use and the "
-                    "business entity that is paying for the shipping. Known as ship using this account.",
-        default=None
-    )
+
+    FreightDetails: Annotated[
+        FreightDetails,
+        Field(description="Freight: carrier and service details.")
+    ]
+
+    ThirdPartyAccount: Annotated[
+        ThirdPartyAccount | None,
+        Field(
+            description="The object containing the third party information for the shipping account to use and the "
+                        "business entity that is paying for the shipping. Known as ship using this account.",
+            default=None
+        )
+    ]
+
     shipReferences: list[str] | None = Field(description="Array of `two` strings max of identifiers used as the "
                                                          "reference fields used during the shipping process. "
                                                          "A shipReference can be a `purchase order number`, "
                                                          "`customer number`, `company name`, `Bill of Lading "
                                                          "number`, or a phrase that identifies that shipment",
                                              default=None)
+
     comments: str | None = Field(
         description="Comments regarding the shipment for further clarification. Note: Use comments only when "
                     "necessary, as it may cause delays in order processing.",
