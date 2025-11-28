@@ -904,3 +904,122 @@ inventory_2_0_0_error_response_2 = {
         ]
     }
 }
+
+inventory_2_0_0_error_response_from_xml_to_dict = {
+    's:Envelope': {
+        '@xmlns:s': 'http://schemas.xmlsoap.org/soap/envelope/',
+        's:Body': {'@xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+                   '@xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+                   'GetInventoryLevelsResponse': {
+                       '@xmlns': 'http://www.promostandards.org/WSDL/Inventory/2.0.0/',
+                       'Inventory': {
+                           '@xmlns': 'http://www.promostandards.org/WSDL/Inventory/2.0.0/SharedObjects/',
+                           'productId': '0770-10', 'PartInventoryArray': {
+                               'PartInventory': [{'partId': '0770-10BK',
+                                                  'mainPart': 'true',
+                                                  'partColor': 'Black (BK)',
+                                                  'partDescription': 'FSC® Mix Pedova™ Zippered UltraHyde Padfolio',
+                                                  'quantityAvailable': {
+                                                      'Quantity': {
+                                                          'uom': 'EA',
+                                                          'value': '12181.0000'}},
+                                                  'manufacturedItem': 'false',
+                                                  'buyToOrder': 'false',
+                                                  'InventoryLocationArray': {
+                                                      'InventoryLocation': [{
+                                                          'inventoryLocationId': '15068',
+                                                          'postalCode': '15068',
+                                                          'country': 'US',
+                                                          'inventoryLocationQuantity': {
+                                                              'Quantity': {
+                                                                  'uom': 'EA',
+                                                                  'value': '12181.0000'}},
+                                                          'FutureAvailabilityArray': {
+                                                              'FutureAvailability': [
+                                                                  {
+                                                                      'Quantity': {
+                                                                          'uom': 'EA',
+                                                                          'value': '10008.0000'},
+                                                                      'availableOn': '2026-01-05T00:00:00'}]}}]},
+                                                  'lastModified': '2025-11-27T00:00:00'},
+                                                 {'partId': '0770-10NY',
+                                                  'mainPart': 'true',
+                                                  'partColor': 'Navy (NY)',
+                                                  'partDescription': 'FSC® Mix Pedova™ Zippered UltraHyde Padfolio',
+                                                  'quantityAvailable': {
+                                                      'Quantity': {
+                                                          'uom': 'EA',
+                                                          'value': '8531.0000'}},
+                                                  'manufacturedItem': 'false',
+                                                  'buyToOrder': 'false',
+                                                  'InventoryLocationArray': {
+                                                      'InventoryLocation': [{
+                                                          'inventoryLocationId': '15068',
+                                                          'postalCode': '15068',
+                                                          'country': 'US',
+                                                          'inventoryLocationQuantity': {
+                                                              'Quantity': {
+                                                                  'uom': 'EA',
+                                                                  'value': '8531.0000'}},
+                                                          'FutureAvailabilityArray': {
+                                                              'FutureAvailability': [
+                                                                  {
+                                                                      'Quantity': {
+                                                                          'uom': 'EA',
+                                                                          'value': '5016.0000'},
+                                                                      'availableOn': '2026-01-05T00:00:00'}]}}]},
+                                                  'lastModified': '2025-11-27T00:00:00'},
+                                                 {'partId': '0770-10RD',
+                                                  'mainPart': 'true',
+                                                  'partColor': 'Red (RD)',
+                                                  'partDescription': 'FSC® Mix Pedova™ Zippered UltraHyde Padfolio',
+                                                  'quantityAvailable': {
+                                                      'Quantity': {
+                                                          'uom': 'EA',
+                                                          'value': '1922.0000'}},
+                                                  'manufacturedItem': 'false',
+                                                  'buyToOrder': 'false',
+                                                  'InventoryLocationArray': {
+                                                      'InventoryLocation': [{
+                                                          'inventoryLocationId': '15068',
+                                                          'postalCode': '15068',
+                                                          'country': 'US',
+                                                          'inventoryLocationQuantity': {
+                                                              'Quantity': {
+                                                                  'uom': 'EA',
+                                                                  'value': '1922.0000'}},
+                                                          'FutureAvailabilityArray': {
+                                                              'FutureAvailability': [
+                                                                  {
+                                                                      'Quantity': {
+                                                                          'uom': 'EA',
+                                                                          'value': '1512.0000'},
+                                                                      'availableOn': '2026-02-14T00:00:00'}]}}]},
+                                                  'lastModified': '2025-11-27T00:00:00'},
+                                                 {'partId': '0770-10TC',
+                                                  'mainPart': 'true',
+                                                  'partColor': 'Terra Cotta (TC)',
+                                                  'partDescription': 'FSC® Mix Pedova™ Zippered UltraHyde Padfolio',
+                                                  'quantityAvailable': {
+                                                      'Quantity': {
+                                                          'uom': 'EA',
+                                                          'value': '2372.0000'}},
+                                                  'manufacturedItem': 'false',
+                                                  'buyToOrder': 'false',
+                                                  'InventoryLocationArray': {
+                                                      'InventoryLocation': [{
+                                                          'inventoryLocationId': '15068',
+                                                          'postalCode': '15068',
+                                                          'country': 'US',
+                                                          'inventoryLocationQuantity': {
+                                                              'Quantity': {
+                                                                  'uom': 'EA',
+                                                                  'value': '2372.0000'}},
+                                                          'FutureAvailabilityArray': {
+                                                              'FutureAvailability': [
+                                                                  {
+                                                                      'Quantity': {
+                                                                          'uom': 'EA',
+                                                                          'value': '2016.0000'},
+                                                                      'availableOn': '2026-02-08T00:00:00'}]}}]},
+                                                  'lastModified': '2025-11-27T00:00:00'}]}}}}}}

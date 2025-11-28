@@ -8,7 +8,8 @@ from psdomain.model.inventory.v_2_0_0 import ZERO, InventoryLevelsResponseV200
 from psdomain.model.base import Severity
 
 from .fixtures import inventory_2_0_0_ok_obj, inventory_1_2_1_ok_obj  # noqa
-from .responses.v_2_0_0 import inventory_2_0_0_error_response, inventory_2_0_0_error_response_2
+from .responses.v_2_0_0 import inventory_2_0_0_error_response, inventory_2_0_0_error_response_2, \
+    inventory_2_0_0_error_response_from_xml_to_dict
 from .responses.v_1_2_1 import storm_tech_response
 
 
@@ -409,3 +410,9 @@ def test_current_availability_v1_v2_comparison_1_2_1():
     assert part.current_availability_v1 == Decimal(500)
     assert part.current_availability_v2 == Decimal(500)
     assert part.current_availability_v1 == part.current_availability_v2
+
+
+def test_from_xml_to_dict():
+    resp = inventory_2_0_0_error_response_from_xml_to_dict['s:Envelope']['s:Body']['GetInventoryLevelsResponse']
+    result = InventoryLevelsResponseV200.model_validate(resp)
+    assert result.ServiceMessageArray is None

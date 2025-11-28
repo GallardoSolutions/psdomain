@@ -2,13 +2,12 @@ from decimal import Decimal
 from datetime import datetime
 from typing import Annotated
 
-from pydantic import model_validator
+from pydantic import model_validator, Field
 
 from .. import base
 from ..base import StrEnum
 
 PSBaseModel = base.PSBaseModel
-
 
 ZERO = Decimal(0)
 
@@ -70,18 +69,21 @@ class FutureAvailabilityArray(PSBaseModel):
 
 
 class Address(PSBaseModel):
-    city: str | None
-    country: str | None
-    postalCode: str | None
+    city: str | None = None
+    country: str | None = None
+    postalCode: str | None = None
 
 
 class InventoryLocation(PSBaseModel):
     inventoryLocationId: str
-    inventoryLocationName: str | None
+    inventoryLocationName: str | None = None
     postalCode: str | None = ...  # the doc says it required but HIT fails if it is
-    country: str | None = ...     # the doc says it required but HIT fails if it is
-    inventoryLocationQuantity: QuantityAvailable | None
-    FutureAvailabilityArray: FutureAvailabilityArray | None
+    country: str | None = ...  # the doc says it required but HIT fails if it is
+    inventoryLocationQuantity: QuantityAvailable | None = Field(default=None)
+    FutureAvailabilityArray: FutureAvailabilityArray | None = Annotated[
+        FutureAvailabilityArray,
+        Field(default=None, description='Array of FutureAvailability objects'),
+    ]
 
     @property
     def future_availability(self) -> Decimal:
@@ -110,13 +112,16 @@ class PartInventory(PSBaseModel):
     partColor: str | None = None
     labelSize: str | None = None
     partDescription: str | None = None
-    quantityAvailable: QuantityAvailable | None
+    quantityAvailable: QuantityAvailable | None = Field(default=None)
     manufacturedItem: bool
     buyToOrder: bool
     replenishmentLeadTime: int | None = None
-    attributeSelection: str | None
+    attributeSelection: str | None = None
     lastModified: datetime | None = None
-    InventoryLocationArray: InventoryLocationArray | None
+    InventoryLocationArray: InventoryLocationArray | None = Annotated[
+        InventoryLocationArray,
+        Field(default=None, description='An array of InventoryLocation objects'),
+    ]
 
     @property
     def inventory_location(self):
@@ -172,9 +177,9 @@ class ArrayOfPartId(PSBaseModel):
 
 
 class Filter(PSBaseModel):
-    partIdArray: ArrayOfPartId | None
-    LabelSizeArray: ArrayOfLabelSize | None
-    PartColorArray: ArrayOfPartColor | None
+    partIdArray: ArrayOfPartId | None = Field(default=None)
+    LabelSizeArray: ArrayOfLabelSize | None = Field(default=None)
+    PartColorArray: ArrayOfPartColor | None = Field(default=None)
 
 
 class FilterValues(PSBaseModel):
@@ -219,13 +224,17 @@ class ProductIDType(StrEnum):
 
 
 class FilterValuesResponseV200(PSBaseModel):
-    FilterValues: FilterValues | None
-    ServiceMessageArray: base.ServiceMessageArray | None
+    FilterValues: FilterValues | None = Annotated[
+        FilterValues,
+        Field(default=None,
+              description='An object containing the variations of a product by size, color, selection, etc')
+    ]
+    ServiceMessageArray: base.ServiceMessageArray | None = Field(default=None)
 
 
 class InventoryLevelsResponseV200(base.ServiceMessageResponse):
     Inventory: Inventory | None  # An object containing the inventory levels for the given product
-    ServiceMessageArray: base.ServiceMessageArray | None
+    ServiceMessageArray: base.ServiceMessageArray | None = Field(default=None)
 
     def get_available_inventory(self, part_id: str) -> Decimal:
         if part_id:
