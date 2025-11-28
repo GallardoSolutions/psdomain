@@ -79,7 +79,10 @@ class InventoryLocation(PSBaseModel):
     inventoryLocationName: str | None = None
     postalCode: str | None = ...  # the doc says it required but HIT fails if it is
     country: str | None = ...  # the doc says it required but HIT fails if it is
-    inventoryLocationQuantity: QuantityAvailable | None = Field(default=None)
+    inventoryLocationQuantity: QuantityAvailable | None = Annotated[
+        QuantityAvailable,
+        Field(default=None)
+    ]
     FutureAvailabilityArray: FutureAvailabilityArray | None = Annotated[
         FutureAvailabilityArray,
         Field(default=None, description='Array of FutureAvailability objects'),
@@ -112,7 +115,10 @@ class PartInventory(PSBaseModel):
     partColor: str | None = None
     labelSize: str | None = None
     partDescription: str | None = None
-    quantityAvailable: QuantityAvailable | None = Field(default=None)
+    quantityAvailable: QuantityAvailable | None = Annotated[
+        QuantityAvailable,
+        Field(default=None)
+    ]
     manufacturedItem: bool
     buyToOrder: bool
     replenishmentLeadTime: int | None = None
@@ -177,9 +183,18 @@ class ArrayOfPartId(PSBaseModel):
 
 
 class Filter(PSBaseModel):
-    partIdArray: ArrayOfPartId | None = Field(default=None)
-    LabelSizeArray: ArrayOfLabelSize | None = Field(default=None)
-    PartColorArray: ArrayOfPartColor | None = Field(default=None)
+    partIdArray: ArrayOfPartId | None = Annotated[
+        ArrayOfPartId,
+        Field(default=None)
+    ]
+    LabelSizeArray: ArrayOfLabelSize | None = Annotated[
+        ArrayOfLabelSize,
+        Field(default=None)
+    ]
+    PartColorArray: ArrayOfPartColor | None = Annotated[
+        ArrayOfPartColor,
+        Field(default=None)
+    ]
 
 
 class FilterValues(PSBaseModel):
