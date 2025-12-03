@@ -14,7 +14,7 @@ from pydantic import Field, model_validator
 
 from .. import base
 from . import common
-from .common import ShipmentDestinationType
+from .common import ShipmentDestinationType, TRACKING_URLS
 
 
 class Item(base.PSBaseModel):
@@ -51,6 +51,19 @@ class Package(base.PSBaseModel):
     shippingAccount: str | None = Field(default=None)
     shipmentTerms: str | None
     ItemArray: ItemArray | None
+
+    @property
+    def tracking_url(self):
+        if not self.trackingNumber or not self.carrier:
+            return None
+
+        carrier = self.carrier.upper().strip()
+
+        for key, url_template in TRACKING_URLS.items():
+            if key in carrier:
+                return url_template.format(self.trackingNumber)
+
+        return None  # Unknown carrier → no link
 
 
 class PackageArray(base.PSBaseModel):

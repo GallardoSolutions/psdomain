@@ -5,7 +5,7 @@ from decimal import Decimal
 from pydantic import constr
 
 from .. import base
-from .common import ShipmentDestinationType, PreProductionProofType, DimUOM, WeightUOM
+from .common import ShipmentDestinationType, PreProductionProofType, DimUOM, WeightUOM, TRACKING_URLS
 
 
 class ShippingContactDetails(base.PSBaseModel):
@@ -67,6 +67,25 @@ class Package(base.PSBaseModel):
     shipmentTerms: base.String128 | None
     ItemArray: ItemArray | None
     preProductionProof: PreProductionProofType | None
+
+    @property
+    def carrier(self):
+        if self.FreightDetails.carrier:
+            return self.FreightDetails.carrier
+        return None
+
+    @property
+    def tracking_url(self):
+        if not self.trackingNumber or not self.carrier:
+            return None
+
+        carrier = self.carrier.upper().strip()
+
+        for key, url_template in TRACKING_URLS.items():
+            if key in carrier:
+                return url_template.format(self.trackingNumber)
+
+        return None  # Unknown carrier → no link
 
 
 class PackageArray(base.PSBaseModel):

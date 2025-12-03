@@ -47,3 +47,11 @@ class PreProductionProofType(StrEnum):
     YES = 'Yes'
     NO = 'No'
     UNKNOWN = 'Unknown'
+
+
+TRACKING_URLS = {
+    "USPS": "https://tools.usps.com/go/TrackConfirmAction?tLabels={}",
+    "UPS": "https://www.ups.com/track?tracknum={}",
+    "FEDEX": "https://www.fedex.com/fedextrack/?trknbr={}",
+    "DHL": "https://www.dhl.com/en/express/tracking.html?AWB={}",
+}
