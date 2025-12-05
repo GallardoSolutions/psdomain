@@ -144,6 +144,9 @@ class ServiceMessageArray(PSBaseModel):
         return cls(ServiceMessage=[msg])
 
 
+type NullableServiceMessageArray = ServiceMessageArray | None
+
+
 class Fob(PSBaseModel):
     fobId: str
     fobPostalCode: str | None

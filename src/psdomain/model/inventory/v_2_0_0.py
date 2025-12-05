@@ -74,16 +74,19 @@ class Address(PSBaseModel):
     postalCode: str | None = None
 
 
+type NullableFutureAvailabilityArray = FutureAvailabilityArray | None
+
+
 class InventoryLocation(PSBaseModel):
     inventoryLocationId: str
     inventoryLocationName: str | None = None
     postalCode: str | None = ...  # the doc says it required but HIT fails if it is
     country: str | None = ...  # the doc says it required but HIT fails if it is
     inventoryLocationQuantity: QuantityAvailable | None = None
-    FutureAvailabilityArray: FutureAvailabilityArray | None = Annotated[
-        FutureAvailabilityArray,
-        Field(description='Array of FutureAvailability objects'),
-    ]
+    FutureAvailabilityArray: NullableFutureAvailabilityArray = Field(
+        default=None,
+        description='Array of FutureAvailability objects'
+    )
 
     @property
     def future_availability(self) -> Decimal:
@@ -106,6 +109,9 @@ class InventoryLocationArray(PSBaseModel):
         return sum([loc.current_availability for loc in self.InventoryLocation], ZERO)
 
 
+type NullableInventoryLocationArray = InventoryLocationArray | None
+
+
 class PartInventory(PSBaseModel):
     partId: str
     mainPart: bool
@@ -118,10 +124,10 @@ class PartInventory(PSBaseModel):
     replenishmentLeadTime: int | None = None
     attributeSelection: str | None = None
     lastModified: datetime | None = None
-    InventoryLocationArray: InventoryLocationArray | None = Annotated[
-        InventoryLocationArray,
-        Field(description='An array of InventoryLocation objects'),
-    ]
+    InventoryLocationArray: NullableInventoryLocationArray = Field(
+        default=None,
+        description='An array of Inventory Location objects'
+    )
 
     @property
     def inventory_location(self):
@@ -215,6 +221,9 @@ class FilterValues(PSBaseModel):
         return values
 
 
+type = NullableFilterValues = FilterValues | None
+
+
 class ProductIDType(StrEnum):
     """
     The type of product ID to search for.
@@ -224,16 +233,22 @@ class ProductIDType(StrEnum):
 
 
 class FilterValuesResponseV200(PSBaseModel):
-    FilterValues: FilterValues | None = Annotated[
-        FilterValues,
-        Field(description='An object containing the variations of a product by size, color, selection, etc')
-    ]
-    ServiceMessageArray: base.ServiceMessageArray | None = Field(default=None)
+    FilterValues: NullableFilterValues = Field(
+        default=None,
+        description='An object containing the variations of a product by size, color, selection, etc'
+    )
+    ServiceMessageArray: base.NullableServiceMessageArray = Field(
+        default=None,
+        description='An array of ServiceMessage objects'
+    )
 
 
 class InventoryLevelsResponseV200(base.ServiceMessageResponse):
     Inventory: Inventory | None  # An object containing the inventory levels for the given product
-    ServiceMessageArray: base.ServiceMessageArray | None = Field(default=None)
+    ServiceMessageArray: base.NullableServiceMessageArray = Field(
+        default=None,
+        description='An array of Service Message objects'
+    )
 
     def get_available_inventory(self, part_id: str) -> Decimal:
         if part_id:

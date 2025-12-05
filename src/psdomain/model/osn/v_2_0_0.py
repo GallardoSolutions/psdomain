@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional
 from decimal import Decimal
 
-from pydantic import constr
+from pydantic import constr, Field
 
 from .. import base
 from .common import ShipmentDestinationType, PreProductionProofType, DimUOM, WeightUOM, TRACKING_URLS
@@ -92,13 +92,19 @@ class PackageArray(base.PSBaseModel):
     Package: list[Package]
 
 
+type = NullablePackageArray = PackageArray | None
+
+
 class Shipment(base.PSBaseModel):
     destinationShippedInFull: bool
     customerPickup: bool
     ShipFromAddress: ShippingContactDetails
     ShipToAddress: ShippingContactDetails
     shipmentDestinationType: ShipmentDestinationType | None
-    PackageArray: PackageArray | None
+    PackageArray: NullablePackageArray = Field(
+        default=None,
+        description='An Array of Shipment Packages',
+    )
 
 
 class ShipmentArray(base.PSBaseModel):
@@ -125,6 +131,15 @@ class OrderShipmentNotificationArray(base.PSBaseModel):
     OrderShipmentNotification: list[OrderShipmentNotification]
 
 
+type NullableOrderShipmentNotificationArray = OrderShipmentNotificationArray | None
+
+
 class GetOrderShipmentNotificationResponseV200(base.PSBaseModel):
-    OrderShipmentNotificationArray: OrderShipmentNotificationArray | None
-    ServiceMessageArray: base.ServiceMessageArray | None
+    OrderShipmentNotificationArray: NullableOrderShipmentNotificationArray = Field(
+        default=None,
+        description='An Array of OrderShipment Notifications',
+    )
+    ServiceMessageArray: base.NullableServiceMessageArray = Field(
+        default=None,
+        description='An Array of Service Messages',
+    )
