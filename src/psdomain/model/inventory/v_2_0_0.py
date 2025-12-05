@@ -79,13 +79,10 @@ class InventoryLocation(PSBaseModel):
     inventoryLocationName: str | None = None
     postalCode: str | None = ...  # the doc says it required but HIT fails if it is
     country: str | None = ...  # the doc says it required but HIT fails if it is
-    inventoryLocationQuantity: QuantityAvailable | None = Annotated[
-        QuantityAvailable,
-        Field(default=None)
-    ]
+    inventoryLocationQuantity: QuantityAvailable | None = None
     FutureAvailabilityArray: FutureAvailabilityArray | None = Annotated[
         FutureAvailabilityArray,
-        Field(default=None, description='Array of FutureAvailability objects'),
+        Field(description='Array of FutureAvailability objects'),
     ]
 
     @property
@@ -115,10 +112,7 @@ class PartInventory(PSBaseModel):
     partColor: str | None = None
     labelSize: str | None = None
     partDescription: str | None = None
-    quantityAvailable: QuantityAvailable | None = Annotated[
-        QuantityAvailable,
-        Field(default=None)
-    ]
+    quantityAvailable: QuantityAvailable | None = None
     manufacturedItem: bool
     buyToOrder: bool
     replenishmentLeadTime: int | None = None
@@ -126,7 +120,7 @@ class PartInventory(PSBaseModel):
     lastModified: datetime | None = None
     InventoryLocationArray: InventoryLocationArray | None = Annotated[
         InventoryLocationArray,
-        Field(default=None, description='An array of InventoryLocation objects'),
+        Field(description='An array of InventoryLocation objects'),
     ]
 
     @property
@@ -183,18 +177,9 @@ class ArrayOfPartId(PSBaseModel):
 
 
 class Filter(PSBaseModel):
-    partIdArray: ArrayOfPartId | None = Annotated[
-        ArrayOfPartId,
-        Field(default=None)
-    ]
-    LabelSizeArray: ArrayOfLabelSize | None = Annotated[
-        ArrayOfLabelSize,
-        Field(default=None)
-    ]
-    PartColorArray: ArrayOfPartColor | None = Annotated[
-        ArrayOfPartColor,
-        Field(default=None)
-    ]
+    partIdArray: ArrayOfPartId | None = None
+    LabelSizeArray: ArrayOfLabelSize | None = None
+    PartColorArray: ArrayOfPartColor | None = None
 
 
 class FilterValues(PSBaseModel):
@@ -241,8 +226,7 @@ class ProductIDType(StrEnum):
 class FilterValuesResponseV200(PSBaseModel):
     FilterValues: FilterValues | None = Annotated[
         FilterValues,
-        Field(default=None,
-              description='An object containing the variations of a product by size, color, selection, etc')
+        Field(description='An object containing the variations of a product by size, color, selection, etc')
     ]
     ServiceMessageArray: base.ServiceMessageArray | None = Field(default=None)
 
