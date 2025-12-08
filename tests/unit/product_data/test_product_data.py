@@ -280,3 +280,21 @@ def test_apparel_size_fallback():
     assert size.apparelStyle == 'Unisex'
     assert size.labelSize == '-'
     assert size.customSize == 'CUSTOM'
+
+
+def test_get_product_sellable():
+    resp = {
+        'ProductSellableArray': None,
+        'ServiceMessageArray': {
+            'ServiceMessage': [
+                {
+                    'code': 104,
+                    'description': 'This account is unauthorized to use this service.  '
+                                   'Please contact the service provider.',
+                    'severity': None
+                }
+            ]
+        }
+    }
+    obj = GetProductSellableResponseV200.model_validate(resp)
+    assert not obj.is_ok
