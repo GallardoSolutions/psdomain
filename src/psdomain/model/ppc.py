@@ -80,7 +80,7 @@ class DecorationMethodArray(base.PSBaseModel):
 class DecorationColors(base.PSBaseModel):
     productId: str
     locationId: int
-    pmsMatch: bool | None = Field(None, description="TRUE, if PMS match is possible"),
+    pmsMatch: bool | None = Field(None, description="TRUE, if PMS match is possible")
     fullColor: bool | None = Field(None,
                                    description="Set to true if the decoration method is full color process; "
                                                "False implies that number of colors is irrelevant")
