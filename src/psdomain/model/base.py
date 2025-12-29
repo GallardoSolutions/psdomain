@@ -7,7 +7,6 @@ import decimal
 
 from pydantic import BaseModel, ConfigDict, constr, model_validator
 
-
 ZERO = decimal.Decimal(0)
 
 
@@ -158,47 +157,51 @@ class FobArray(PSBaseModel):
 
 
 ALL_SERVICE_CODES = [
-        {
-            "Code": "INV",
-            "Name": "Inventory"
-        },
-        {
-            "Code": "INVC",
-            "Name": "Invoice"
-        },
-        {
-            "Code": "MED",
-            "Name": "Media Content"
-        },
-        {
-            "Code": "OSN",
-            "Name": "Order Shipment Notification"
-        },
-        {
-            "Code": "ODRSTAT",
-            "Name": "Order Status"
-        },
-        {
-            "Code": "PDC",
-            "Name": "Product Compliance"
-        },
-        {
-            "Code": "Product",
-            "Name": "Product Data"
-        },
-        {
-            "Code": "PPC",
-            "Name": "Product Pricing and Configuration"
-        },
-        {
-            "Code": "PO",
-            "Name": "Purchase Order"
-        },
-        {
-            "Code": "SPCC",
-            "Name": "Service Provider Customer Credentials"
-        }
-    ]
+    {
+        "Code": "INV",
+        "Name": "Inventory"
+    },
+    {
+        "Code": "INVC",
+        "Name": "Invoice"
+    },
+    {
+        "Code": "MED",
+        "Name": "Media Content"
+    },
+    {
+        "Code": "OSN",
+        "Name": "Order Shipment Notification"
+    },
+    {
+        "Code": "ODRSTAT",
+        "Name": "Order Status"
+    },
+    {
+        "Code": "PDC",
+        "Name": "Product Compliance"
+    },
+    {
+        "Code": "Product",
+        "Name": "Product Data"
+    },
+    {
+        "Code": "PPC",
+        "Name": "Product Pricing and Configuration"
+    },
+    {
+        "Code": "PO",
+        "Name": "Purchase Order"
+    },
+    {
+        "Code": "SPCC",
+        "Name": "Service Provider Customer Credentials"
+    },
+    {
+        "Code": "CD",
+        "Name": "Company Data"
+    },
+]
 
 
 class WeightUoM(StrEnum):
