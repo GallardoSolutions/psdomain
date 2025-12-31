@@ -61,6 +61,8 @@ class ServiceCode(StrEnum):
     PO = 'Purchase Order'
     PDC = 'Product Compliance'
     SPCC = 'Supplier Price and Configuration'
+    CD = 'Company Data'
+    RA = 'Remittance Advice'
 
     def __str__(self):
         return self.name
@@ -200,6 +202,10 @@ ALL_SERVICE_CODES = [
     {
         "Code": "CD",
         "Name": "Company Data"
+    },
+    {
+        "Code": "RA",
+        "Name": "Remittance Advice"
     },
 ]
 

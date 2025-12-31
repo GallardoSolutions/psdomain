@@ -1,6 +1,48 @@
-from .base import ServiceCode, ConfigurationType, PriceType, ALL_SERVICE_CODES
+from .base import ServiceCode, ConfigurationType, PriceType, ALL_SERVICE_CODES, ServiceMessage
 from . import exceptions
 from .product_data.common import Product
+
+# Company Data models
+from .company_data import (
+    Address as CDAddress,
+    Phone as CDPhone,
+    Contact as CDContact,
+    Identifier,
+    Brand,
+    BusinessLine,
+    CompanyData,
+    BusinessCharacteristic,
+    Certification,
+    PaymentMethod,
+    PaymentTerms,
+    PhysicalLocation,
+    Policy,
+    PromoStandardsService,
+    PromoStandardsServiceDetail,
+    ShippingMethod,
+    GetCompanyDataResponse,
+    GetAvailablePromoStandardsServicesResponse,
+    GetPromoStandardsServiceDetailsResponse,
+    GetBusinessCharacteristicsResponse,
+    GetCertificationsResponse,
+    GetContactsResponse,
+    GetPaymentMethodsResponse,
+    GetPaymentTermsResponse,
+    GetPhysicalLocationsResponse,
+    GetPoliciesResponse,
+    GetShippingMethodsResponse,
+    GetServiceMethodsResponse as CDGetServiceMethodsResponse,
+)
+
+# Remittance Advice models
+from .remittance_advice import (
+    PayerDetails,
+    PaymentDetails,
+    RemittanceDetail,
+    Remittance,
+    SendRemittanceAdviceResponse,
+    GetServiceMethodsResponse as RAGetServiceMethodsResponse,
+)
 from .product_data.latest import ProductDateModifiedResponseLatest, ProductCloseOutResponseLatest, ProductLatest, \
     ProductResponseLatest
 from .product_data.v_1_0_0 import ProductDateModifiedResponseV100, ProductCloseOutResponseV100, ProductV100, \
@@ -36,5 +78,17 @@ __all__ = [
     'ProductDateModifiedResponse', 'ProductCloseOutResponse', 'ProductLatest', 'ProductResponseLatest',
     'ProductV100', 'ProductResponseV100', 'InventoryLevelsResponse', 'InventoryLevelsResponseV121',
     'GetServiceMethodsResponseV200', 'GetIssueResponseV200', 'GetOrderStatusResponseV200',
-    'GetProductSellableResponseV100', 'GetProductSellableResponseV200'
+    'GetProductSellableResponseV100', 'GetProductSellableResponseV200', 'ServiceMessage',
+    # Company Data models
+    'CDAddress', 'CDPhone', 'CDContact', 'Identifier', 'Brand', 'BusinessLine', 'CompanyData',
+    'BusinessCharacteristic', 'Certification', 'PaymentMethod', 'PaymentTerms', 'PhysicalLocation',
+    'Policy', 'PromoStandardsService', 'PromoStandardsServiceDetail', 'ShippingMethod',
+    'GetCompanyDataResponse', 'GetAvailablePromoStandardsServicesResponse',
+    'GetPromoStandardsServiceDetailsResponse', 'GetBusinessCharacteristicsResponse',
+    'GetCertificationsResponse', 'GetContactsResponse', 'GetPaymentMethodsResponse',
+    'GetPaymentTermsResponse', 'GetPhysicalLocationsResponse', 'GetPoliciesResponse',
+    'GetShippingMethodsResponse', 'CDGetServiceMethodsResponse',
+    # Remittance Advice models
+    'PayerDetails', 'PaymentDetails', 'RemittanceDetail', 'Remittance',
+    'SendRemittanceAdviceResponse', 'RAGetServiceMethodsResponse',
 ]
