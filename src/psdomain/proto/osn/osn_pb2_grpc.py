@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-from proto.osn import osn_pb2 as proto_dot_osn_dot_osn__pb2
+from psdomain.proto.osn import osn_pb2 as proto_dot_osn_dot_osn__pb2
 
 GRPC_GENERATED_VERSION = '1.76.0'
 GRPC_VERSION = grpc.__version__

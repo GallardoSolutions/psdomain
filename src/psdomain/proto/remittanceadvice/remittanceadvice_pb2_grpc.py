@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-from proto.remittanceadvice import remittanceadvice_pb2 as proto_dot_remittanceadvice_dot_remittanceadvice__pb2
+from psdomain.proto.remittanceadvice import remittanceadvice_pb2 as proto_dot_remittanceadvice_dot_remittanceadvice__pb2
 
 GRPC_GENERATED_VERSION = '1.76.0'
 GRPC_VERSION = grpc.__version__

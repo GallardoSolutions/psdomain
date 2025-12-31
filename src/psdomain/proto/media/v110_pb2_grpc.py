@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-from proto.media import v110_pb2 as proto_dot_media_dot_v110__pb2
+from psdomain.proto.media import v110_pb2 as proto_dot_media_dot_v110__pb2
 
 GRPC_GENERATED_VERSION = '1.76.0'
 GRPC_VERSION = grpc.__version__

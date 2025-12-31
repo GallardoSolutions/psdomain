@@ -3,8 +3,8 @@
 import grpc
 import warnings
 
-from proto.product import v100_pb2 as proto_dot_product_dot_v100__pb2
-from proto.product import v200_pb2 as proto_dot_product_dot_v200__pb2
+from psdomain.proto.product import v100_pb2 as proto_dot_product_dot_v100__pb2
+from psdomain.proto.product import v200_pb2 as proto_dot_product_dot_v200__pb2
 
 GRPC_GENERATED_VERSION = '1.76.0'
 GRPC_VERSION = grpc.__version__

@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-from proto.companydata import companydata_pb2 as proto_dot_companydata_dot_companydata__pb2
+from psdomain.proto.companydata import companydata_pb2 as proto_dot_companydata_dot_companydata__pb2
 
 GRPC_GENERATED_VERSION = '1.76.0'
 GRPC_VERSION = grpc.__version__
