@@ -9,17 +9,20 @@ from collections import defaultdict
 from typing import TYPE_CHECKING
 
 from psdomain.converters.base import proto_str_or_none, pydantic_str_or_empty
-from psdomain.model.base import ServiceMessage, ServiceMessageArray
+from psdomain.model.base import ErrorMessage
 from psdomain.model.media_content import (
     ClassType,
     ClassTypeArray,
     Decoration,
     DecorationArray,
+    GetMediaDateModifiedResponse,
     Location,
     LocationArray,
     MediaContent,
+    MediaContentArray,
     MediaContentDetailsResponse,
     MediaDateModified,
+    MediaDateModifiedArray,
 )
 
 if TYPE_CHECKING:
@@ -230,25 +233,23 @@ def media_groups_from_proto(
     return result
 
 
-# --- ServiceMessage converters ---
+# --- ErrorMessage converters ---
 
 
-def service_message_to_proto(msg: ServiceMessage) -> "proto.ServiceMessage":
-    """Convert pydantic ServiceMessage to proto ServiceMessage."""
+def error_message_to_proto(msg: ErrorMessage) -> "proto.ErrorMessage":
+    """Convert pydantic ErrorMessage to proto ErrorMessage."""
     pb2 = _get_proto()
-    return pb2.ServiceMessage(
-        code=msg.code or 0,
-        description=pydantic_str_or_empty(msg.description),
-        severity=str(msg.severity) if msg.severity else "",
+    return pb2.ErrorMessage(
+        code=msg.code,
+        description=msg.description,
     )
 
 
-def service_message_from_proto(p: "proto.ServiceMessage") -> ServiceMessage:
-    """Convert proto ServiceMessage to pydantic ServiceMessage."""
-    return ServiceMessage(
-        code=p.code if p.code else None,
-        description=proto_str_or_none(p.description),
-        severity=proto_str_or_none(p.severity),
+def error_message_from_proto(p: "proto.ErrorMessage") -> ErrorMessage:
+    """Convert proto ErrorMessage to pydantic ErrorMessage."""
+    return ErrorMessage(
+        code=p.code,
+        description=p.description,
     )
 
 
@@ -266,9 +267,8 @@ def to_proto(
         for mc in response.MediaContent:
             result.media_content.append(media_content_to_proto(mc))
 
-    if response.ServiceMessageArray and response.ServiceMessageArray.ServiceMessage:
-        for msg in response.ServiceMessageArray.ServiceMessage:
-            result.service_messages.append(service_message_to_proto(msg))
+    if response.errorMessage:
+        result.error_message.CopyFrom(error_message_to_proto(response.errorMessage))
 
     return result
 
@@ -277,21 +277,19 @@ def from_proto(
     proto_msg: "proto.GetMediaContentResponse",
 ) -> MediaContentDetailsResponse:
     """Convert proto GetMediaContentResponse to pydantic MediaContentDetailsResponse."""
-    media_content = None
+    media_content_array = None
     if proto_msg.media_content:
-        media_content = [
-            media_content_from_proto(mc) for mc in proto_msg.media_content
-        ]
+        media_content_array = MediaContentArray(
+            MediaContent=[media_content_from_proto(mc) for mc in proto_msg.media_content]
+        )
 
-    service_messages = None
-    if proto_msg.service_messages:
-        msgs = [service_message_from_proto(m) for m in proto_msg.service_messages]
-        service_messages = ServiceMessageArray(ServiceMessage=msgs)
+    error_msg = None
+    if proto_msg.HasField('error_message'):
+        error_msg = error_message_from_proto(proto_msg.error_message)
 
     return MediaContentDetailsResponse(
-        MediaContent=media_content,
-        MediaDateModified=None,
-        ServiceMessageArray=service_messages,
+        MediaContentArray=media_content_array,
+        errorMessage=error_msg,
     )
 
 
@@ -299,45 +297,38 @@ def from_proto(
 
 
 def date_modified_to_proto(
-    response: MediaContentDetailsResponse,
+    response: GetMediaDateModifiedResponse,
 ) -> "proto.GetMediaDateModifiedResponse":
-    """Convert pydantic MediaContentDetailsResponse to proto GetMediaDateModifiedResponse.
-
-    Uses MediaDateModified field instead of MediaContent.
-    """
+    """Convert pydantic GetMediaDateModifiedResponse to proto GetMediaDateModifiedResponse."""
     pb2 = _get_proto()
     result = pb2.GetMediaDateModifiedResponse()
 
-    if response.MediaDateModified:
-        result.media_groups.extend(
-            media_date_modified_to_proto_groups(response.MediaDateModified)
+    if response.MediaDateModifiedArray:
+        result.media.extend(
+            media_date_modified_to_proto_groups(response.MediaDateModifiedArray.MediaDateModified)
         )
 
-    if response.ServiceMessageArray and response.ServiceMessageArray.ServiceMessage:
-        for msg in response.ServiceMessageArray.ServiceMessage:
-            result.service_messages.append(service_message_to_proto(msg))
+    if response.errorMessage:
+        result.error_message.CopyFrom(error_message_to_proto(response.errorMessage))
 
     return result
 
 
 def date_modified_from_proto(
     proto_msg: "proto.GetMediaDateModifiedResponse",
-) -> MediaContentDetailsResponse:
-    """Convert proto GetMediaDateModifiedResponse to pydantic MediaContentDetailsResponse.
+) -> GetMediaDateModifiedResponse:
+    """Convert proto GetMediaDateModifiedResponse to pydantic GetMediaDateModifiedResponse."""
+    media_date_modified_array = None
+    if proto_msg.media:
+        media_date_modified_array = MediaDateModifiedArray(
+            MediaDateModified=media_groups_from_proto(list(proto_msg.media))
+        )
 
-    Populates MediaDateModified field instead of MediaContent.
-    """
-    media_date_modified = None
-    if proto_msg.media_groups:
-        media_date_modified = media_groups_from_proto(list(proto_msg.media_groups))
+    error_msg = None
+    if proto_msg.HasField('error_message'):
+        error_msg = error_message_from_proto(proto_msg.error_message)
 
-    service_messages = None
-    if proto_msg.service_messages:
-        msgs = [service_message_from_proto(m) for m in proto_msg.service_messages]
-        service_messages = ServiceMessageArray(ServiceMessage=msgs)
-
-    return MediaContentDetailsResponse(
-        MediaContent=None,
-        MediaDateModified=media_date_modified,
-        ServiceMessageArray=service_messages,
+    return GetMediaDateModifiedResponse(
+        MediaDateModifiedArray=media_date_modified_array,
+        errorMessage=error_msg,
     )

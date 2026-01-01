@@ -5,8 +5,11 @@ Tests roundtrip conversion: JSON -> Pydantic -> Proto -> Pydantic
 """
 import pytest
 
+from psdomain.model.base import ErrorMessage
 from psdomain.model.media_content import (
     MediaContent,
+    MediaContentArray,
+    MediaContentDetailsResponse,
     MediaType,
     BLANK,
     REAR,
@@ -304,3 +307,50 @@ class TestMediaV110Converter:
         assert roundtrip.productId == "NULL-001"
         assert roundtrip.DecorationArray is None or len(roundtrip.DecorationArray.Decoration) == 0
         assert roundtrip.LocationArray is None or len(roundtrip.LocationArray.Location) == 0
+
+    def test_response_with_error_message(self):
+        """Test MediaContentDetailsResponse with errorMessage converts correctly."""
+        from psdomain.converters.media import v110
+
+        # Create response with error
+        response = MediaContentDetailsResponse(
+            MediaContentArray=None,
+            errorMessage=ErrorMessage(code=404, description="Product not found"),
+        )
+
+        proto_response = v110.to_proto(response)
+
+        # Verify error message in proto
+        assert proto_response.error_message.code == 404
+        assert proto_response.error_message.description == "Product not found"
+        assert len(proto_response.media_content) == 0
+
+        # Roundtrip
+        roundtrip = v110.from_proto(proto_response)
+        assert roundtrip.errorMessage is not None
+        assert roundtrip.errorMessage.code == 404
+        assert roundtrip.errorMessage.description == "Product not found"
+        assert roundtrip.MediaContentArray is None
+
+    def test_response_with_media_content(self, blank_hit):
+        """Test MediaContentDetailsResponse with media content converts correctly."""
+        from psdomain.converters.media import v110
+
+        # Create response with media content
+        response = MediaContentDetailsResponse(
+            MediaContentArray=MediaContentArray(MediaContent=[blank_hit]),
+            errorMessage=None,
+        )
+
+        proto_response = v110.to_proto(response)
+
+        # Verify media content in proto
+        assert len(proto_response.media_content) == 1
+        assert proto_response.media_content[0].product_id == "55410"
+
+        # Roundtrip
+        roundtrip = v110.from_proto(proto_response)
+        assert roundtrip.errorMessage is None
+        assert roundtrip.MediaContentArray is not None
+        assert len(roundtrip.MediaContentArray.MediaContent) == 1
+        assert roundtrip.MediaContentArray.MediaContent[0].productId == "55410"
