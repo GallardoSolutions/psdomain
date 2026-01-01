@@ -12,8 +12,11 @@ from psdomain.converters.base import proto_str_or_none, pydantic_str_or_empty
 from psdomain.model.base import ServiceMessage, ServiceMessageArray
 from psdomain.model.media_content import (
     ClassType,
+    ClassTypeArray,
     Decoration,
+    DecorationArray,
     Location,
+    LocationArray,
     MediaContent,
     MediaContentDetailsResponse,
     MediaDateModified,
@@ -36,7 +39,7 @@ def decoration_to_proto(dec: Decoration) -> "proto.Decoration":
     """Convert pydantic Decoration to proto Decoration."""
     pb2 = _get_proto()
     return pb2.Decoration(
-        decoration_id=pydantic_str_or_empty(dec.decorationId),
+        decoration_id=dec.decorationId or 0,
         decoration_name=pydantic_str_or_empty(dec.decorationName),
     )
 
@@ -44,7 +47,7 @@ def decoration_to_proto(dec: Decoration) -> "proto.Decoration":
 def decoration_from_proto(p: "proto.Decoration") -> Decoration:
     """Convert proto Decoration to pydantic Decoration."""
     return Decoration(
-        decorationId=proto_str_or_none(p.decoration_id),
+        decorationId=p.decoration_id if p.decoration_id else None,
         decorationName=proto_str_or_none(p.decoration_name),
     )
 
@@ -66,21 +69,21 @@ def location_from_proto(p: "proto.Location") -> Location:
     )
 
 
-def class_type_to_proto(ct: ClassType | None) -> str:
-    """Convert pydantic ClassType enum to proto string."""
-    if ct is None:
-        return ""
-    return ct.value
+def class_type_to_proto(ct: ClassType) -> "proto.ClassType":
+    """Convert pydantic ClassType to proto ClassType."""
+    pb2 = _get_proto()
+    return pb2.ClassType(
+        class_type_id=ct.classTypeId or 0,
+        class_type_name=pydantic_str_or_empty(ct.classTypeName),
+    )
 
 
-def class_type_from_proto(value: str) -> ClassType | None:
-    """Convert proto string to pydantic ClassType enum."""
-    if not value:
-        return None
-    try:
-        return ClassType(value)
-    except ValueError:
-        return None
+def class_type_from_proto(p: "proto.ClassType") -> ClassType:
+    """Convert proto ClassType to pydantic ClassType."""
+    return ClassType(
+        classTypeId=p.class_type_id if p.class_type_id else 0,
+        classTypeName=proto_str_or_none(p.class_type_name) or "",
+    )
 
 
 # --- MediaContent converters ---
@@ -94,49 +97,76 @@ def media_content_to_proto(mc: MediaContent) -> "proto.MediaContent":
         part_id=pydantic_str_or_empty(mc.partId),
         url=pydantic_str_or_empty(mc.url),
         media_type=pydantic_str_or_empty(mc.mediaType),
-        class_type=class_type_to_proto(mc.classType),
-        file_size=pydantic_str_or_empty(mc.fileSize),
-        height=pydantic_str_or_empty(mc.height),
-        width=pydantic_str_or_empty(mc.width),
-        dpi=pydantic_str_or_empty(mc.dpi),
+        single_part=mc.singlePart if mc.singlePart is not None else False,
         color=pydantic_str_or_empty(mc.color),
         description=pydantic_str_or_empty(mc.description),
-        single_part=mc.singlePart if mc.singlePart is not None else False,
-        change_time=pydantic_str_or_empty(mc.changeTime),
     )
-    if mc.Decoration:
-        result.decoration.CopyFrom(decoration_to_proto(mc.Decoration))
-    if mc.Location:
-        result.location.CopyFrom(location_to_proto(mc.Location))
+
+    # Handle optional numeric fields
+    if mc.fileSize is not None:
+        result.file_size = mc.fileSize
+    if mc.width is not None:
+        result.width = float(mc.width)
+    if mc.height is not None:
+        result.height = float(mc.height)
+    if mc.dpi is not None:
+        result.dpi = mc.dpi
+
+    # Convert ClassTypeArray to repeated class_types
+    if mc.ClassTypeArray and mc.ClassTypeArray.ClassType:
+        for ct in mc.ClassTypeArray.ClassType:
+            result.class_types.append(class_type_to_proto(ct))
+
+    # Convert DecorationArray to repeated decorations
+    if mc.DecorationArray and mc.DecorationArray.Decoration:
+        for dec in mc.DecorationArray.Decoration:
+            result.decorations.append(decoration_to_proto(dec))
+
+    # Convert LocationArray to repeated locations
+    if mc.LocationArray and mc.LocationArray.Location:
+        for loc in mc.LocationArray.Location:
+            result.locations.append(location_to_proto(loc))
+
     return result
 
 
 def media_content_from_proto(p: "proto.MediaContent") -> MediaContent:
     """Convert proto MediaContent to pydantic MediaContent."""
-    decoration = None
-    if p.HasField("decoration"):
-        decoration = decoration_from_proto(p.decoration)
+    # Build ClassTypeArray from repeated class_types
+    class_type_array = ClassTypeArray(
+        ClassType=[class_type_from_proto(ct) for ct in p.class_types]
+    ) if p.class_types else ClassTypeArray(ClassType=[])
 
-    location = None
-    if p.HasField("location"):
-        location = location_from_proto(p.location)
+    # Build DecorationArray from repeated decorations
+    decoration_array = None
+    if p.decorations:
+        decoration_array = DecorationArray(
+            Decoration=[decoration_from_proto(dec) for dec in p.decorations]
+        )
+
+    # Build LocationArray from repeated locations
+    location_array = None
+    if p.locations:
+        location_array = LocationArray(
+            Location=[location_from_proto(loc) for loc in p.locations]
+        )
 
     return MediaContent(
         productId=proto_str_or_none(p.product_id),
         partId=proto_str_or_none(p.part_id),
         url=proto_str_or_none(p.url),
         mediaType=proto_str_or_none(p.media_type),
-        classType=class_type_from_proto(p.class_type),
-        fileSize=proto_str_or_none(p.file_size),
-        height=proto_str_or_none(p.height),
-        width=proto_str_or_none(p.width),
-        dpi=proto_str_or_none(p.dpi),
+        fileSize=p.file_size if p.file_size else None,
+        width=int(p.width) if p.width else None,
+        height=int(p.height) if p.height else None,
+        dpi=p.dpi if p.dpi else None,
         color=proto_str_or_none(p.color),
         description=proto_str_or_none(p.description),
-        singlePart=p.single_part if p.single_part else None,
-        changeTime=proto_str_or_none(p.change_time),
-        Decoration=decoration,
-        Location=location,
+        singlePart=p.single_part,
+        changeTimeStamp=None,
+        ClassTypeArray=class_type_array,
+        DecorationArray=decoration_array,
+        LocationArray=location_array,
     )
 
 
