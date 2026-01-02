@@ -10,13 +10,6 @@ from psdomain.model.media_content import (
     MediaContent,
     MediaContentArray,
     MediaContentDetailsResponse,
-    MediaType,
-    BLANK,
-    REAR,
-    PRIMARY,
-    ClassTypeArray,
-    DecorationArray,
-    Decoration,
 )
 
 null, false, true = None, False, True
