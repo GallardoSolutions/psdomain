@@ -561,13 +561,24 @@ class Part(base.PSBaseModel):
         # returns a sorted list of part prices by minQuantity if PartPriceArray is not None, empty list otherwise
         return sorted(self.PartPriceArray.PartPrice, key=lambda p: p.minQuantity) if self.PartPriceArray else []
 
-    def get_price(self, qty: int) -> PartPrice | None:
+    def get_price(self, qty: int,
+                  uom: base.UOM = base.UOM.EA) -> PartPrice | None:
         # returns the price for the given quantity if it exists, None otherwise
-        reversed_prices = self.prices[::-1]
+        prices = self.get_filtered_prices(uom)
+        reversed_prices = prices[::-1]
         for price in reversed_prices:
             if price.minQuantity <= qty:
                 return price
         return None
+
+    def get_filtered_prices(self, uom) -> list[PartPrice]:
+        orig_prices = self.prices
+        ret = [p for p in orig_prices if p.priceUom == uom]
+        if not ret:
+            if uom != base.UOM.EA:
+                return self.get_filtered_prices(base.UOM.EA)
+            ret = self.prices
+        return ret
 
     @property
     def location_ids(self) -> list[str | int]:
