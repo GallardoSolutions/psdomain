@@ -1,6 +1,7 @@
 from datetime import date
+from typing import Annotated
 
-from pydantic import model_validator
+from pydantic import Field, model_validator
 
 from .base import ServiceMessageArray, StrEnum, PSBaseModel, ServiceMessageResponse
 
@@ -204,8 +205,8 @@ class Invoice(PSBaseModel):
     invoiceDate: date
     purchaseOrderNumber: str | None = None
     purchaseOrderVersion: str | None = None
-    BillTo: BillTo | None = None
-    SoldTo: SoldTo | None = None
+    BillTo: Annotated[BillTo | None, Field(default=None)]
+    SoldTo: Annotated[SoldTo | None, Field(default=None)]
     invoiceComments: str | None = None
     paymentTerms: str | None = None
     paymentDueDate: date
@@ -220,8 +221,8 @@ class Invoice(PSBaseModel):
     invoiceAmountDue: float
     invoiceDocumentUrl: str | None = None
     InvoiceLineItemsArray: InvoiceLineItemsArray
-    SalesOrderNumbersArray: SalesOrderNumbersArray | None = None
-    TaxArray: TaxArray | None = None
+    SalesOrderNumbersArray: Annotated[SalesOrderNumbersArray | None, Field(default=None)]
+    TaxArray: Annotated[TaxArray | None, Field(default=None)]
     invoicePaymentUrl: str | None = None
 
 
