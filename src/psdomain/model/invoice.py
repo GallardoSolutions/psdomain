@@ -1,5 +1,6 @@
 from datetime import date
 
+from pydantic import model_validator
 
 from .base import ServiceMessageArray, StrEnum, PSBaseModel, ServiceMessageResponse
 
@@ -60,6 +61,10 @@ class Tax(PSBaseModel):
     taxAmount: float
 
 
+class TaxArray(PSBaseModel):
+    tax: list[Tax]
+
+
 class SalesOrderNumber(PSBaseModel):
     """
     Field	Description	Data Type	Required
@@ -110,6 +115,10 @@ class InvoiceLineItem(PSBaseModel):
     distributorPartId: str | None
 
 
+class InvoiceLineItemsArray(PSBaseModel):
+    InvoiceLineItem: list[InvoiceLineItem]
+
+
 class AccountInfo(PSBaseModel):
     """
     accountName	The name of the account that will be invoiced for the purchase order. This also represents the companyName field from the PO.	64 STRING	FALSE  # noqa
@@ -125,18 +134,38 @@ class AccountInfo(PSBaseModel):
     email	The email	128 STRING	FALSE
     phone	The phone number	32 STRING	FALSE
     """
-    accountName: str | None
-    accountNumber: str | None
-    attentionTo: str | None
-    address1: str | None
-    address2: str | None
-    address3: str | None
-    city: str | None
-    region: str | None
-    postalCode: str | None
-    country: str | None
-    email: str | None
-    phone: str | None
+    accountName: str | None = None
+    accountNumber: str | None = None
+    attentionTo: str | None = None
+    address1: str | None = None
+    address2: str | None = None
+    address3: str | None = None
+    city: str | None = None
+    region: str | None = None
+    postalCode: str | None = None
+    country: str | None = None
+    email: str | None = None
+    phone: str | None = None
+
+    @model_validator(mode='before')
+    @classmethod
+    def normalize_address_fields(cls, values):
+        """Map PascalCase Address1/2/3 from SOAP to camelCase address1/2/3."""
+        if isinstance(values, dict):
+            for n in ('1', '2', '3'):
+                pascal_key = f'Address{n}'
+                camel_key = f'address{n}'
+                if pascal_key in values and camel_key not in values:
+                    values[camel_key] = values.pop(pascal_key)
+        return values
+
+
+class BillTo(PSBaseModel):
+    AccountInfo: AccountInfo
+
+
+class SoldTo(PSBaseModel):
+    AccountInfo: AccountInfo
 
 
 class Invoice(PSBaseModel):
@@ -152,7 +181,7 @@ class Invoice(PSBaseModel):
     paymentTerms	The terms of the invoice	64 STRING	FALSE
     paymentDueDate	The Date the invoice must be paid in full without incurring late charges.	DATE	TRUE
     currency	The currency of the invoice in ISO4217 format	Enumerated STRING	TRUE
-    fobId	The fob point of the invoice	64 STRING	FALSE
+    fob	The fob point of the invoice	64 STRING	FALSE
     salesAmount	The amount of the sale in the currency specified.	DOUBLE	TRUE
     shippingAmount	The amount of the shipping charges in the currency specified.	DOUBLE	TRUE
     handlingAmount	The amount of the handling charges in the currency specified.	DOUBLE	TRUE
@@ -173,15 +202,15 @@ class Invoice(PSBaseModel):
     invoiceNumber: str
     invoiceType: str
     invoiceDate: date
-    purchaseOrderNumber: str | None
-    purchaseOrderVersion: str | None
-    BillTo: AccountInfo | None
-    SoldTo: AccountInfo | None
-    invoiceComments: str | None
-    paymentTerms: str | None
+    purchaseOrderNumber: str | None = None
+    purchaseOrderVersion: str | None = None
+    BillTo: BillTo | None = None
+    SoldTo: SoldTo | None = None
+    invoiceComments: str | None = None
+    paymentTerms: str | None = None
     paymentDueDate: date
     currency: str
-    fobId: str | None
+    fob: str | None = None
     salesAmount: float
     shippingAmount: float
     handlingAmount: float
@@ -189,11 +218,11 @@ class Invoice(PSBaseModel):
     invoiceAmount: float
     advancePaymentAmount: float
     invoiceAmountDue: float
-    invoiceDocumentUrl: str | None
-    InvoiceLineItemsArray: list[InvoiceLineItem]
-    SalesOrderNumbersArray: SalesOrderNumbersArray | None
-    TaxArray: list[Tax] | None
-    invoicePaymentUrl: str | None
+    invoiceDocumentUrl: str | None = None
+    InvoiceLineItemsArray: InvoiceLineItemsArray
+    SalesOrderNumbersArray: SalesOrderNumbersArray | None = None
+    TaxArray: TaxArray | None = None
+    invoicePaymentUrl: str | None = None
 
 
 class InvoiceArray(PSBaseModel):
