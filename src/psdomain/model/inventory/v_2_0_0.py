@@ -129,6 +129,24 @@ class PartInventory(PSBaseModel):
         description='An array of Inventory Location objects'
     )
 
+    @model_validator(mode='before')
+    @classmethod
+    def coerce_null_booleans(cls, values):
+        bool_defaults = {
+            'mainPart': True,
+            'manufacturedItem': False,
+            'buyToOrder': False,
+        }
+        if isinstance(values, dict):
+            for field, default in bool_defaults.items():
+                if values.get(field) is None:
+                    values[field] = default
+        else:
+            for field, default in bool_defaults.items():
+                if getattr(values, field, None) is None:
+                    setattr(values, field, default)
+        return values
+
     @property
     def inventory_location(self):
         return self.InventoryLocationArray.InventoryLocation if self.InventoryLocationArray else []

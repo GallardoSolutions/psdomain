@@ -416,3 +416,33 @@ def test_from_xml_to_dict():
     resp = inventory_2_0_0_error_response_from_xml_to_dict['s:Envelope']['s:Body']['GetInventoryLevelsResponse']
     result = InventoryLevelsResponseV200.model_validate(resp)
     assert result.ServiceMessageArray is None
+
+
+def test_part_inventory_coerce_null_booleans():
+    """Test that None boolean fields are coerced to sensible defaults."""
+    from psdomain.model.inventory.v_2_0_0 import PartInventory
+
+    part = PartInventory.model_validate({
+        'partId': 'TEST-NULL',
+        'mainPart': None,
+        'manufacturedItem': None,
+        'buyToOrder': None,
+    })
+    assert part.mainPart is True
+    assert part.manufacturedItem is False
+    assert part.buyToOrder is False
+
+
+def test_part_inventory_explicit_booleans_preserved():
+    """Test that explicit boolean values are not overwritten by the validator."""
+    from psdomain.model.inventory.v_2_0_0 import PartInventory
+
+    part = PartInventory.model_validate({
+        'partId': 'TEST-EXPLICIT',
+        'mainPart': False,
+        'manufacturedItem': True,
+        'buyToOrder': True,
+    })
+    assert part.mainPart is False
+    assert part.manufacturedItem is True
+    assert part.buyToOrder is True
