@@ -248,8 +248,8 @@ class Shipment(PSBaseModel):
     allowConsolidation: bool = Field(description="Allow consolidation of shipments.")
 
     FreightDetails: Annotated[
-        FreightDetails,
-        Field(description="Freight: carrier and service details.")
+        FreightDetails | None,
+        Field(description="Freight: carrier and service details.", default=None)
     ]
 
     ThirdPartyAccount: Annotated[
