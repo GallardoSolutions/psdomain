@@ -46,3 +46,28 @@ def test_shipment_with_freight_details():
     assert shipment.FreightDetails is not None
     assert shipment.FreightDetails.carrier == "UPS"
     assert shipment.FreightDetails.service == "GROUND"
+
+
+def test_freight_details_with_no_fields():
+    """Both carrier and service are optional per SOAP minOccurs=0."""
+    fd = FreightDetails()
+    assert fd.carrier is None
+    assert fd.service is None
+
+
+def test_freight_details_with_carrier_only():
+    fd = FreightDetails(carrier="FEDEX")
+    assert fd.carrier == "FEDEX"
+    assert fd.service is None
+
+
+def test_freight_details_with_service_only():
+    fd = FreightDetails(service="GROUND")
+    assert fd.carrier is None
+    assert fd.service == "GROUND"
+
+
+def test_freight_details_with_both_fields():
+    fd = FreightDetails(carrier="UPS", service="2DAY")
+    assert fd.carrier == "UPS"
+    assert fd.service == "2DAY"

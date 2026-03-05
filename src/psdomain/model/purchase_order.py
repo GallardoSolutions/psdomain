@@ -13,14 +13,14 @@ The objects are defined based on https://tools.promostandards.org/purchase-order
 
 class OrderType(StrEnum):
     """
-    “Blank”—This is data is for blank goods.
+    "Blank"—This is data is for blank goods.
 
-    “Sample”—This data is for a random sample order
+    "Sample"—This data is for a random sample order
 
-    “Simple”—The data in the purchase order is sent over without supplier configured data and will be processed
+    "Simple"—The data in the purchase order is sent over without supplier configured data and will be processed
     manually.
 
-    “Configured”—The data is sent over in conjunction with the supplier’s Product Pricing and Configuration web service
+    "Configured"—The data is sent over in conjunction with the supplier's Product Pricing and Configuration web service
     and designed for electronic processing of the purchase order.
     """
     Blank = "Blank"
@@ -31,9 +31,9 @@ class OrderType(StrEnum):
 
 class DigitalProofType(StrEnum):
     """
-    “Email”—The proof will be sent via email.
+    "Email"—The proof will be sent via email.
 
-    “Webservice”—The proof will be sent via Webservice.
+    "Webservice"—The proof will be sent via Webservice.
     """
     Email = "Email"
     Webservice = "Webservice"
@@ -71,7 +71,7 @@ class ToleranceType(StrEnum):
     AllowOverRun, AllowUnderrun, AllowOverrunOrUnderrun, ExactOnly.
 
     Specifying AllowOverRun, AllowUnderrun or AllowOverrunOrUnderrun without a value and uom will result
-    in the supplier’s discretion.
+    in the supplier's discretion.
     """
     AllowOverRun = "AllowOverRun"
     AllowUnderrun = "AllowUnderrun"
@@ -230,10 +230,15 @@ class ShipTo(PSBaseModel):
 
 
 class FreightDetails(PSBaseModel):
-    carrier: str = Field(description="The carrier name of the shipping vendor being requested. "
-                                     "(i.e. “UPS”, “FEDEX”, etc.)")
-    service: str = Field(description="The service code of the shipping vendor for the service being requested. "
-                                     "i.e. GROUND, 2DAY, NEXTDAY, etc.")
+    carrier: str | None = Field(
+        description="The carrier name of the shipping vendor being requested (i.e. UPS, FEDEX, etc.)",
+        default=None,
+    )
+    service: str | None = Field(
+        description="The service code of the shipping vendor for the service being requested "
+                    "(i.e. GROUND, 2DAY, NEXTDAY, etc.)",
+        default=None,
+    )
 
 
 class Shipment(PSBaseModel):
@@ -319,7 +324,7 @@ class Layers(PSBaseModel):
 class TransportMechanism(StrEnum):
     """
     The mechanism that will be used to transport the artwork; values are enumerated:
-    “Email”, “Url”, “Ftp”, “ArtworkToFollow”
+    "Email", "Url", "Ftp", "ArtworkToFollow"
     """
     Email = "Email"
     Url = "Url"
@@ -330,7 +335,7 @@ class TransportMechanism(StrEnum):
 class ArtworkType(StrEnum):
     """
     The purpose of the artwork file; values are enumerated:
-    “ProductionReady”, “VirtualProof”, “SupplierArtTemplate”, “NonProductionReady”
+    "ProductionReady", "VirtualProof", "SupplierArtTemplate", "NonProductionReady"
     """
     ProductionReady = "ProductionReady"
     VirtualProof = "VirtualProof"
@@ -379,10 +384,10 @@ class Artwork(PSBaseModel):
 
 
 class Decoration(PSBaseModel):
-    decorationId: int = Field(description="The decorationId from the supplier’s PromoStandards Product Pricing and "
+    decorationId: int = Field(description="The decorationId from the supplier's PromoStandards Product Pricing and "
                                           "Configuration service",
                               examples=[58])
-    decorationName: str | None = Field(description="The decorationName from the supplier’s PromoStandards Product "
+    decorationName: str | None = Field(description="The decorationName from the supplier's PromoStandards Product "
                                                    "Pricing and Configuration service.",
                                        examples=["Color Print SilkScreen"],
                                        default=None)
@@ -401,14 +406,14 @@ class ChargeType(StrEnum):
 
 
 class Charge(PSBaseModel):
-    chargeId: str = Field(description="The chargeId from the supplier’s PromoStandards Product Pricing and "
+    chargeId: str = Field(description="The chargeId from the supplier's PromoStandards Product Pricing and "
                                       "Configuration service", max_length=64)
     chargeName: str | None = Field(
-        description="The chargeName from the supplier’s PromoStandards Product Pricing and Configuration service.",
+        description="The chargeName from the supplier's PromoStandards Product Pricing and Configuration service.",
         default=None
     )
     description: str | None = Field(
-        description="The charge description from the supplier’s PromoStandards Product Pricing and "
+        description="The charge description from the supplier's PromoStandards Product Pricing and "
                     "Configuration service.",
         default=None
     )
@@ -424,7 +429,7 @@ class ChargeArray(PSBaseModel):
     """
     An array of charge information.
 
-    This array should be populated with information from the supplier’s PromoStandards
+    This array should be populated with information from the supplier's PromoStandards
     Product Pricing and Configuration service
     """
     Charge: list[Charge]
@@ -441,7 +446,7 @@ class ShipmentLinkArray(PSBaseModel):
 
 class ReferenceNuberType(StrEnum):
     """
-    The type of the prior order reference; values are enumerated: “PurchaseOrder”,”SalesOrder”, “JobOrWorkOrder”
+    The type of the prior order reference; values are enumerated: "PurchaseOrder","SalesOrder", "JobOrWorkOrder"
     """
     PurchaseOrder = "PurchaseOrder"
     SalesOrder = "SalesOrder"
@@ -453,10 +458,10 @@ class Location(PSBaseModel):
                                             "locations to a part.  Due to different colors and sizes, identical "
                                             "locations may need to be decorated differently",
                                 examples=[1])
-    locationId: int = Field(description="The locationId from the supplier’s PromoStandards Product Pricing and "
+    locationId: int = Field(description="The locationId from the supplier's PromoStandards Product Pricing and "
                                         "Configuration service", examples=[3174])
     locationName: str | None = Field(
-        description="The locationName from the supplier’s PromoStandards Product Pricing and "
+        description="The locationName from the supplier's PromoStandards Product Pricing and "
                     "Configuration service", examples=["Left Chest"],
         default=None)
     DecorationArray: DecorationArray
@@ -466,7 +471,7 @@ class LocationArray(PSBaseModel):
     """
     An array of Decoration Location Information.
 
-    This array should be populated with information from the supplier’s PromoStandards Product Pricing and
+    This array should be populated with information from the supplier's PromoStandards Product Pricing and
     Configuration service
     """
     Location: list[Location]
@@ -483,7 +488,7 @@ class Configuration(PSBaseModel):
         ChargeArray | None,
         Field(
             description="An array of product part information. This array should be populated with information from "
-                        "the supplier’s PromoStandards Product Pricing and Configuration service",
+                        "the supplier's PromoStandards Product Pricing and Configuration service",
             default=None)
     ]
 
@@ -491,7 +496,7 @@ class Configuration(PSBaseModel):
         LocationArray | None,
         Field(
             description="An array of Decoration Location Information. This array should be populated with information "
-                        "from the supplier’s PromoStandards Product Pricing and Configuration service",
+                        "from the supplier's PromoStandards Product Pricing and Configuration service",
             default=None
         )
     ]
@@ -500,14 +505,14 @@ class Configuration(PSBaseModel):
 class Part(PSBaseModel):
     partGroup: str | None = Field(description="An identifier that links common line item parts together",
                                   default=None)
-    partId: str = Field(description="The part Id from the supplier’s PromoStandards Product Pricing and Configuration "
+    partId: str = Field(description="The part Id from the supplier's PromoStandards Product Pricing and Configuration "
                                     "service")
     Quantity: Quantity
-    customerPartId: str | None = Field(description="How the part is being represented to the distributor’s customer",
+    customerPartId: str | None = Field(description="How the part is being represented to the distributor's customer",
                                        default=None)
     customerSupplied: bool = Field(description="The part will be supplied by the customer or another entity other than "
                                                "the supplier")
-    description: str | None = Field(description="The description from the supplier’s PromoStandards Product Pricing "
+    description: str | None = Field(description="The description from the supplier's PromoStandards Product Pricing "
                                                 "and Configuration service",
                                     default=None)
     locationLinkId: list[int] | None = Field(description="An array of location link Ids.  This links the part to its "
@@ -532,9 +537,9 @@ class PartArray(PSBaseModel):
 class LineType(StrEnum):
     """
     The type of order; values are enumerated:
-·  “New” –A new purchase order with no prior order reference
-·  “Repeat” —An exact repeat of a previous purchase order with the vendor
-·  “Reference” –An order that has the same artwork as a previous order.
+·  "New" –A new purchase order with no prior order reference
+·  "Repeat" —An exact repeat of a previous purchase order with the vendor
+·  "Reference" –An order that has the same artwork as a previous order.
     """
     New = "New"
     Repeat = "Repeat"
@@ -548,9 +553,9 @@ class LineItem(PSBaseModel):
                     "field to explain the details.")
     lineType: LineType = Field(
         description='The type of order; values are enumerated: '
-                    '“New” –A new purchase order with no prior order reference, '
-                    '“Repeat” —An exact repeat of a previous purchase order with the vendor, '
-                    '“Reference” –An order that has the same artwork as a previous order.',
+                    '"New" –A new purchase order with no prior order reference, '
+                    '"Repeat" —An exact repeat of a previous purchase order with the vendor, '
+                    '"Reference" –An order that has the same artwork as a previous order.',
     )
     Quantity: Annotated[
         Quantity | None,
@@ -558,7 +563,7 @@ class LineItem(PSBaseModel):
               default=None)
     ]
 
-    fobId: str | None = Field(description="Used to indicate the FOB point.  Use fobId from the supplier’s Product "
+    fobId: str | None = Field(description="Used to indicate the FOB point.  Use fobId from the supplier's Product "
                                           "Pricing and Configuration Service to populate this information",
                               default=None)
     ToleranceDetails: Annotated[
@@ -590,11 +595,11 @@ class LineItem(PSBaseModel):
         )
     ]
 
-    endCustomerSalesOrder: str | None = Field(description="The distributor’s order number provided to the end customer",
+    endCustomerSalesOrder: str | None = Field(description="The distributor's order number provided to the end customer",
                                               default=None)
-    productId: str | None = Field(description="The manufacturer’s product id associated with the configuration data",
+    productId: str | None = Field(description="The manufacturer's product id associated with the configuration data",
                                   default=None)
-    customerProductId: str | None = Field(description="The distributor’s product id", default=None)
+    customerProductId: str | None = Field(description="The distributor's product id", default=None)
     lineItemGroupingId: int | None = Field(
         description="An identifier that allows configuration data to be spread out "
                     "among multiple purchase order lines. Keep `lineItemGroupingID` "
@@ -608,7 +613,7 @@ class LineItem(PSBaseModel):
         PartArray | None,
         Field(
             description="An array of product part information. This array should be populated with information from "
-                        "the supplier’s PromoStandards Product Pricing and Configuration service.",
+                        "the supplier's PromoStandards Product Pricing and Configuration service.",
             default=None
         )
     ]
@@ -703,7 +708,7 @@ class PO(PSBaseModel):
 
 class SupportedOrderType(StrEnum):
     """
-    The type of order; values are enumerated: “Blank”, “Sample”, “Simple” “Configured”
+    The type of order; values are enumerated: "Blank", "Sample", "Simple" "Configured"
     """
     Blank = "Blank"
     Sample = "Sample"
