@@ -23,7 +23,7 @@ class ResponseToArray(PSBaseModel):
 class OrderStatusDetail(PSBaseModel):
     factoryOrderNumber: str
     statusID: int
-    statusName: str  # in the wsdl is required but not in best practice & PromoStandards docs
+    statusName: str | None = None  # minOccurs=0 per WSDL; Hirsch omits it when errorMessage is set
     responseRequired: bool | None = False  # THe docs say it is required, but we found PCNA sending None
     validTimestamp: datetime
     expectedShipDate: datetime | None
