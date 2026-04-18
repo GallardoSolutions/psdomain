@@ -82,12 +82,23 @@ class SalesOrderNumbersArray(PSBaseModel):
     def normalize_flat_sales_order_numbers(cls, values):
         """Some suppliers (e.g. Gemline) flatten the SalesOrderNumbersArray, emitting
         <salesOrderNumber> directly instead of wrapping each entry in <SalesOrderNumber>.
-        Normalize the flattened shape to the canonical list[SalesOrderNumber]."""
-        if isinstance(values, dict) and 'SalesOrderNumber' not in values and 'salesOrderNumber' in values:
-            son = values.pop('salesOrderNumber')
+        Normalize the flattened shape to the canonical list[SalesOrderNumber].
+        Works on both dict inputs and zeep CompoundValue-style objects."""
+        if isinstance(values, dict):
+            get = values.get
+            pop = values.pop
+            has_nested = 'SalesOrderNumber' in values and values.get('SalesOrderNumber') is not None
+            has_flat = 'salesOrderNumber' in values and values.get('salesOrderNumber') is not None
+        else:
+            get = lambda k: getattr(values, k, None)  # noqa: E731
+            pop = get
+            has_nested = get('SalesOrderNumber') is not None
+            has_flat = get('salesOrderNumber') is not None
+        if not has_nested and has_flat:
+            son = pop('salesOrderNumber')
             if not isinstance(son, list):
                 son = [son]
-            values['SalesOrderNumber'] = [{'salesOrderNumber': s} for s in son]
+            return {'SalesOrderNumber': [{'salesOrderNumber': s} for s in son]}
         return values
 
 

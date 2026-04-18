@@ -128,3 +128,13 @@ def test_sales_order_numbers_flattened_gemline_form():
         {"SalesOrderNumber": [{"salesOrderNumber": "SO-9001"}]}
     )
     assert arr3.SalesOrderNumber[0].salesOrderNumber == "SO-9001"
+
+
+def test_sales_order_numbers_flattened_zeep_object_form():
+    """Zeep hands pydantic a CompoundValue (attribute-access object), not a dict.
+    The normalizer must still reshape it."""
+    from types import SimpleNamespace
+    from psdomain.model.invoice import SalesOrderNumbersArray
+    zeep_like = SimpleNamespace(salesOrderNumber=["E789553"])
+    arr = SalesOrderNumbersArray.model_validate(zeep_like)
+    assert arr.SalesOrderNumber[0].salesOrderNumber == "E789553"
