@@ -86,3 +86,45 @@ def test_sales_order_numbers_wrapper(invoice_response_ok_obj):
     assert len(orders) == 2
     assert orders[0].salesOrderNumber == "SO-9001"
     assert orders[1].salesOrderNumber == "SO-9002"
+
+
+def test_invoice_line_item_chargeid_optional():
+    """Product line items omit chargeId (only charge lines carry it)."""
+    from psdomain.model.invoice import InvoiceLineItem
+    product_line = InvoiceLineItem.model_validate({
+        "invoiceLineItemNumber": 1,
+        "productId": "40060",
+        "partId": "40060",
+        "purchaseOrderLineItemNumber": None,
+        "orderedQuantity": 102,
+        "invoiceQuantity": 102,
+        "backOrderedQuantity": None,
+        "quantityUOM": "EA",
+        "lineItemDescription": "MOLESKINE HARD COVER RULED LARGE NOTEBOOK",
+        "unitPrice": 17.54,
+        "discountAmount": None,
+        "extendedPrice": 1789.08,
+        "distributorProductId": None,
+        "distributorPartId": None,
+    })
+    assert product_line.chargeId is None
+    assert product_line.productId == "40060"
+
+
+def test_sales_order_numbers_flattened_gemline_form():
+    """Gemline flattens <SalesOrderNumbersArray><salesOrderNumber>X</salesOrderNumber></...>
+    skipping the <SalesOrderNumber> wrapper. Normalizer should reconstruct the canonical shape."""
+    from psdomain.model.invoice import SalesOrderNumbersArray
+    arr = SalesOrderNumbersArray.model_validate({"salesOrderNumber": ["E789553"]})
+    assert len(arr.SalesOrderNumber) == 1
+    assert arr.SalesOrderNumber[0].salesOrderNumber == "E789553"
+
+    # scalar form also supported
+    arr2 = SalesOrderNumbersArray.model_validate({"salesOrderNumber": "E787347"})
+    assert arr2.SalesOrderNumber[0].salesOrderNumber == "E787347"
+
+    # canonical form still works
+    arr3 = SalesOrderNumbersArray.model_validate(
+        {"SalesOrderNumber": [{"salesOrderNumber": "SO-9001"}]}
+    )
+    assert arr3.SalesOrderNumber[0].salesOrderNumber == "SO-9001"

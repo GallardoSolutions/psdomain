@@ -77,6 +77,19 @@ class SalesOrderNumber(PSBaseModel):
 class SalesOrderNumbersArray(PSBaseModel):
     SalesOrderNumber: list[SalesOrderNumber]
 
+    @model_validator(mode='before')
+    @classmethod
+    def normalize_flat_sales_order_numbers(cls, values):
+        """Some suppliers (e.g. Gemline) flatten the SalesOrderNumbersArray, emitting
+        <salesOrderNumber> directly instead of wrapping each entry in <SalesOrderNumber>.
+        Normalize the flattened shape to the canonical list[SalesOrderNumber]."""
+        if isinstance(values, dict) and 'SalesOrderNumber' not in values and 'salesOrderNumber' in values:
+            son = values.pop('salesOrderNumber')
+            if not isinstance(son, list):
+                son = [son]
+            values['SalesOrderNumber'] = [{'salesOrderNumber': s} for s in son]
+        return values
+
 
 class InvoiceLineItem(PSBaseModel):
     """
@@ -102,7 +115,7 @@ class InvoiceLineItem(PSBaseModel):
     invoiceLineItemNumber: float | None
     productId: str | None
     partId: str | None
-    chargeId: str
+    chargeId: str | None = None  # present only on charge lines; product lines omit it (Gemline)
     purchaseOrderLineItemNumber: str | None
     orderedQuantity: float | None
     invoiceQuantity: float
