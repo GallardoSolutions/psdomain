@@ -91,12 +91,16 @@ class ClassTypeArray(base.PSBaseModel):
 
 
 class Decoration(base.PSBaseModel):
-    decorationId: int
-    decorationName: str
+    # decorationName is optional per the SOAP schema (minOccurs=0). decorationId is required
+    # by the schema (minOccurs=1), but some suppliers (e.g. Bel Promo) return a 'Blank'
+    # decoration with no decorationId, so we relax it to tolerate non-compliant responses.
+    decorationId: int | None = None
+    decorationName: str | None = None
 
     @property
     def is_blank(self):
-        return self.decorationName.lower() == 'blank'  # HIT has a decoration with name 'Blank'
+        # HIT/Bel Promo have a decoration with name 'Blank'
+        return bool(self.decorationName) and self.decorationName.lower() == 'blank'
 
 
 class DecorationArray(base.PSBaseModel):
@@ -108,12 +112,14 @@ class DecorationArray(base.PSBaseModel):
 
     @property
     def names_list(self):
-        return [dec.decorationName for dec in self.Decoration]
+        return [dec.decorationName for dec in self.Decoration if dec.decorationName]
 
 
 class Location(base.PSBaseModel):
+    # locationId is required (minOccurs=1); locationName is optional (minOccurs=0) per the
+    # MediaContent SOAP definition.
     locationId: int
-    locationName: str
+    locationName: str | None = None
 
 
 class LocationArray(base.PSBaseModel):
@@ -125,7 +131,7 @@ class LocationArray(base.PSBaseModel):
 
     @property
     def names_list(self):
-        return [loc.locationName for loc in self.Location]
+        return [loc.locationName for loc in self.Location if loc.locationName]
 
 
 # Some ClassTypeOptions

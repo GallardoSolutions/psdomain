@@ -1,4 +1,6 @@
 # flake8: noqa F811
+import pytest
+from pydantic import ValidationError
 from .fixtures import blank_mc, blank_hit, primary_decorated  # noqa
 from psdomain.model.media_content import ClassType, ClassTypeArray, BLANK, FRONT, DECORATED, DecorationArray, \
     Decoration, Location, LocationArray, MediaContent, MediaContentArray, MediaContentDetailsResponse  # noqa
@@ -48,6 +50,24 @@ def test_location_list():
     assert names_list == ['Side', 'Back']
 
 
+def test_location_name_optional_id_required():
+    # locationName is optional (minOccurs=0); locationId is required (minOccurs=1).
+    loc = Location(locationId=23)
+    assert loc.locationId == 23
+    assert loc.locationName is None
+    with pytest.raises(ValidationError):
+        Location(locationName='Side')
+
+
+def test_location_array_names_list_skips_none():
+    arr = LocationArray(Location=[
+        Location(locationId=23, locationName='Side'),
+        Location(locationId=24),
+    ])
+    assert arr.names_list == ['Side']
+    assert arr.names == 'Side'
+
+
 def test_decoration_list():
     lst = [
         Decoration(decorationId=10, decorationName='Screen Print'),
@@ -56,6 +76,61 @@ def test_decoration_list():
     arr = DecorationArray(Decoration=lst)
     names_list = arr.names_list
     assert names_list == ['Screen Print', 'Embroidery']
+
+
+def test_decoration_allows_none_id():
+    # Bel Promo returns a 'Blank' decoration with no decorationId.
+    dec = Decoration(decorationName='Blank')
+    assert dec.decorationId is None
+    assert dec.decorationName == 'Blank'
+    assert dec.is_blank
+
+
+def test_decoration_allows_both_none():
+    # The MediaContent 1.1.0 SOAP definition allows both fields to be absent.
+    dec = Decoration()
+    assert dec.decorationId is None
+    assert dec.decorationName is None
+    assert not dec.is_blank
+
+
+def test_decoration_array_names_list_skips_none():
+    lst = [
+        Decoration(decorationId=1, decorationName='screen_print'),
+        Decoration(decorationName='Blank'),
+        Decoration(),
+    ]
+    arr = DecorationArray(Decoration=lst)
+    assert arr.names_list == ['screen_print', 'Blank']
+    assert arr.names == 'screen_print, Blank'
+
+
+def test_media_content_with_blank_decoration_no_id():
+    # Reproduces the Bel Promo proto message: a 'Blank' decoration without decorationId.
+    data = {
+        "productId": "A0024AL",
+        "partId": "A0024AL-Clear",
+        "url": "https://belusaweb.s3.amazonaws.com/product-images/designlab/clear.jpg",
+        "mediaType": "Image",
+        "singlePart": True,
+        "ClassTypeArray": {
+            "ClassType": [
+                {"classTypeId": 1006, "classTypeName": "Primary"},
+                {"classTypeId": 2000, "classTypeName": "Standard"},
+            ]
+        },
+        "DecorationArray": {
+            "Decoration": [
+                {"decorationName": "Blank"}
+            ]
+        },
+        "LocationArray": None,
+    }
+    mc = MediaContent.model_validate(data)
+    assert mc.decorations[0].decorationId is None
+    assert mc.decorations[0].is_blank
+    assert mc.is_blank
+    assert not mc.is_decorated
 
 
 def test_get_unique_urls():
