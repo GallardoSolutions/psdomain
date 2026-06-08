@@ -347,3 +347,49 @@ class TestMediaV110Converter:
         assert roundtrip.MediaContentArray is not None
         assert len(roundtrip.MediaContentArray.MediaContent) == 1
         assert roundtrip.MediaContentArray.MediaContent[0].productId == "55410"
+
+    def test_blank_decoration_id_zero_roundtrip(self):
+        """A 'Blank' decoration with decorationId 0 must survive the proto roundtrip.
+
+        Bel Promo (e.g. product A0055AL) returns a Blank decoration with
+        decorationId 0. The previous converter mapped a falsy 0 to None, which
+        was discarded by the cache and crashed deserialization. The id must be
+        preserved as 0, matching the live (uncached) response.
+        """
+        from psdomain.converters.media import v110
+
+        data = {
+            "productId": "A0055AL",
+            "partId": "A0055AL-Clear",
+            "url": "https://belusaweb.s3.amazonaws.com/x.jpg",
+            "mediaType": "Image",
+            "fileSize": null,
+            "width": null,
+            "height": null,
+            "dpi": null,
+            "color": null,
+            "description": null,
+            "singlePart": True,
+            "changeTimeStamp": null,
+            "ClassTypeArray": {
+                "ClassType": [
+                    {"classTypeId": 1006, "classTypeName": "Primary"}
+                ]
+            },
+            "DecorationArray": {
+                "Decoration": [
+                    {"decorationId": 0, "decorationName": "Blank"}
+                ]
+            },
+            "LocationArray": None,
+        }
+        mc = MediaContent.model_validate(data)
+
+        proto_mc = v110.media_content_to_proto(mc)
+        assert proto_mc.decorations[0].decoration_id == 0
+
+        roundtrip = v110.media_content_from_proto(proto_mc)
+        assert roundtrip.DecorationArray is not None
+        assert len(roundtrip.DecorationArray.Decoration) == 1
+        assert roundtrip.DecorationArray.Decoration[0].decorationId == 0
+        assert roundtrip.DecorationArray.Decoration[0].decorationName == "Blank"

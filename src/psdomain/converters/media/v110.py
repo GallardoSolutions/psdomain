@@ -48,9 +48,13 @@ def decoration_to_proto(dec: Decoration) -> "proto.Decoration":
 
 
 def decoration_from_proto(p: "proto.Decoration") -> Decoration:
-    """Convert proto Decoration to pydantic Decoration."""
+    """Convert proto Decoration to pydantic Decoration.
+
+    decoration_id 0 is a legitimate value (e.g. Bel Promo's 'Blank' decoration),
+    so it must be preserved rather than collapsed to None.
+    """
     return Decoration(
-        decorationId=p.decoration_id if p.decoration_id else None,
+        decorationId=p.decoration_id,
         decorationName=proto_str_or_none(p.decoration_name),
     )
 
@@ -65,9 +69,13 @@ def location_to_proto(loc: Location) -> "proto.Location":
 
 
 def location_from_proto(p: "proto.Location") -> Location:
-    """Convert proto Location to pydantic Location."""
+    """Convert proto Location to pydantic Location.
+
+    locationId is required (int) on the model, so preserve the proto value
+    directly instead of collapsing a falsy 0 to None (which would crash).
+    """
     return Location(
-        locationId=p.location_id if p.location_id else None,
+        locationId=p.location_id,
         locationName=proto_str_or_none(p.location_name),
     )
 
