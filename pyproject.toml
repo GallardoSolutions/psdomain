@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "psdomain"
-version = "0.1.29"
+version = "0.0.0"  # placeholder; real version is derived from git tags by poetry-dynamic-versioning
 description = "Domain Model for PromoStandards in Python"
 authors = ["Edilio Gallardo <edilio@gallardo.solutions>"]
 readme = "README.md"
@@ -25,6 +25,16 @@ pytest-mock = "^3.14.0"
 pytest-cov = "^7.1.0"
 xmltodict = "^0.13.0"
 
+[tool.poetry-dynamic-versioning]
+enable = true
+vcs = "git"
+style = "pep440"
+pattern = "^v(?P<base>\\d+\\.\\d+\\.\\d+)"
+
+# Keep src/psdomain/__init__.py's __version__ in sync with the derived version.
+[tool.poetry-dynamic-versioning.substitution]
+files = ["src/psdomain/__init__.py"]
+
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+build-backend = "poetry_dynamic_versioning.backend"
