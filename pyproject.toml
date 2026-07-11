@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "psdomain"
-version = "0.1.0"
+version = "0.1.29"
 description = "Domain Model for PromoStandards in Python"
 authors = ["Edilio Gallardo <edilio@gallardo.solutions>"]
 readme = "README.md"

@@ -353,7 +353,7 @@ class ProductPriceArray(base.PSBaseModel):
 
 
 class ProductPriceGroup(base.PSBaseModel):
-    groupName: str
+    groupName: str | None = None  # minOccurs=0 in the SOAP definition; Goldstar sends null
     currency: str
     description: str | None
     ProductPriceArray: typing.Annotated[typing.Optional[ProductPriceArray], Field(None)]

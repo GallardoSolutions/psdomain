@@ -57,6 +57,20 @@ class TestProductPriceGroup:
         assert price_group.prices[0].price == Decimal("10.50")
         assert price_group.prices[1].price == Decimal("8.75")
 
+    def test_product_price_group_with_none_group_name(self):
+        """groupName is minOccurs=0 in the SOAP definition, so suppliers like
+        Goldstar may send it as null. It must be accepted as None."""
+        price_group = ProductPriceGroup(
+            groupName=None,
+            currency="USD",
+            description="USD-List-Blank",
+            ProductPriceArray=None
+        )
+
+        assert price_group.groupName is None
+        assert price_group.currency == "USD"
+        assert price_group.description == "USD-List-Blank"
+
     def test_product_price_group_without_price_array_field(self):
         """Test that ProductPriceGroup can be created without ProductPriceArray field"""
         price_group = ProductPriceGroup(
