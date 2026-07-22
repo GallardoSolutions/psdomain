@@ -111,6 +111,62 @@ def test_invoice_line_item_chargeid_optional():
     assert product_line.productId == "40060"
 
 
+def _line_item_base():
+    return {
+        "invoiceLineItemNumber": 1,
+        "productId": "40060",
+        "partId": "40060",
+        "orderedQuantity": 102,
+        "invoiceQuantity": 102,
+        "backOrderedQuantity": None,
+        "quantityUOM": "EA",
+        "lineItemDescription": "MOLESKINE HARD COVER RULED LARGE NOTEBOOK",
+        "unitPrice": 17.54,
+        "discountAmount": None,
+        "extendedPrice": 1789.08,
+        "distributorProductId": None,
+        "distributorPartId": None,
+    }
+
+
+def test_purchase_order_line_item_number_accepts_decimal():
+    """The WSDL/XSD types purchaseOrderLineItemNumber as xsd:decimal, and SanMar
+    returns it as a number (e.g. 3, 1, 2, 4). It was previously typed `str`, which
+    rejected those values with a `string_type` validation error. The field is now
+    Decimal, accepts numeric input, and stays optional."""
+    from decimal import Decimal
+    from psdomain.model.invoice import InvoiceLineItem
+    base = _line_item_base()
+    # SanMar sends it as a bare decimal; string, int, float and Decimal all coerce.
+    for value in (3, "3", 3.0, Decimal("3")):
+        line = InvoiceLineItem.model_validate({**base, "purchaseOrderLineItemNumber": value})
+        assert line.purchaseOrderLineItemNumber == Decimal("3")
+        assert isinstance(line.purchaseOrderLineItemNumber, Decimal)
+
+    # remains optional (older suppliers omit it -> None)
+    line = InvoiceLineItem.model_validate({**base, "purchaseOrderLineItemNumber": None})
+    assert line.purchaseOrderLineItemNumber is None
+
+
+def test_invoice_numeric_fields_are_decimal():
+    """All xsd:decimal fields (money + quantities) are modeled as Decimal to preserve
+    exact precision. A value like 0.1 must not drift the way binary float does."""
+    from decimal import Decimal
+    from psdomain.model.invoice import InvoiceLineItem
+    line = InvoiceLineItem.model_validate({
+        **_line_item_base(),
+        "purchaseOrderLineItemNumber": 2,
+        "unitPrice": "0.1",
+        "discountAmount": "0.2",
+        "extendedPrice": "10.4",
+    })
+    assert isinstance(line.unitPrice, Decimal)
+    assert isinstance(line.invoiceQuantity, Decimal)
+    assert isinstance(line.orderedQuantity, Decimal)
+    # exact — no 0.30000000000000004 float artifact
+    assert line.unitPrice + line.discountAmount == Decimal("0.3")
+
+
 def test_sales_order_numbers_flattened_gemline_form():
     """Gemline flattens <SalesOrderNumbersArray><salesOrderNumber>X</salesOrderNumber></...>
     skipping the <SalesOrderNumber> wrapper. Normalizer should reconstruct the canonical shape."""

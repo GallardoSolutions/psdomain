@@ -1,4 +1,5 @@
 from datetime import date
+from decimal import Decimal
 from typing import Annotated
 
 from pydantic import Field, model_validator
@@ -55,11 +56,11 @@ class Tax(PSBaseModel):
     taxType	The type of tax the identifier applies to. Values are enumerated: “SALES”, “HST/GST”, “PST”, “VAT”.	64
             STRING FACIT	TRUE
     taxJurisdiction	The jurisdiction for the tax. For example, NJ, PA or Philadelphia City.	64 SRING	TRUE
-    taxAmount	The amount of tax	DOUBLE	TRUE
+    taxAmount	The amount of tax	DECIMAL	TRUE
     """
     taxType: TaxType
     taxJurisdiction: str
-    taxAmount: float
+    taxAmount: Decimal
 
 
 class TaxArray(PSBaseModel):
@@ -105,37 +106,43 @@ class SalesOrderNumbersArray(PSBaseModel):
 class InvoiceLineItem(PSBaseModel):
     """
     Field	Description	Data Type	Required
-    invoiceLineItemNumber	The line item number of the line item	DOUBLE	FALSE
+    invoiceLineItemNumber	The line item number of the line item	DECIMAL	FALSE
     productId	The productId when the line item applies to a product.	64 STRING	FALSE
     partId	The partId when the line item applies to a product.	64 STRING	FALSE
     chargeId	The chargeId when the line item applies to a charge.	64 STRING	TRUE
-    purchaseOrderLineItemNumber	The line item number of the purchase order that the invoice references	64 STRING	FALSE # noqa
-    orderedQuantity	The quantity ordered by the referenced purchase order	DOUBLE	FALSE
-    invoiceQuantity	The quantity of the line item invoiced.	DOUBLE	TRUE
-    backOrderedQuantity	The quantity of the line item backordered.	DOUBLE	FALSE
+    purchaseOrderLineItemNumber	The line item number of the purchase order that the invoice references	DECIMAL	FALSE # noqa
+        NOTE: the PromoStandards published field table lists this as "64 STRING", but the
+        WSDL/XSD (SharedObjects) defines it as xsd:decimal (fractionDigits=4), and live
+        suppliers such as SanMar return it as a number, e.g. 3. We follow the schema.  # noqa
+    orderedQuantity	The quantity ordered by the referenced purchase order	DECIMAL	FALSE
+    invoiceQuantity	The quantity of the line item invoiced.	DECIMAL	TRUE
+    backOrderedQuantity	The quantity of the line item backordered.	DECIMAL	FALSE
     quantityUOM	The unit of measure of the orderQuantity, invoicedQuantity, and backOrderedQuantity	2 STRING FACIT	TRUE # noqa
     lineItemDescription	A textual description of the line item	1024 STRING	TRUE
-    unitPrice	The price of the unit in the currency of the purchase order	DOUBLE	TRUE
-    discountAmount	An amount of discount applied to the item.	DOUBLE	FALSE
+    unitPrice	The price of the unit in the currency of the purchase order	DECIMAL	TRUE
+    discountAmount	An amount of discount applied to the item.	DECIMAL	FALSE
     extendedPrice	"The extended price for the line item
 
-    Note: extendedPrice = (unitPrice * invoicedQuantity) - discountAmount"	DOUBLE	TRUE
+    Note: extendedPrice = (unitPrice * invoicedQuantity) - discountAmount"	DECIMAL	TRUE
     distributorProductId	The distributor’s productId for the item when the line item applies to a product.	64 STRING	FALSE  # noqa
     distributorPartId	The distributor’s partId for the item when the line item applies to a product.	64 STRING	FALSE  # noqa
+
+    All numeric fields are xsd:decimal (fractionDigits=4) in the SharedObjects schema; we
+    model them as Decimal to preserve exact monetary/quantity precision (float is lossy).
     """
-    invoiceLineItemNumber: float | None
+    invoiceLineItemNumber: Decimal | None
     productId: str | None
     partId: str | None
     chargeId: str | None = None  # present only on charge lines; product lines omit it (Gemline)
-    purchaseOrderLineItemNumber: str | None
-    orderedQuantity: float | None
-    invoiceQuantity: float
-    backOrderedQuantity: float | None
+    purchaseOrderLineItemNumber: Decimal | None
+    orderedQuantity: Decimal | None
+    invoiceQuantity: Decimal
+    backOrderedQuantity: Decimal | None
     quantityUOM: str
     lineItemDescription: str
-    unitPrice: float
-    discountAmount: float | None
-    extendedPrice: float
+    unitPrice: Decimal
+    discountAmount: Decimal | None
+    extendedPrice: Decimal
     distributorProductId: str | None
     distributorPartId: str | None
 
@@ -207,17 +214,17 @@ class Invoice(PSBaseModel):
     paymentDueDate	The Date the invoice must be paid in full without incurring late charges.	DATE	TRUE
     currency	The currency of the invoice in ISO4217 format	Enumerated STRING	TRUE
     fob	The fob point of the invoice	64 STRING	FALSE
-    salesAmount	The amount of the sale in the currency specified.	DOUBLE	TRUE
-    shippingAmount	The amount of the shipping charges in the currency specified.	DOUBLE	TRUE
-    handlingAmount	The amount of the handling charges in the currency specified.	DOUBLE	TRUE
-    taxAmount	The total amount of taxes in the currency specified.	DOUBLE	TRUE
+    salesAmount	The amount of the sale in the currency specified.	DECIMAL	TRUE
+    shippingAmount	The amount of the shipping charges in the currency specified.	DECIMAL	TRUE
+    handlingAmount	The amount of the handling charges in the currency specified.	DECIMAL	TRUE
+    taxAmount	The total amount of taxes in the currency specified.	DECIMAL	TRUE
     invoiceAmount	"The total amount of the invoice in the currency specified.
 
-    Note: invoiceAmount = salesAmount + shippingAmount + handlingAmount + taxAmount"	DOUBLE	TRUE
-    advancePaymentAmount	The amount of any advanced payments in the currency specified. If the source system does not support including prepayments on an invoice this value should be set to zero.	DOUBLE	TRUE  # noqa
+    Note: invoiceAmount = salesAmount + shippingAmount + handlingAmount + taxAmount"	DECIMAL	TRUE
+    advancePaymentAmount	The amount of any advanced payments in the currency specified. If the source system does not support including prepayments on an invoice this value should be set to zero.	DECIMAL	TRUE  # noqa
     invoiceAmountDue	"The total of the invoice amount due after applying any prepayments in the currency specified.
 
-    Note: invoiceAmountDue = invoiceAmount - advancePaymentAmount"	DOUBLE	TRUE
+    Note: invoiceAmountDue = invoiceAmount - advancePaymentAmount"	DECIMAL	TRUE
     invoiceDocumentUrl	The url to be able to download the physical invoice document.	1024 STRING	FALSE
     InvoiceLineItemsArray	An array of invoice line item objects	OBJECT ARRAY	TRUE
     SalesOrderNumbersArray	An array of sales order numbers included in the invoice.	OBJECT ARRAY	FALSE
@@ -236,13 +243,13 @@ class Invoice(PSBaseModel):
     paymentDueDate: date
     currency: str
     fob: str | None = None
-    salesAmount: float
-    shippingAmount: float
-    handlingAmount: float
-    taxAmount: float
-    invoiceAmount: float
-    advancePaymentAmount: float
-    invoiceAmountDue: float
+    salesAmount: Decimal
+    shippingAmount: Decimal
+    handlingAmount: Decimal
+    taxAmount: Decimal
+    invoiceAmount: Decimal
+    advancePaymentAmount: Decimal
+    invoiceAmountDue: Decimal
     invoiceDocumentUrl: str | None = None
     InvoiceLineItemsArray: InvoiceLineItemsArray
     SalesOrderNumbersArray: Annotated[SalesOrderNumbersArray | None, Field(default=None)]
