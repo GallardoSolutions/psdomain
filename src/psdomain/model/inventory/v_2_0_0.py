@@ -159,9 +159,16 @@ class PartInventory(PSBaseModel):
 
     @property
     def current_availability_v2(self) -> Decimal:
-        # some suppliers doesn't provide a reliable quantityAvailable so we calculate it
-        if self.inventory_location:
-            return sum([loc.current_availability for loc in self.inventory_location], ZERO)
+        # Some suppliers don't provide a reliable quantityAvailable, so when the
+        # per-location breakdown carries real numbers we sum that instead.
+        # But some suppliers (e.g. S&S Canada) send an InventoryLocationArray in
+        # which every inventoryLocationQuantity is null while the real total sits
+        # in quantityAvailable -- summing those nulls would wrongly yield 0. So we
+        # only trust the location sum when at least one location actually reports a
+        # quantity; otherwise we fall back to quantityAvailable.
+        locations = self.inventory_location
+        if any(loc.inventoryLocationQuantity is not None for loc in locations):
+            return sum([loc.current_availability for loc in locations], ZERO)
         if self.quantityAvailable:
             return self.quantityAvailable.value
         return ZERO

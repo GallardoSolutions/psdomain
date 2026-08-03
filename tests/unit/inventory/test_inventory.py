@@ -396,6 +396,44 @@ def test_current_availability_v2_2_0_0_priority():
     assert part.quantityAvailable.value == Decimal(100)  # Original value is different
 
 
+def test_current_availability_v2_2_0_0_null_locations():
+    """S&S Canada regression: InventoryLocationArray is present but every
+    inventoryLocationQuantity is null, with the real total in quantityAvailable.
+    Summing the null locations would wrongly yield 0, so v2 must fall back to
+    quantityAvailable instead of collapsing to zero."""
+    from psdomain.model.inventory.v_2_0_0 import (
+        PartInventory, QuantityAvailable, Quantity, InventoryLocation, InventoryLocationArray
+    )
+    from psdomain.model.base import UOM
+
+    part = PartInventory(
+        partId='B01253503',
+        mainPart=True,
+        quantityAvailable=QuantityAvailable(
+            Quantity=Quantity(value=Decimal(107), uom=UOM.EA)
+        ),
+        manufacturedItem=False,
+        buyToOrder=False,
+        attributeSelection=None,
+        InventoryLocationArray=InventoryLocationArray(
+            InventoryLocation=[
+                InventoryLocation(
+                    inventoryLocationId=loc_id,
+                    inventoryLocationName=loc_name,
+                    postalCode=None,
+                    country=None,
+                    inventoryLocationQuantity=None,  # supplier does not break stock down by location
+                    FutureAvailabilityArray=None,
+                )
+                for loc_id, loc_name in (('QC', 'Montreal'), ('BC', 'Vancouver'), ('ON', 'Toronto'))
+            ]
+        )
+    )
+
+    # Locations exist but report no quantity -> use the reliable total, not 0.
+    assert part.current_availability_v2 == Decimal(107)
+
+
 def test_current_availability_v1_v2_comparison_1_2_1():
     """Test that v1 and v2 are identical in version 1.2.1 API"""
     from psdomain.model.inventory.v_1_2_1 import ProductVariationInventory
