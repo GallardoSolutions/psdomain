@@ -378,6 +378,16 @@ class MediaResponse(base.PSBaseModel):
     def errors(self):
         return str(self.errorMessage) if self.errorMessage else None
 
+    @classmethod
+    def not_supported(cls):
+        # Mirror ErrorMessageResponse.not_supported: null the payload field and
+        # carry a "Not Supported" ErrorMessage. Lets the SOAP layer degrade a
+        # media fault (e.g. a supplier endpoint returning a bare 404 that zeep
+        # wraps as "Unknown fault occured") into an empty media response instead
+        # of raising.
+        field_name = [k for k in cls.model_fields.keys() if k != 'errorMessage'][0]
+        return cls(**{field_name: None, 'errorMessage': base.ErrorMessage.not_supported()})
+
 
 class MediaContentDetailsResponse(MediaResponse):
     MediaContentArray: MediaContentArray | None
