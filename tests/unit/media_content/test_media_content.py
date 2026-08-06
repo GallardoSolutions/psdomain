@@ -207,3 +207,13 @@ def test_is_too_big():
                       mediaType='Image',
                       **core_dict)
     assert not mc.is_too_big
+
+
+def test_not_supported_returns_empty_media_with_error():
+    # Lets the SOAP layer degrade a media fault into an empty response instead of
+    # raising (mirrors ErrorMessageResponse.not_supported for the errorMessage field).
+    resp = MediaContentDetailsResponse.not_supported()
+    assert resp.MediaContentArray is None
+    assert resp.errorMessage is not None
+    assert resp.errorMessage.code == 125
+    assert not resp.is_ok
