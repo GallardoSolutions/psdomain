@@ -6,6 +6,7 @@ Converts between pydantic MediaContentDetailsResponse and proto GetMediaContentR
 from __future__ import annotations
 
 from collections import defaultdict
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
 from psdomain.converters.base import proto_str_or_none, pydantic_str_or_empty
@@ -33,6 +34,29 @@ def _get_proto():
     """Lazy import of proto module."""
     from psdomain.proto.media import v110_pb2
     return v110_pb2
+
+
+# --- Timestamp helpers ---
+
+
+def datetime_to_proto(dt: datetime | None):
+    """Convert datetime to proto Timestamp (assumes UTC for naive datetimes)."""
+    if dt is None:
+        return None
+    from google.protobuf.timestamp_pb2 import Timestamp
+    ts = Timestamp()
+    ts.FromDatetime(dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc))
+    return ts
+
+
+def datetime_from_proto(ts) -> datetime | None:
+    """Convert proto Timestamp to a UTC-aware datetime."""
+    if ts is None:
+        return None
+    try:
+        return ts.ToDatetime(tzinfo=timezone.utc)
+    except Exception:
+        return None
 
 
 # --- Helper converters for nested types ---
@@ -123,6 +147,12 @@ def media_content_to_proto(mc: MediaContent) -> "proto.MediaContent":
     if mc.dpi is not None:
         result.dpi = mc.dpi
 
+    # Preserve changeTimeStamp (media import persists this field)
+    if mc.changeTimeStamp is not None:
+        ts = datetime_to_proto(mc.changeTimeStamp)
+        if ts is not None:
+            result.change_timestamp.CopyFrom(ts)
+
     # Convert ClassTypeArray to repeated class_types
     if mc.ClassTypeArray and mc.ClassTypeArray.ClassType:
         for ct in mc.ClassTypeArray.ClassType:
@@ -174,7 +204,10 @@ def media_content_from_proto(p: "proto.MediaContent") -> MediaContent:
         color=proto_str_or_none(p.color),
         description=proto_str_or_none(p.description),
         singlePart=p.single_part,
-        changeTimeStamp=None,
+        changeTimeStamp=(
+            datetime_from_proto(p.change_timestamp)
+            if p.HasField('change_timestamp') else None
+        ),
         ClassTypeArray=class_type_array,
         DecorationArray=decoration_array,
         LocationArray=location_array,

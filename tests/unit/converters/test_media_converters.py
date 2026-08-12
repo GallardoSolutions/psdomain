@@ -3,6 +3,8 @@ Tests for media content converters (v110).
 
 Tests roundtrip conversion: JSON -> Pydantic -> Proto -> Pydantic
 """
+from datetime import datetime, timezone
+
 import pytest
 
 from psdomain.model.base import ErrorMessage
@@ -347,6 +349,79 @@ class TestMediaV110Converter:
         assert roundtrip.MediaContentArray is not None
         assert len(roundtrip.MediaContentArray.MediaContent) == 1
         assert roundtrip.MediaContentArray.MediaContent[0].productId == "55410"
+
+    def test_change_timestamp_roundtrip(self):
+        """changeTimeStamp must survive the proto roundtrip.
+
+        The media import (extra/services/media_content.py) reads and persists
+        mc.changeTimeStamp, so the converter must not drop it. Previously the
+        converter hardcoded changeTimeStamp=None on the way back, silently
+        nulling the field on every protobuf-backed response.
+        """
+        from psdomain.converters.media import v110
+
+        changed = datetime(2026, 8, 12, 14, 30, 45, tzinfo=timezone.utc)
+        data = {
+            "productId": "TS-001",
+            "partId": "TS-PART",
+            "url": "https://example.com/image.jpg",
+            "mediaType": "Image",
+            "fileSize": null,
+            "width": null,
+            "height": null,
+            "dpi": null,
+            "color": null,
+            "description": null,
+            "singlePart": True,
+            "changeTimeStamp": changed,
+            "ClassTypeArray": {
+                "ClassType": [
+                    {"classTypeId": 1006, "classTypeName": "Primary"}
+                ]
+            },
+            "DecorationArray": None,
+            "LocationArray": None,
+        }
+        mc = MediaContent.model_validate(data)
+
+        proto_mc = v110.media_content_to_proto(mc)
+        assert proto_mc.HasField("change_timestamp")
+
+        roundtrip = v110.media_content_from_proto(proto_mc)
+        assert roundtrip.changeTimeStamp == changed
+
+    def test_change_timestamp_none_roundtrip(self):
+        """A null changeTimeStamp must stay null (field unset in proto)."""
+        from psdomain.converters.media import v110
+
+        data = {
+            "productId": "TS-002",
+            "partId": None,
+            "url": "https://example.com/image.jpg",
+            "mediaType": "Image",
+            "fileSize": null,
+            "width": null,
+            "height": null,
+            "dpi": null,
+            "color": null,
+            "description": null,
+            "singlePart": True,
+            "changeTimeStamp": null,
+            "ClassTypeArray": {
+                "ClassType": [
+                    {"classTypeId": 1006, "classTypeName": "Primary"}
+                ]
+            },
+            "DecorationArray": None,
+            "LocationArray": None,
+        }
+        mc = MediaContent.model_validate(data)
+
+        proto_mc = v110.media_content_to_proto(mc)
+        assert not proto_mc.HasField("change_timestamp")
+
+        roundtrip = v110.media_content_from_proto(proto_mc)
+        assert roundtrip.changeTimeStamp is None
 
     def test_blank_decoration_id_zero_roundtrip(self):
         """A 'Blank' decoration with decorationId 0 must survive the proto roundtrip.
