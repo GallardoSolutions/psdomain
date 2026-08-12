@@ -56,6 +56,13 @@ from .v200_pb2 import (
     FobPoint,
 )
 
+# REST-only aggregated views (no RPC) — served by the psrestful REST API
+from .fast_pb2 import (
+    SlimProduct,
+    SellableFastResponse,
+    SellableProductIdsResponse,
+)
+
 # gRPC service (includes both v2.0.0 and v1.0.0 RPCs)
 from .v200_pb2_grpc import (
     ProductServiceStub,
