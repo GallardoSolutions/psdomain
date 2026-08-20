@@ -8,7 +8,8 @@ from psdomain.model.product_data.v_1_0_0 import ProductCloseOutResponseV100, Pro
     GetProductSellableResponseV100, ProductResponseV100
 from psdomain.model.base import Severity
 from psdomain.model.product_data.common import ProductPartArray, sort_sizes, ProductCategory, Product, ApparelSize, \
-    ProductCategoryArray, RelatedProductArray, ProductKeywordArray, ProductMarketingPointArray, RelatedProduct
+    ProductCategoryArray, RelatedProductArray, ProductKeywordArray, ProductMarketingPointArray, RelatedProduct, \
+    ProductPart
 
 from .responses.product_parts import product_part_array
 from .fixtures import sellable_response, resp_alpha  # noqa
@@ -108,6 +109,60 @@ def test_is_closeout(resp_alpha):
     Test is_closeout property for product
     """
     assert resp_alpha.Product.is_closeout is False
+
+
+_PART_DEFAULTS = dict(
+    partId='P', description=['x'], primaryColor=None, ColorArray=None,
+    countryOfOrigin=None, primaryMaterial=None, SpecificationArray=None, shape=None,
+    ApparelSize=None, Dimension=None, leadTime=None, unspsc=None, gtin=None,
+    isRushService=None, endDate=None, effectiveDate=None, isCaution=None,
+    cautionComment=None, nmfcCode=None, nmfcDescription=None, nmfcNumber=None,
+    isOnDemand=None, isHazmat=None, ProductPackagingArray=None, ShippingPackageArray=None,
+)
+
+
+def _part(is_closeout):
+    return ProductPart(**{**_PART_DEFAULTS, 'isCloseout': is_closeout})
+
+
+def _product(product_is_closeout, part_closeouts):
+    parts = [_part(c) for c in part_closeouts]
+    return Product.model_construct(
+        isCloseout=product_is_closeout,
+        ProductPartArray=ProductPartArray(ProductPart=parts),
+    )
+
+
+def test_is_closeout_product_level_flag_wins():
+    # Supplier's own product-level flag set -> closeout regardless of parts.
+    p = _product(True, [False, False])
+    assert p.is_closeout is True
+    assert p.has_closeout is True
+
+
+def test_is_closeout_true_only_when_all_parts_closeout():
+    p = _product(None, [True, True, True])
+    assert p.is_closeout is True
+    assert p.has_closeout is True
+
+
+def test_partial_closeout_parts_do_not_close_the_product():
+    # The Gildan 8000 case: a couple of discontinued sizes must NOT close the style.
+    p = _product(None, [True, False, False])
+    assert p.is_closeout is False
+    assert p.has_closeout is True
+
+
+def test_no_closeout_parts():
+    p = _product(None, [False, False])
+    assert p.is_closeout is False
+    assert p.has_closeout is False
+
+
+def test_is_closeout_empty_parts_and_no_flag():
+    p = _product(None, [])
+    assert p.is_closeout is False
+    assert p.has_closeout is False
 
 
 def test_brand(resp_alpha):
