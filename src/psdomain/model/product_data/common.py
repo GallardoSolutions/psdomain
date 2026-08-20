@@ -506,7 +506,28 @@ class Product(base.PSBaseModel):
 
     @property
     def is_closeout(self):
-        return self.isCloseout or any(pp.isCloseout for pp in self.parts if pp.isCloseout)
+        """Whether the whole product is on closeout.
+
+        True when the supplier's product-level ``isCloseout`` flag is set, or when
+        *every* part is on closeout. A product with only *some* closeout parts
+        (e.g. a couple of discontinued sizes/colors) is still active overall;
+        use :pyattr:`has_closeout` to detect that case.
+        """
+        if self.isCloseout:
+            return True
+        parts = self.parts
+        return bool(parts) and all(pp.isCloseout for pp in parts)
+
+    @property
+    def has_closeout(self):
+        """Whether the product or any of its parts is on closeout.
+
+        This is the inclusive check (product-level flag OR any closeout part).
+        Useful for surfacing that a still-active product has some closeout
+        variants. For the "the whole product is closeout" decision, use
+        :pyattr:`is_closeout`.
+        """
+        return bool(self.isCloseout) or any(pp.isCloseout for pp in self.parts)
 
     @property
     def line_name(self):
