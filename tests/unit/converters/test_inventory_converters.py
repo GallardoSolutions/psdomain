@@ -11,6 +11,7 @@ from psdomain.model.inventory.v_2_0_0 import (
 )
 from psdomain.model.inventory.v_1_2_1 import InventoryLevelsResponseV121
 from psdomain.converters.inventory import v200, v121
+from psdomain.converters.base import quantity_to_int
 
 
 class TestInventoryV200Converter:
@@ -520,3 +521,54 @@ class TestInventoryV121Converter:
         assert len(rt_part.AttributeFlexArray.AttributeFlex) == 2
         assert rt_part.attributeColor == "Blue"
         assert rt_part.attributeSize == "Large"
+
+
+class TestFractionalQuantities:
+    """Supplier 67279 sent quantityAvailable '283.5' (PSRESTFUL-API-8): int('283.5')
+    raised and every protobuf response / cache write for the product failed."""
+
+    def test_quantity_to_int(self):
+        assert quantity_to_int('283.5') == 283
+        assert quantity_to_int('100') == 100
+        assert quantity_to_int(' 12 ') == 12
+        assert quantity_to_int('-0.5') == 0
+        assert quantity_to_int(None) == 0
+        assert quantity_to_int('') == 0
+        assert quantity_to_int(7) == 7
+        with pytest.raises(ValueError):
+            quantity_to_int('N/A')
+
+    def test_v121_fractional_quantity_available(self):
+        json_data = {
+            "productID": "TFLP48",
+            "ProductVariationInventoryArray": {
+                "ProductVariationInventory": [
+                    {"partID": "TFLP48-01", "partDescription": None, "partBrand": None, "priceVariance": None,
+                     "quantityAvailable": "283.5", "AttributeFlexArray": None, "customProductMessage": None,
+                     "entryType": None, "validTimestamp": None}
+                ]
+            },
+            "ProductCompanionInventoryArray": None,
+            "errorMessage": None,
+        }
+        proto_response = v121.to_proto(InventoryLevelsResponseV121.model_validate(json_data))
+        assert proto_response.inventory.product_variations[0].quantity_available == 283
+
+    def test_v200_fractional_quantity_value(self):
+        json_data = {
+            "ServiceMessageArray": None,
+            "Inventory": {
+                "productId": "TFLP48",
+                "PartInventoryArray": {
+                    "PartInventory": [
+                        {"partId": "TFLP48-01", "mainPart": True, "partColor": None, "labelSize": None,
+                         "partDescription": None,
+                         "quantityAvailable": {"Quantity": {"value": "283.5", "uom": "EA"}},
+                         "manufacturedItem": False, "buyToOrder": False, "replenishmentLeadTime": None,
+                         "attributeSelection": None, "InventoryLocationArray": None}
+                    ]
+                }
+            }
+        }
+        proto_response = v200.to_proto(InventoryLevelsResponseV200.model_validate(json_data))
+        assert proto_response.inventory.part_inventory[0].quantity_available.value == 283

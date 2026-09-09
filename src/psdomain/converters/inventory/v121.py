@@ -23,7 +23,7 @@ from psdomain.model.inventory.v_1_2_1 import (
     AttributeFlex,
     AttributeFlexArray,
 )
-from psdomain.converters.base import proto_str_or_none
+from psdomain.converters.base import proto_str_or_none, quantity_to_int
 
 if TYPE_CHECKING:
     from psdomain.proto.inventory import v121_pb2 as proto
@@ -57,7 +57,7 @@ def product_variation_to_proto(pv: ProductVariationInventory, proto_module) -> '
 
     result = proto_module.ProductVariationInventory(
         part_id=pv.partID,
-        quantity_available=int(pv.quantityAvailable) if pv.quantityAvailable else 0,
+        quantity_available=quantity_to_int(pv.quantityAvailable),
     )
 
     if pv.partDescription:
@@ -129,7 +129,7 @@ def product_companion_to_proto(pc: ProductCompanionInventory, proto_module) -> '
 
     result = proto_module.ProductCompanionInventory(
         part_id=pc.partID,
-        quantity_available=int(pc.quantityAvailable) if pc.quantityAvailable else 0,
+        quantity_available=quantity_to_int(pc.quantityAvailable),
     )
 
     if pc.partDescription:

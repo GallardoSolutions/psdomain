@@ -4,6 +4,7 @@ Base converter utilities for Pydantic <-> Proto conversion.
 from __future__ import annotations
 
 import re
+from decimal import Decimal, InvalidOperation
 from typing import TypeVar, Callable, Any
 
 T = TypeVar('T')
@@ -61,3 +62,21 @@ def pydantic_str_or_empty(value: str | None) -> str:
     Proto requires strings, not None, for string fields.
     """
     return value if value is not None else ""
+
+
+def quantity_to_int(value) -> int:
+    """Whole-number quantity for an int64 proto field.
+
+    Suppliers occasionally report fractional quantities (67279 sent
+    quantityAvailable '283.5' for TFLP48). ``int('283.5')`` raises, which failed
+    the protobuf cache write and every protobuf response for the product
+    (psrestful-api Sentry PSRESTFUL-API-8). Go through Decimal and truncate
+    toward zero; None and '' count as 0. Non-numeric text still raises
+    ValueError so genuinely bad data is not silently zeroed.
+    """
+    if value is None or value == '':
+        return 0
+    try:
+        return int(Decimal(str(value).strip()))
+    except InvalidOperation as e:
+        raise ValueError(f'quantity is not numeric: {value!r}') from e
