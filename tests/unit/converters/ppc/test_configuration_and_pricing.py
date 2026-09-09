@@ -14,6 +14,15 @@ from psdomain.model.ppc import (
     PartPriceArray,
     Location,
     LocationArray,
+    Charge,
+    ChargeArray,
+    ChargeType,
+    Decoration,
+    DecorationArray,
+    DecorationGeometryType,
+    DecorationUomType,
+    LocationIdArray,
+    LocationId,
 )
 from psdomain.model.base import PriceType, UOM, Currency, ErrorMessage
 from psdomain.converters.ppc import configuration_and_pricing
@@ -177,3 +186,63 @@ class TestConfigurationAndPricingConverter:
         roundtrip = configuration_and_pricing.config_and_pricing_from_proto(proto_response)
         assert len(roundtrip.Configuration.parts) == 2
         assert roundtrip.Configuration.currency == Currency.CAD
+
+
+# HIT returns ids above the signed 32-bit range (charge 2245162467 on product
+# 85048). The PromoStandards XSD says xs:int, suppliers don't honour it, and
+# with int32 proto fields the converter raised "Value out of range" and every
+# protobuf response/cache write for the product was a 500 (PSRESTFUL-API-5).
+BIG_ID = 2245162467
+
+
+class TestIdsAboveInt32:
+
+    @staticmethod
+    def _response():
+        charge = Charge(
+            chargeId=BIG_ID, chargeName="Setup", chargeType=ChargeType.SETUP, chargeDescription="Setup fee",
+            ChargePriceArray=None, chargesPerLocation=None, chargesPerColor=None,
+        )
+        decoration = Decoration(
+            decorationId=BIG_ID + 1, decorationName="Screen Print", decorationGeometry=DecorationGeometryType.RECTANGLE,
+            decorationHeight=None, decorationWidth=None, decorationDiameter=None,
+            decorationUom=DecorationUomType.COLORS,
+            allowSubForDefaultLocation=None, allowSubForDefaultMethod=None,
+            ChargeArray=ChargeArray(Charge=[charge]),
+            decorationUnitsIncluded=None, decorationUnitsIncludedUom=None, decorationUnitsMax=None,
+            defaultDecoration=None, leadTime=None, rushLeadTime=None,
+        )
+        location = Location(
+            locationId=BIG_ID + 2, locationName="Front",
+            DecorationArray=DecorationArray(Decoration=[decoration]),
+            decorationsIncluded=0, defaultLocation=True, maxDecoration=1, minDecoration=0, locationRank=None,
+        )
+        part = Part(
+            partId="PART-001", partDescription=None,
+            PartPriceArray=PartPriceArray(PartPrice=[]), partGroup=1, nextPartGroup=None,
+            partGroupRequired=True, partGroupDescription="Main", ratio=Decimal("1"), defaultPart=True,
+            LocationIdArray=LocationIdArray(LocationId=[LocationId(locationId=BIG_ID + 2)]),
+        )
+        config = Configuration(
+            PartArray=PartArray(Part=[part]), LocationArray=LocationArray(Location=[location]),
+            productId="85048", currency=Currency.USD, FobArray=None, fobPostalCode=None,
+            priceType=PriceType.NET, configurationType=None,
+        )
+        return ConfigurationAndPricingResponse(Configuration=config, ErrorMessage=None)
+
+    def test_charge_location_decoration_ids_survive_roundtrip(self):
+        proto = configuration_and_pricing.config_and_pricing_to_proto(self._response())
+
+        loc = proto.configuration.locations[0]
+        assert loc.location_id == BIG_ID + 2
+        assert loc.decorations[0].decoration_id == BIG_ID + 1
+        assert loc.decorations[0].charges[0].charge_id == BIG_ID
+        assert list(proto.configuration.parts[0].location_ids) == [BIG_ID + 2]
+
+        # Wire round-trip (int64 varints) and back to pydantic.
+        wire = proto.SerializeToString()
+        back = configuration_and_pricing.config_and_pricing_from_proto(type(proto).FromString(wire))
+        rt_loc = back.Configuration.LocationArray.Location[0]
+        assert rt_loc.locationId == BIG_ID + 2
+        assert rt_loc.DecorationArray.Decoration[0].decorationId == BIG_ID + 1
+        assert rt_loc.DecorationArray.Decoration[0].ChargeArray.Charge[0].chargeId == BIG_ID
