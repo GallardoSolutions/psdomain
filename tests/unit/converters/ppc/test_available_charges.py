@@ -92,3 +92,21 @@ class TestAvailableChargesConverter:
         roundtrip = available_charges.available_charges_from_proto(proto_response)
         assert roundtrip.AvailableChargeArray is None
         assert roundtrip.ErrorMessage.code == 404
+
+
+class TestAvailableChargeIdsAboveInt32:
+
+    def test_big_charge_id_survives_roundtrip(self):
+        # HIT charge ids exceed int32; the proto field is int64 (PSRESTFUL-API-5).
+        big = 2245162467
+        response = AvailableChargesResponse(
+            AvailableChargeArray=AvailableChargeArray(AvailableCharge=[
+                AvailableCharge(chargeId=big, chargeName="Setup", chargeType=ChargeType.SETUP,
+                                chargeDescription="Setup fee"),
+            ]),
+            ErrorMessage=None,
+        )
+        proto = available_charges.available_charges_to_proto(response)
+        assert proto.charges[0].charge_id == big
+        back = available_charges.available_charges_from_proto(type(proto).FromString(proto.SerializeToString()))
+        assert back.AvailableChargeArray.AvailableCharge[0].chargeId == big

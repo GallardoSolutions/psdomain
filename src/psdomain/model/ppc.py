@@ -317,8 +317,10 @@ class Decoration(base.PSBaseModel):
                                                                 'without changing the price')
     allowSubForDefaultMethod: bool | None = Field(description='Buyer is allowed to substitute this decoration method '
                                                               'without changing the price')
-    itemPartQuantityLTM: int | None = Field('Specifies the Part Quantity that is the absolute minimum that can be '
-                                            'ordered with a Less Than Minimum (LTM) charge')
+    itemPartQuantityLTM: int | None = Field(
+        default=None,
+        description='Specifies the Part Quantity that is the absolute minimum that can be ordered with a '
+                    'Less Than Minimum (LTM) charge')
     ChargeArray: ChargeArray | None
     decorationUnitsIncluded: int | None = Field(description='The number of included decoration units. For example, '
                                                             'if 1 color decoration is included set value to “1”. '
