@@ -38,7 +38,7 @@ from psdomain.model.base import (
     ServiceMessageArray,
     ServiceMessage,
 )
-from psdomain.converters.base import proto_str_or_none, pydantic_str_or_empty
+from psdomain.converters.base import proto_str_or_none, pydantic_str_or_empty, quantity_to_int
 
 if TYPE_CHECKING:
     from psdomain.proto.inventory import v200_pb2 as proto
@@ -49,7 +49,7 @@ if TYPE_CHECKING:
 def quantity_to_proto(qty: Quantity, proto_module) -> 'proto.QuantityAvailable':
     """Convert pydantic Quantity to proto QuantityAvailable."""
     return proto_module.QuantityAvailable(
-        value=int(qty.value),
+        value=quantity_to_int(qty.value),
         uom=str(qty.uom) if qty.uom else ""
     )
 
@@ -68,7 +68,7 @@ def future_availability_to_proto(fa: FutureAvailability, proto_module) -> 'proto
     """Convert pydantic FutureAvailability to proto FutureAvailability."""
     from google.protobuf.timestamp_pb2 import Timestamp
     result = proto_module.FutureAvailability(
-        quantity_value=int(fa.Quantity.value),
+        quantity_value=quantity_to_int(fa.Quantity.value),
         quantity_uom=str(fa.Quantity.uom) if fa.Quantity.uom else ""
     )
     if fa.availableOn:
