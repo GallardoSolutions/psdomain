@@ -180,7 +180,7 @@ class ProductPackagingArray(base.PSBaseModel):
 
 
 class ShippingPackage(base.PSBaseModel):
-    packageType: str
+    packageType: str | None  # required by the spec, but Aakron sends null for every part (2026-09-12)
     description: str | None
     quantity: Decimal
     dimensionUom: base.DimensionUoM
