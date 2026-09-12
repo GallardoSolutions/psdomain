@@ -345,11 +345,20 @@ class Decoration(base.PSBaseModel):
 
     @field_validator('decorationGeometry', mode="before")
     def normalize_decoration_geometry(cls, value):
+        """Never reject a PPC response over the geometry label: suppliers invent values
+        ("Box" from LANCO, 2026-09-12). Known values match case-insensitively; anything
+        else becomes OTHER."""
         if value is None:
             return DecorationGeometryType.OTHER
-        if value in ['Na', 'NA', 'N/A', 'n/a']:
+        if isinstance(value, DecorationGeometryType):
+            return value
+        text = str(value).strip()
+        if text in ['Na', 'NA', 'N/A', 'n/a']:
             return DecorationGeometryType.NOT_AVAILABLE
-        return value
+        for member in DecorationGeometryType:
+            if member.value.lower() == text.lower():
+                return member
+        return DecorationGeometryType.OTHER
 
     @property
     def charges(self):
