@@ -61,7 +61,7 @@ from psdomain.model.product_data.common import (
     ProductSellableArray,
 )
 from psdomain.model.base import ServiceMessage, ServiceMessageArray
-from psdomain.converters.base import proto_str_or_none, pydantic_str_or_empty
+from psdomain.converters.base import proto_str_or_none, pydantic_str_or_empty, int32_clamped
 
 if TYPE_CHECKING:
     from psdomain.proto.product import v200_pb2 as proto
@@ -279,11 +279,11 @@ def shipping_package_from_proto(p) -> ShippingPackage:
 
 def product_price_to_proto(pp: ProductPrice, proto_module) -> 'proto.ProductPrice':
     result = proto_module.ProductPrice(
-        quantity_min=pp.quantityMin,
+        quantity_min=int32_clamped(pp.quantityMin),
         price=str(pp.price) if pp.price else "0",
     )
     if pp.quantityMax is not None:
-        result.quantity_max = pp.quantityMax
+        result.quantity_max = int32_clamped(pp.quantityMax)
     if pp.discountCode:
         result.discount_code = pp.discountCode
     return result

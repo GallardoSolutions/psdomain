@@ -80,3 +80,17 @@ def quantity_to_int(value) -> int:
         return int(Decimal(str(value).strip()))
     except InvalidOperation as e:
         raise ValueError(f'quantity is not numeric: {value!r}') from e
+
+
+INT32_MAX = 2 ** 31 - 1
+
+
+def int32_clamped(value) -> int:
+    """Whole number clamped to the int32 range of a proto ``int32`` field.
+
+    Suppliers use int64 max as "no upper bound": Aakron sends quantityMax =
+    9223372036854775807 on the last price break (product 98202, 2026-09-12),
+    which made the protobuf cache write fail with "Value out of range"
+    (psrestful-api Sentry PSRESTFUL-API-37). int32 max keeps the meaning.
+    """
+    return max(-INT32_MAX - 1, min(int(value), INT32_MAX))
