@@ -209,6 +209,14 @@ class PrimaryColor(base.PSBaseModel):
 class ColorArray(base.PSBaseModel):
     Color: list[Color]
 
+    @field_validator('Color', mode='before')
+    def drop_null_entries(cls, value):
+        # EVANS answers "Color": [null] on some parts (product 1974, 2026-09-12); a null entry
+        # is no colour at all, not a reason to reject the whole product.
+        if isinstance(value, list):
+            return [item for item in value if item is not None]
+        return value
+
 
 class SpecificationType(StrEnum):
     Length = 'Length'
