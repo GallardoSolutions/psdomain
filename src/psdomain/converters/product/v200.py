@@ -333,7 +333,7 @@ def location_decoration_to_proto(ld: LocationDecoration, proto_module) -> 'proto
         price_includes=ld.priceIncludes,
     )
     if ld.maxImprintColors is not None:
-        result.max_imprint_colors = ld.maxImprintColors
+        result.max_imprint_colors = int32_clamped(ld.maxImprintColors)
     return result
 
 
@@ -469,7 +469,7 @@ def product_part_to_proto(pp: ProductPart, proto_module) -> 'proto.ProductPart':
         result.dimension.CopyFrom(dimension_to_proto(pp.Dimension, proto_module))
 
     if pp.leadTime is not None:
-        result.lead_time = pp.leadTime
+        result.lead_time = int32_clamped(pp.leadTime)
 
     if pp.unspsc:
         result.unspsc = pp.unspsc
@@ -646,7 +646,7 @@ def product_to_proto(prod: ProductV200, proto_module) -> 'proto.Product':
         result.compliance_info_available = prod.complianceInfoAvailable
 
     if prod.unspscCommodityCode is not None:
-        result.unspsc_commodity_code = prod.unspscCommodityCode
+        result.unspsc_commodity_code = int32_clamped(prod.unspscCommodityCode)
 
     if prod.LocationDecorationArray:
         for ld in prod.LocationDecorationArray.LocationDecoration:

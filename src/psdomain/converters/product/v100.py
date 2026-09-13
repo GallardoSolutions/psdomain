@@ -394,7 +394,7 @@ def product_part_to_proto(pp: ProductPart, proto_module) -> 'proto.ProductPartV1
         result.dimension.CopyFrom(dimension_to_proto(pp.Dimension, proto_module))
 
     if pp.leadTime is not None:
-        result.lead_time = pp.leadTime
+        result.lead_time = int32_clamped(pp.leadTime)
 
     if pp.unspsc:
         result.unspsc = pp.unspsc
