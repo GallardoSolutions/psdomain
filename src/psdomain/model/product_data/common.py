@@ -13,6 +13,36 @@ def get_normalized_category(category: str) -> str:
     return ret if ret != '-' else ''
 
 
+# PromoStandards labelSize vocabulary (Product Data 2.0 ApparelSize).
+STANDARD_SIZES = frozenset({
+    "OSFA", "6XS", "5XS", "4XS", "3XS", "2XS", "XS", "S", "M", "L", "XL",
+    "2XL", "3XL", "4XL", "5XL", "6XL",
+})
+
+# Spellings suppliers put in customSize NEXT TO a normal labelSize, mapped to the
+# spec token. Only spellings seen in real feeds: A4/Boxercraft "XXS", Colosseum
+# "XXL", Royal Apparel "2X", Pennant "SM/MD/LG", Pearsox "MEDIUM".
+SIZE_ALIASES = {
+    "XXS": "2XS", "XXXS": "3XS",
+    "XXL": "2XL", "XXXL": "3XL", "XXXXL": "4XL",
+    "2X": "2XL", "3X": "3XL", "4X": "4XL", "5X": "5XL",
+    "SM": "S", "MD": "M", "LG": "L",
+    "SMALL": "S", "MEDIUM": "M", "LARGE": "L",
+    "EXTRA SMALL": "XS", "EXTRA LARGE": "XL",
+    "ONE SIZE": "OSFA", "OSFM": "OSFA",
+}
+
+
+def canonical_size(value: str | None) -> str | None:
+    """The spec token for a size spelling, or None when the value is not a
+    recognizable standard size (free text such as "S/M", "42R", "NA")."""
+    if not value:
+        return None
+    token = value.strip().upper().replace("-", "")
+    token = SIZE_ALIASES.get(token, token)
+    return token if token in STANDARD_SIZES else None
+
+
 class ProductCategory(base.PSBaseModel):
     category: str | None
     subCategory: str | None
@@ -296,12 +326,33 @@ class ProductPart(base.PSBaseModel):
 
     def get_size(self) -> str:
         apparel_size = self.ApparelSize
-        if apparel_size:
-            label_size = apparel_size.labelSize or ''
-            if label_size.upper() == 'CUSTOM':
-                return apparel_size.customSize
-            return label_size
-        return ''
+        if not apparel_size:
+            return ''
+        label_size = (apparel_size.labelSize or '').strip()
+        custom_size = (apparel_size.customSize or '').strip()
+
+        # Spec path: customSize carries the size when the label is CUSTOM.
+        if label_size.upper() == 'CUSTOM':
+            return custom_size
+
+        # Off-spec path. Some suppliers file a size the vocabulary already has
+        # under a neighbouring label and keep the real size in customSize (A4
+        # and Boxercraft: labelSize "XS" + customSize "XXS"), which makes two
+        # distinct parts read as the same Color/Size. Honor customSize only when
+        # it is a standard size DIFFERENT from the label, and return the spec
+        # token so it sorts and builds SKUs like every other size.
+        # Both sides must be standard sizes: an off-spec label (SanMar Canada's
+        # "L/XL") already carries more information than any token and is kept.
+        #   XS   + "XXS"  -> "2XS"   (different size: use it)
+        #   2XL  + "XXL"  -> "2XL"   (same size spelled differently: keep label)
+        #   S    + "S/M"  -> "S"     (not a standard size: keep label)
+        #   S    + "NA"   -> "S"     (junk: keep label)
+        #   L/XL + "XL"   -> "L/XL"  (off-spec label: keep label)
+        custom_token = canonical_size(custom_size)
+        label_token = canonical_size(label_size)
+        if custom_token and label_token and custom_token != label_token:
+            return custom_token
+        return label_size
 
     def get_apparel_style(self) -> str:
         apparel_size = self.ApparelSize
