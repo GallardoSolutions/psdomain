@@ -254,19 +254,33 @@ class ColorArray(base.PSBaseModel):
 # never a better display name than the supplier's own colorName.
 STANDARD_COLOR_BUCKETS = frozenset({
     'assorted', 'beige', 'black', 'blue', 'brown', 'camouflage', 'camo', 'clear', 'custom', 'gold', 'gray',
-    'grey', 'green', 'metallic', 'multi', 'multicolor', 'multi-color', 'natural', 'orange', 'other', 'peach',
-    'pink', 'purple', 'rainbow', 'red', 'silver', 'tan', 'white', 'yellow',
+    'grey', 'green', 'heather', 'metallic', 'multi', 'multicolor', 'multi-color', 'multi color', 'multicolour',
+    'natural', 'orange', 'other', 'peach', 'pink', 'purple', 'rainbow', 'red', 'silver', 'tan', 'white',
+    'yellow', 'sample', 'design for sample', 'no match',
 })
 
-# Abbreviations suppliers use inside colorName tokens (Champro, A4, SanMar 4XL+ SKUs).
+# S&S files unmatched colours as "ZZZ - Multi Color" / "ZZZ - No Match".
+_PLACEHOLDER_STANDARD_PREFIX = 'zzz'
+
+# Abbreviations suppliers use inside colorName tokens (Champro, A4, SanMar 4XL+ SKUs). "Gr" is
+# deliberately absent: SanMar uses it for Green ("Kelly Gr") and Graphite as often as for Grey.
 COLOR_ABBREVIATIONS = {
-    'lt': 'Light', 'dk': 'Dark', 'md': 'Medium', 'med': 'Medium', 'hthr': 'Heather', 'hth': 'Heather',
+    'lt': 'Light', 'dk': 'Dark', 'md': 'Medium', 'med': 'Medium', 'hthr': 'Heather', 'hth': 'Heather', 'htr': 'Heather',
     'choc': 'Chocolate', 'ylw': 'Yellow', 'grn': 'Green', 'brn': 'Brown', 'org': 'Orange', 'fl': 'Fluorescent',
     'wht': 'White', 'blk': 'Black', 'blck': 'Black', 'rd': 'Red', 'nv': 'Navy', 'nvy': 'Navy', 'prpl': 'Purple',
     'pnk': 'Pink', 'slvr': 'Silver', 'gld': 'Gold', 'mrn': 'Maroon', 'ntrl': 'Natural', 'gry': 'Gray',
-    'gr': 'Grey', 'roy': 'Royal', 'ryl': 'Royal', 'chr': 'Charcoal', 'char': 'Charcoal', 'antq': 'Antique',
+    'roy': 'Royal', 'ryl': 'Royal', 'chr': 'Charcoal', 'char': 'Charcoal', 'antq': 'Antique',
     'antqu': 'Antique', 'bl': 'Blue', 'blu': 'Blue', 'wh': 'White',
 }
+
+# Supplier colour codes glued in front of the name: S&S "GY-Grey", "KB-Khaki/ Black Microcheck",
+# Midwest Workwear "NV-Navy", OTTO "025 - Char. Gray", Champro "LB7 - LT BLUE, WHITE".
+# "T-Shirt", "3-Month", "12-Sheet" are not codes: one character never is, and digits only are when
+# spaced ("003 - Black").
+_HYPHEN_CODE_PREFIX = re.compile(r'^(?P<code>[A-Z0-9]{2,4})(?P<sep>\s*-\s*)(?=[A-Za-z])')
+# A leading code or brand tag before a space is kept but ignored when judging legibility:
+# S&S "CS Grey Light Heather/ White", HIT "FSC BLACK", SanMar "TNF Black" (The North Face).
+_SPACE_CODE_PREFIX = re.compile(r'^(?P<code>[A-Z]{2,3})\s+(?=[A-Za-z])')
 
 # Short real words with no a/e/i/o/u that must not read as abbreviations.
 _VOWELLESS_COLOR_WORDS = frozenset({'sky', 'gym', 'lynx', 'ivy'})
@@ -306,11 +320,15 @@ def is_legible_color_name(name: str | None) -> bool:
     name = name.strip()
     if _CAMEL_BOUNDARY.search(name):
         return False
+    m = _SPACE_CODE_PREFIX.match(name)
+    if m and _is_code(m.group('code')):
+        name = name[m.end():]  # "TNF Black", "FSC BLACK": judge the name after the tag
     return not any(_is_abbreviation(t) for t in _color_tokens(name))
 
 
 def expand_color_abbreviations(name: str) -> str:
-    """"DkGrn" -> "Dark Green", "Blk/Wht" -> "Black/White". Unknown tokens are kept."""
+    """"DkGrn" -> "Dark Green", "Blk/Wht" -> "Black/White". Unknown tokens are kept, and so are
+    repeated panels ("Blk/Blk/Wht" is a three-panel cap, not a typo)."""
     out = []
     for chunk in _COLOR_TOKEN_SPLIT.split(name.strip()):
         if not chunk:
@@ -320,19 +338,38 @@ def expand_color_abbreviations(name: str) -> str:
             continue
         words = [COLOR_ABBREVIATIONS.get(t.rstrip('.').lower(), t) for t in _CAMEL_BOUNDARY.split(chunk) if t]
         out.append(' '.join(words))
-    return _drop_repeated_words(''.join(out))
+    return ''.join(out)
 
 
-def _drop_repeated_words(name: str) -> str:
-    """"NV-Navy" expands to "Navy-Navy" (Midwest Workwear prefixes a code): keep one."""
-    words = re.split(r'([\s\-/]+)', name)
-    kept: list[str] = []
-    for w in words:
-        if len(kept) >= 2 and w.strip() and w.lower() == kept[-2].lower():
-            kept.pop()  # drop the separator before the duplicate
-            continue
-        kept.append(w)
-    return ''.join(kept)
+def _is_code(token: str) -> bool:
+    """A supplier code, not a word: has a digit ("LB7", "025") or no vowel ("GY", "FSC") and is
+    not an abbreviation we would rather expand ("Dk", "Wh")."""
+    word = token.lower()
+    if word in COLOR_ABBREVIATIONS or word in _VOWELLESS_COLOR_WORDS:
+        return False  # "Dk" should be expanded, "Sky" is a word
+    return any(ch.isdigit() for ch in word) or not any(ch in 'aeiou' for ch in word)
+
+
+def strip_color_code_prefix(name: str) -> str:
+    """Drop a supplier colour code glued to the name with a hyphen: "GY-Grey" -> "Grey",
+    "025 - Char. Gray" -> "Char. Gray", "NV-Navy" -> "Navy". "RED-WHITE" is left alone (a word),
+    and so is "TNF Black": before a space the tag may be a brand, so it stays."""
+    name = name.strip()
+    m = _HYPHEN_CODE_PREFIX.match(name)
+    if m and not (m.group('code').isdigit() and m.group('sep') == '-'):
+        code, rest = m.group('code'), name[m.end():]
+        expansion = COLOR_ABBREVIATIONS.get(code.lower())
+        if expansion is None and _is_code(code):
+            return rest
+        if expansion is not None and rest.lower().startswith(expansion.lower()):
+            return rest  # "NV-Navy", "WH-White": the code is also an abbreviation of the name
+    return name
+
+
+def _is_bucket(standard: str) -> bool:
+    """True when standardColorName is a generic family or a placeholder rather than a name."""
+    lowered = standard.strip().lower()
+    return lowered in STANDARD_COLOR_BUCKETS or lowered.startswith(_PLACEHOLDER_STANDARD_PREFIX)
 
 
 def _is_subsequence(short: str, long: str) -> bool:
@@ -362,13 +399,16 @@ def get_display_color_name(color_name: str | None, standard_color_name: str | No
 
     1. standardColorName spells out colorName ("AntqChryRd" / "Antique Cherry Red"): the standard name.
     2. colorName is legible: colorName. A generic bucket ("Red") never replaces "Cardinal".
-    3. colorName is abbreviated and standardColorName is descriptive (not a bucket): the standard
-       name, which is what stays constant across sizes ("ForestGrn" / "Forest").
+    3. colorName is abbreviated and standardColorName is descriptive (not a bucket or a
+       placeholder such as "ZZZ - Multi Color"): the standard name, which is what stays constant
+       across sizes ("ForestGrn" / "Forest").
     4. Otherwise colorName with its abbreviations expanded ("DkGrn" -> "Dark Green").
 
+    A hyphenated supplier code in front of the name is dropped first ("GY-Grey" becomes "Grey");
+    a tag before a space is kept but does not make the name abbreviated ("TNF Black").
     All-caps names are title-cased. Empty colorName gives ''.
     """
-    color_name = (color_name or '').strip()
+    color_name = strip_color_code_prefix(color_name or '')
     standard = (standard_color_name or '').strip()
     if not color_name:
         return ''
@@ -376,7 +416,7 @@ def get_display_color_name(color_name: str | None, standard_color_name: str | No
         return _title_if_shouting(standard)
     if is_legible_color_name(color_name):
         return _title_if_shouting(color_name)
-    if standard and standard.lower() not in STANDARD_COLOR_BUCKETS:
+    if standard and not _is_bucket(standard):
         return _title_if_shouting(standard)
     return expand_color_abbreviations(_title_if_shouting(color_name))
 
