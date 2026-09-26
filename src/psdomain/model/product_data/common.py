@@ -1,3 +1,4 @@
+import re
 import typing
 from datetime import datetime
 from decimal import Decimal
@@ -248,6 +249,138 @@ class ColorArray(base.PSBaseModel):
         return value
 
 
+# Generic buckets suppliers file in standardColorName (the PromoStandards standard colour list
+# plus the spellings seen in real feeds). A bucket says what family a colour belongs to; it is
+# never a better display name than the supplier's own colorName.
+STANDARD_COLOR_BUCKETS = frozenset({
+    'assorted', 'beige', 'black', 'blue', 'brown', 'camouflage', 'camo', 'clear', 'custom', 'gold', 'gray',
+    'grey', 'green', 'metallic', 'multi', 'multicolor', 'multi-color', 'natural', 'orange', 'other', 'peach',
+    'pink', 'purple', 'rainbow', 'red', 'silver', 'tan', 'white', 'yellow',
+})
+
+# Abbreviations suppliers use inside colorName tokens (Champro, A4, SanMar 4XL+ SKUs).
+COLOR_ABBREVIATIONS = {
+    'lt': 'Light', 'dk': 'Dark', 'md': 'Medium', 'med': 'Medium', 'hthr': 'Heather', 'hth': 'Heather',
+    'choc': 'Chocolate', 'ylw': 'Yellow', 'grn': 'Green', 'brn': 'Brown', 'org': 'Orange', 'fl': 'Fluorescent',
+    'wht': 'White', 'blk': 'Black', 'blck': 'Black', 'rd': 'Red', 'nv': 'Navy', 'nvy': 'Navy', 'prpl': 'Purple',
+    'pnk': 'Pink', 'slvr': 'Silver', 'gld': 'Gold', 'mrn': 'Maroon', 'ntrl': 'Natural', 'gry': 'Gray',
+    'gr': 'Grey', 'roy': 'Royal', 'ryl': 'Royal', 'chr': 'Charcoal', 'char': 'Charcoal', 'antq': 'Antique',
+    'antqu': 'Antique', 'bl': 'Blue', 'blu': 'Blue', 'wh': 'White',
+}
+
+# Short real words with no a/e/i/o/u that must not read as abbreviations.
+_VOWELLESS_COLOR_WORDS = frozenset({'sky', 'gym', 'lynx', 'ivy'})
+
+# "CardinalRd" and "SOrange" (SanMar's Safety Orange) are both camelCase runs; a single leading
+# capital counts, a longer run does not ("UNTUCKit" is a brand, not an abbreviation).
+_CAMEL_BOUNDARY = re.compile(r'(?<=[a-z])(?=[A-Z])|(?<![A-Za-z][A-Z])(?<=[A-Z])(?=[A-Z][a-z])')
+_COLOR_TOKEN_SPLIT = re.compile(r'([\s/,&+\-]+)')
+
+
+def _color_tokens(name: str) -> list[str]:
+    """Word tokens of a colour name, with camelCase runs split ("AntqChryRd" -> Antq, Chry, Rd)."""
+    tokens = []
+    for chunk in _COLOR_TOKEN_SPLIT.split(name):
+        if not chunk or _COLOR_TOKEN_SPLIT.fullmatch(chunk):
+            continue
+        tokens.extend(t for t in _CAMEL_BOUNDARY.split(chunk) if t)
+    return tokens
+
+
+def _is_abbreviation(token: str) -> bool:
+    word = token.rstrip('.!').lower()
+    if not word.isalpha():
+        return False  # "2011", "#1" and the like say nothing about legibility
+    if word in COLOR_ABBREVIATIONS:
+        return True
+    if word in _VOWELLESS_COLOR_WORDS:
+        return False
+    return len(word) >= 2 and not any(ch in 'aeiou' for ch in word)
+
+
+def is_legible_color_name(name: str | None) -> bool:
+    """True when a colour name reads as plain words: no camelCase runs ("CardinalRd"), no
+    vowel-less truncations ("Chry", "Gn") and no known abbreviations ("Lt", "Dk", "Hthr")."""
+    if not name or not name.strip():
+        return False
+    name = name.strip()
+    if _CAMEL_BOUNDARY.search(name):
+        return False
+    return not any(_is_abbreviation(t) for t in _color_tokens(name))
+
+
+def expand_color_abbreviations(name: str) -> str:
+    """"DkGrn" -> "Dark Green", "Blk/Wht" -> "Black/White". Unknown tokens are kept."""
+    out = []
+    for chunk in _COLOR_TOKEN_SPLIT.split(name.strip()):
+        if not chunk:
+            continue
+        if _COLOR_TOKEN_SPLIT.fullmatch(chunk):
+            out.append(chunk)
+            continue
+        words = [COLOR_ABBREVIATIONS.get(t.rstrip('.').lower(), t) for t in _CAMEL_BOUNDARY.split(chunk) if t]
+        out.append(' '.join(words))
+    return _drop_repeated_words(''.join(out))
+
+
+def _drop_repeated_words(name: str) -> str:
+    """"NV-Navy" expands to "Navy-Navy" (Midwest Workwear prefixes a code): keep one."""
+    words = re.split(r'([\s\-/]+)', name)
+    kept: list[str] = []
+    for w in words:
+        if len(kept) >= 2 and w.strip() and w.lower() == kept[-2].lower():
+            kept.pop()  # drop the separator before the duplicate
+            continue
+        kept.append(w)
+    return ''.join(kept)
+
+
+def _is_subsequence(short: str, long: str) -> bool:
+    it = iter(long)
+    return all(ch in it for ch in short)
+
+
+def _expands(color_name: str, standard: str) -> bool:
+    """True when `standard` spells out `color_name` token by token: "Antqu Chry Red" and
+    "AntqChryRd" are both expanded by "Antique Cherry Red"; "CARDINAL" is not expanded by "Red"."""
+    short = [t.lower() for t in _color_tokens(color_name)]
+    long = [t.lower() for t in _color_tokens(standard)]
+    if not short or len(short) != len(long):
+        return False
+    return all(a and b and a[0] == b[0] and _is_subsequence(a, b) for a, b in zip(short, long))
+
+
+def _title_if_shouting(name: str) -> str:
+    if not name.isupper():
+        return name
+    return ' '.join(w if any(ch.isdigit() for ch in w) else w.title() for w in name.split(' '))
+
+
+def get_display_color_name(color_name: str | None, standard_color_name: str | None) -> str:
+    """The most readable name for a part colour, choosing between the supplier's colorName and
+    its standardColorName:
+
+    1. standardColorName spells out colorName ("AntqChryRd" / "Antique Cherry Red"): the standard name.
+    2. colorName is legible: colorName. A generic bucket ("Red") never replaces "Cardinal".
+    3. colorName is abbreviated and standardColorName is descriptive (not a bucket): the standard
+       name, which is what stays constant across sizes ("ForestGrn" / "Forest").
+    4. Otherwise colorName with its abbreviations expanded ("DkGrn" -> "Dark Green").
+
+    All-caps names are title-cased. Empty colorName gives ''.
+    """
+    color_name = (color_name or '').strip()
+    standard = (standard_color_name or '').strip()
+    if not color_name:
+        return ''
+    if standard and _expands(color_name, standard):
+        return _title_if_shouting(standard)
+    if is_legible_color_name(color_name):
+        return _title_if_shouting(color_name)
+    if standard and standard.lower() not in STANDARD_COLOR_BUCKETS:
+        return _title_if_shouting(standard)
+    return expand_color_abbreviations(_title_if_shouting(color_name))
+
+
 class SpecificationType(StrEnum):
     Length = 'Length'
     Thickness = 'Thickness'
@@ -360,20 +493,50 @@ class ProductPart(base.PSBaseModel):
             return apparel_size.apparelStyle
         return ''
 
+    def _primary_color(self) -> 'Color | None':
+        arr = self.ColorArray
+        if arr and arr.Color:
+            return arr.Color[0]
+        return self.primaryColor.Color if self.primaryColor else None
+
     def get_primary_color(self, color_field: str = 'colorName') -> str:
         """
         Returns the primary color of the product part.
         :param color_field: colorName or standardColorName
         :return:
         """
-        arr = self.ColorArray
-        if arr:
-            primary_color = arr.Color[0]
-        else:
-            primary_color = self.primaryColor
-            if primary_color:
-                primary_color = primary_color.Color
+        primary_color = self._primary_color()
         return getattr(primary_color, color_field) if primary_color else ''
+
+    def get_display_color(self) -> str:
+        """The most readable name for the part's primary colour (see get_display_color_name).
+        Display only: SKU and option mapping keep using get_primary_color."""
+        color = self._primary_color()
+        return get_display_color_name(color.colorName, color.standardColorName) if color else ''
+
+    def get_color_key(self) -> str:
+        """Case-insensitive key that puts every spelling of one colour in the same group."""
+        return self.get_display_color().casefold()
+
+
+class ColorGroup(typing.NamedTuple):
+    """The parts of one colour, in size order."""
+    key: str
+    name: str
+    hex: str | None
+    parts: list['ProductPart']
+
+    @property
+    def sizes(self) -> list[str]:
+        return [p.get_size() for p in self.parts if p.get_size()]
+
+    @property
+    def has_closeout(self) -> bool:
+        return any(p.isCloseout for p in self.parts)
+
+    @property
+    def all_closeout(self) -> bool:
+        return bool(self.parts) and all(p.isCloseout for p in self.parts)
 
 
 class ProductPartArray(base.PSBaseModel):
@@ -384,10 +547,25 @@ class ProductPartArray(base.PSBaseModel):
         Returns the number of colors available for the product parts.
         :return: int
         """
-        if not self.ProductPart:
-            return 0
-        colors = {part.get_primary_color() for part in self.ProductPart}
-        return len(colors)
+        return len(self.group_by_color())
+
+    def group_by_color(self) -> list[ColorGroup]:
+        """Parts grouped by colour in first-seen order, each group sorted by size. Every spelling
+        of a colour lands in one group ("Forest" and "ForestGrn"); parts with no colour share
+        the unnamed group."""
+        groups: dict[str, list[ProductPart]] = {}
+        for part in self.ProductPart or []:
+            groups.setdefault(part.get_color_key(), []).append(part)
+        return [ColorGroup(key=key, name=parts[0].get_display_color(), hex=self._first_hex(parts),
+                           parts=sort_sizes(parts)) for key, parts in groups.items()]
+
+    @staticmethod
+    def _first_hex(parts: list[ProductPart]) -> str | None:
+        for part in parts:
+            color = part._primary_color()
+            if color and color.hex:
+                return color.hex
+        return None
 
     def get_number_of_sizes(self) -> int:
         """
