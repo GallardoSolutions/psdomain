@@ -12,7 +12,7 @@ import pytest
 
 from psdomain.model.product_data.common import (
     ProductPart, Color, ColorArray, PrimaryColor, ProductPartArray, ApparelSize, ApparelStyle,
-    is_legible_color_name, get_display_color_name, expand_color_abbreviations,
+    is_legible_color_name, get_display_color_name, expand_color_abbreviations, strip_color_code_prefix,
 )
 
 from .test_product_part import default_values
@@ -33,6 +33,7 @@ class TestIsLegibleColorName:
         "Black", "Cardinal Red", "CAROLINA BLUE", "Antique Cherry Red", "Black/White",
         "Heather Grey", "Sky Blue", "Navy", "Athletic Orange 2011", "Dusty Lilac- New!",
         "Royal", "Kelly Green", "Ash", "Coral Silk", "Brown Savana", "UNTUCKit Navy (576)",
+        "TNF Black", "FSC BLACK", "CS Grey Light Heather/ White", "GW Black (998)",   # tag + plain words
     ])
     def test_plain_words_are_legible(self, name):
         assert is_legible_color_name(name) is True
@@ -71,11 +72,48 @@ class TestExpandColorAbbreviations:
         assert expand_color_abbreviations("Blk/Wht") == "Black/White"
         assert expand_color_abbreviations("Chry Red") == "Chry Red"
 
-    def test_drops_the_word_a_code_prefix_expands_to(self):
-        # Midwest Workwear: "NV-Navy", "WH-White".
-        assert expand_color_abbreviations("NV-Navy") == "Navy"
-        assert expand_color_abbreviations("WH-White") == "White"
-        assert expand_color_abbreviations("Navy-White") == "Navy-White"
+    def test_keeps_every_panel_of_a_multi_part_name(self):
+        # OTTO caps and carolinamade: the middle panel used to vanish ("Blk/Wht/Blk" -> "Black").
+        assert expand_color_abbreviations("Blk/Wht/Blk") == "Black/White/Black"
+        assert expand_color_abbreviations("Blk/Blk/Wht") == "Black/Black/White"
+        assert expand_color_abbreviations("Dk Grn/Whi/Silver") == "Dark Green/Whi/Silver"
+        assert expand_color_abbreviations("Red/White/Red") == "Red/White/Red"
+
+    def test_gr_is_ambiguous_and_left_alone(self):
+        # SanMar: "Kelly Gr" is Kelly Green, "Graph Gy/Gr Gy" is Graphite.
+        assert expand_color_abbreviations("Kelly Gr/White") == "Kelly Gr/White"
+
+
+class TestStripColorCodePrefix:
+    @pytest.mark.parametrize("name, expected", [
+        ("GY-Grey", "Grey"),                                  # S&S
+        ("KB-Khaki/ Black Microcheck", "Khaki/ Black Microcheck"),
+        ("HV-Fluorescent Yellow/ Green", "Fluorescent Yellow/ Green"),
+        ("NV-Navy", "Navy"),                                  # Midwest Workwear: code is also an abbreviation
+        ("WH-White", "White"),
+        ("025 - Char. Gray", "Char. Gray"),                   # OTTO
+        ("LB7 - LT BLUE, WHITE", "LT BLUE, WHITE"),           # Champro
+        ("A748 - Mt Baker", "Mt Baker"),                      # BIC
+    ])
+    def test_hyphenated_code_is_dropped(self, name, expected):
+        assert strip_color_code_prefix(name) == expected
+
+    @pytest.mark.parametrize("name", [
+        "RED-WHITE",        # a word, not a code
+        "Navy-White",
+        "T-Shirt",          # one character is never a code
+        "J-HOOK SWIVEL",
+        "12-Sheet Almanac",   # digits glued to the name are a quantity, not a code
+        "3-Month Display",
+        "SKY-BLUE",         # vowel-less but a real word
+        "Lt-Blue",          # an abbreviation to expand, not a code
+        "TNF Black",        # brand tag before a space: kept
+        "RT Edge",          # Realtree pattern
+        "CS Grey Light Heather/ White",
+        "Black",
+    ])
+    def test_other_names_are_untouched(self, name):
+        assert strip_color_code_prefix(name) == name
 
 
 class TestGetDisplayColorName:
@@ -134,6 +172,8 @@ class TestGetDisplayColorName:
         ("Blk/Wht", "Multicolor", "Black/White"),
         ("LT BLUE/WHITE", "Multicolor", "Light Blue/White"),   # A4: title-cased before expanding
         ("NV-Navy", "Blue", "Navy"),
+        ("025 - Char. Gray", "", "Charcoal Gray"),             # OTTO code prefix
+        ("017 - Dk. Green", "", "Dark Green"),
         ("DkChoc", None, "Dark Chocolate"),
         ("DkChoc", "", "Dark Chocolate"),
     ])
@@ -142,6 +182,27 @@ class TestGetDisplayColorName:
 
     def test_unknown_abbreviation_is_returned_unchanged(self):
         assert get_display_color_name("Chry Red", "Red") == "Chry Red"
+
+    @pytest.mark.parametrize("color_name, standard, expected", [
+        ("GY-Grey", "Gravel", "Grey"),                        # S&S: the code made the name look abbreviated
+        ("FB-French Blue", "Carolina Blue", "French Blue"),
+        ("HV-Fluorescent Yellow/ Green", "Safety Yellow", "Fluorescent Yellow/ Green"),
+        ("CS Grey Light Heather/ White", "Gravel", "CS Grey Light Heather/ White"),
+        ("DTG Dark Grey", "Charcoal", "DTG Dark Grey"),
+        ("TNF Black", "TNF Black", "TNF Black"),
+    ])
+    def test_code_prefix_does_not_hand_the_name_to_the_standard(self, color_name, standard, expected):
+        assert get_display_color_name(color_name, standard) == expected
+
+    @pytest.mark.parametrize("color_name, standard, expected", [
+        ("KB-Khaki/ Black Microcheck", "ZZZ - Multi Color", "Khaki/ Black Microcheck"),   # S&S placeholder
+        ("Antq Chry Rd", "ZZZ - No Match", "Antique Chry Red"),
+        ("HSMP", "DESIGN FOR SAMPLE", "Hsmp"),                                              # momentec
+        ("Char Heather", "Heather", "Charcoal Heather"),                                    # MV Sport
+        ("Light Denim Htr", "Heather", "Light Denim Heather"),
+    ])
+    def test_placeholder_standard_names_are_buckets(self, color_name, standard, expected):
+        assert get_display_color_name(color_name, standard) == expected
 
     # --- casing ---
 
