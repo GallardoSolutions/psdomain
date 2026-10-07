@@ -50,7 +50,10 @@ class ClassType(base.PSBaseModel):
             FACTS: 'Fact Sheets',
             COMPLIANCE: 'Compliance Documents',
             ART_TEMPLATE: 'Art Templates',
-            MARKETING: 'Marketing Material'
+            MARKETING: 'Marketing Material',
+            HIGH_RESOLUTION: 'High Resolution',
+            MODEL: 'Model',
+            LIFESTYLE: 'Lifestyle',
         }
         class_type_name = names.get(class_type_id, 'Custom')
         return cls(classTypeId=class_type_id, classTypeName=class_type_name)
@@ -168,6 +171,13 @@ FACTS = 4002  # Fact sheets
 COMPLIANCE = 4003  # Compliance documents
 ART_TEMPLATE = 4004  # Art templates
 MARKETING = 4005  # Marketing material
+
+# Extended class types: not part of the PromoStandards specification, so they use
+# IDs outside its range. They can appear alongside the standard class types.
+HIGH_RESOLUTION = 8000  # The image is high resolution
+MODEL = 8001  # A person is wearing or holding the product
+LIFESTYLE = 8002  # The product staged in a real-life scene
+CUSTOM_CLASS_TYPES = frozenset({HIGH_RESOLUTION, MODEL, LIFESTYLE})
 
 
 class MediaContent(base.PSBaseModel):
@@ -323,6 +333,16 @@ class MediaContent(base.PSBaseModel):
     @property
     def is_alternate(self):
         return ALTERNATE in self.get_class_types()
+
+    @property
+    def is_model(self):
+        """A person is wearing or holding the product (extended class type)."""
+        return MODEL in self.get_class_types()
+
+    @property
+    def is_lifestyle(self):
+        """The product is staged in a real-life scene (extended class type)."""
+        return LIFESTYLE in self.get_class_types()
 
     @property
     def is_group(self):
