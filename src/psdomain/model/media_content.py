@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from urllib.parse import urlparse
 
 # reference https://tools.promostandards.org/media-content-1-1-0
 from . import base
@@ -10,6 +11,12 @@ BASE_SIZE = 1100
 BEST_SIZE = 1900
 
 PS_MEDX_HOST = os.getenv('PS_MEDX_HOST', 'https://psmedx.com/')
+
+# 3D model files some suppliers send with mediaType Image (SanMar: .glb with its custom class type 505
+# "Image 3D"). They can't be shown in an <img>, sized or classified, so they are never displayable.
+MODEL_3D_EXTENSIONS = ('.glb', '.gltf', '.usdz', '.obj', '.fbx', '.stl')
+# Files sent as Image that can't be rendered or handed to PIL.
+NON_DISPLAYABLE_EXTENSIONS = ('.psd', '.pdf') + MODEL_3D_EXTENSIONS
 
 
 class MediaType(base.StrEnum):
@@ -353,8 +360,18 @@ class MediaContent(base.PSBaseModel):
         return SWATCH in self.get_class_types()
 
     @property
+    def is_3d_model(self):
+        """A 3D model rather than a picture: a 3D file extension, or (for extension-less URLs) a class type
+        whose name mentions 3D. Custom class type IDs differ per supplier, so the name is used, not the ID."""
+        if self.url and urlparse(self.url).path.lower().endswith(MODEL_3D_EXTENSIONS):
+            return True
+        return any('3d' in ct.classTypeName.lower().replace(' ', '') for ct in self.ClassTypeArray.ClassType)
+
+    @property
     def is_displayable(self):
-        return self.is_image and self.url and not self.url.lower().endswith(('.psd', '.pdf'))
+        if not (self.is_image and self.url):
+            return False
+        return not urlparse(self.url).path.lower().endswith(NON_DISPLAYABLE_EXTENSIONS) and not self.is_3d_model
 
     def lt_blank_thumbnail(self, other: 'MediaContent'):
         return self.lt_single_part_blank_size(other, THUMBNAIL_SIZE)
