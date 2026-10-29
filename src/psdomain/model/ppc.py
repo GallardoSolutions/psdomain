@@ -68,9 +68,19 @@ class ColorArray(base.PSBaseModel):
     Color: list[product_data.Color]
 
 
+def missing_decoration_name_to_empty(value):
+    """The spec requires decorationName, but a supplier sending an empty element (Ariel BIB-BL25,
+    2026-10-29) must not void the whole response: the name becomes an empty string."""
+    return '' if value is None else value
+
+
 class DecorationMethod(base.PSBaseModel):
     decorationId: int
     decorationName: str
+
+    @field_validator('decorationName', mode='before')
+    def tolerate_missing_name(cls, value):
+        return missing_decoration_name_to_empty(value)
 
 
 class DecorationMethodArray(base.PSBaseModel):
@@ -334,6 +344,10 @@ class Decoration(base.PSBaseModel):
     leadTime: int | None = Field(description='The lead time for the given decoration', examples=[7])
     rushLeadTime: int | None = Field(description='The lead time for rush service for a given decoration '
                                                  '(rush charges may apply)', examples=[3])
+
+    @field_validator('decorationName', mode='before')
+    def tolerate_missing_name(cls, value):
+        return missing_decoration_name_to_empty(value)
 
     @model_validator(mode='before')
     def normalize_decoration_units_include_uom(cls, values):
