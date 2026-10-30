@@ -142,9 +142,11 @@ def test_ppc_decoration_arr_non_existing():
 
 
 def test_ppc_unknown_price_uom_response():
-    # priceUom = "C" is not a valid value
-    with pytest.raises(ValidationError):
-        ConfigurationAndPricingResponse.model_validate(ppc_unknown_price_uom_response)
+    # priceUom = "C" is not a valid value: HIT puts its discount-code letter there. Since v0.1.47 the
+    # response is accepted and the unit becomes EA (see test_price_uom_lenient.py).
+    response = ConfigurationAndPricingResponse.model_validate(ppc_unknown_price_uom_response)
+    assert response.is_ok
+    assert response.parts[0].prices[0].priceUom == 'EA'
 
 
 def test_square_inches_decoration():
