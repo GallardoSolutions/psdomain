@@ -68,6 +68,21 @@ class ColorArray(base.PSBaseModel):
     Color: list[product_data.Color]
 
 
+def unknown_price_uom_to_each(value):
+    """The spec restricts priceUom to the UOM enum, but HIT answers its discount-code letter ("C", every
+    price of 17286/17312) or an empty element (5790COFF), which voided the whole response (HTTP 400,
+    PSRESTFUL-DJANGO-100). Those prices are per unit, so anything the enum does not know becomes EA;
+    real codes pass through, case-insensitively."""
+    if value is None:
+        return base.UOM.EA
+    if isinstance(value, base.UOM):
+        return value
+    try:
+        return base.UOM(str(value).strip().upper())
+    except ValueError:
+        return base.UOM.EA
+
+
 def missing_decoration_name_to_empty(value):
     """The spec requires decorationName, but a supplier sending an empty element (Ariel BIB-BL25,
     2026-10-29) must not void the whole response: the name becomes an empty string."""
@@ -536,6 +551,10 @@ class PartPrice(base.PSBaseModel):
     priceUom: base.UOM = Field(examples=['EA'], description='The unit of measure for the price')
     priceEffectiveDate: datetime | None  # StormCreek is returning None for this field
     priceExpiryDate: datetime | None  # Spector is returning None for this field
+
+    @field_validator('priceUom', mode='before')
+    def tolerate_unknown_uom(cls, value):
+        return unknown_price_uom_to_each(value)
 
     def __le__(self, other):
         return self.minQuantity <= other.minQuantity
