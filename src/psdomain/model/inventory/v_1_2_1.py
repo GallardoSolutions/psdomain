@@ -126,10 +126,15 @@ class ProductCompanionInventoryArray(PSBaseModel):
     ProductCompanionInventory: List[ProductCompanionInventory]
 
 
+# Python 3.14 evaluates annotations lazily in the class namespace, where a field's default (None)
+# shadows a class of the same name; fields named after their type annotate through these aliases.
+_ProductCompanionInventoryArray = ProductCompanionInventoryArray
+
+
 class InventoryLevelsResponseV121(PSBaseModel):
     productID: constr(max_length=64)
     ProductVariationInventoryArray: Optional[ProductVariationInventoryArray]
-    ProductCompanionInventoryArray: Optional[ProductCompanionInventoryArray] = None
+    ProductCompanionInventoryArray: Optional[_ProductCompanionInventoryArray] = None
     errorMessage: Optional[constr(max_length=256)] = None
     CustomMessageArray: Optional[List[CustomMessage]] = None
     errorMessage: str | None
