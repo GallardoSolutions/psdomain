@@ -397,9 +397,6 @@ class TestInventoryV121Converter:
         assert parts[0].partID == "PART-121"
         assert parts[0].quantityAvailable == "100"
 
-    @pytest.mark.skip(
-        reason="InventoryLevelsResponseV121 pydantic model has constraint on ProductCompanionInventoryArray"
-    )
     def test_v121_with_companion_inventory(self):
         """Test v1.2.1 with companion inventory."""
         json_data = {

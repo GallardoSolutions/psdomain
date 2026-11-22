@@ -170,17 +170,8 @@ class Issue(PSBaseModel):
     productId: Optional[String64] = None
     ResolutionArray: Optional[_ResolutionArray] = None
 
-    @field_validator('issueResolutionURL')
-    def validate_issue_resolution_url(cls, v):
-        if not v.startswith('http'):
-            raise ValueError('issueResolutionURL must be a valid URL')
-        return v
-
-    @field_validator('responseRequiredBy')
-    def validate_response_required_by(cls, v):
-        if v < datetime.utcnow():
-            raise ValueError('responseRequiredBy must be a future date')
-        return v
+    # issueResolutionURL is an HttpUrl, which already accepts only http(s). responseRequiredBy is not checked
+    # against now: a supplier may send it with or without an offset, and a deadline already past is still data.
 
     @field_validator('issueBlockingStatus')
     def validate_issue_blocking_status(cls, v):
