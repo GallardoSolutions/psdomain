@@ -1,25 +1,30 @@
 from datetime import datetime
-from typing import Optional
 from decimal import Decimal
 
-from pydantic import constr, Field
+from pydantic import AliasChoices, Field
 
 from .. import base
 from .common import ShipmentDestinationType, PreProductionProofType, DimUOM, WeightUOM, TRACKING_URLS
 
 
 class ShippingContactDetails(base.PSBaseModel):
-    attentionTo: Optional[base.String35]
-    companyName: Optional[base.String35]
-    address1: base.String35
-    address2: Optional[base.String35]
-    address3: Optional[base.String35]
-    city: base.String30
-    region: base.String3
-    postalCode: base.String10
-    country: Optional[base.CountryIso2]
-    email: Optional[base.String128]
-    phone: Optional[constr(max_length=32)]
+    """A shipment's ship-from or ship-to address, as the supplier sent it.
+
+    Every field is optional and no length or code list is enforced: this is supplier data we pass on, and
+    rejecting it fails the whole response (Lincoln Line sends no ship-from postalCode and attentionTo values
+    longer than the spec's 35 characters). Same reasoning as 1.0.0's Address.
+    """
+    attentionTo: str | None = None
+    companyName: str | None = None
+    address1: str | None = None
+    address2: str | None = None
+    address3: str | None = None
+    city: str | None = None
+    region: str | None = None
+    postalCode: str | None = None
+    country: str | None = None
+    email: str | None = None
+    phone: str | None = None
 
 
 class DimensionWeight(base.PSBaseModel):
@@ -50,7 +55,8 @@ class Item(base.PSBaseModel):
     distributorProductId: base.String64 | None
     distributorPartId: base.String64 | None
     purchaseOrderLineNumber: int | None
-    quantity: base.Quantity
+    # The 2.0.0 schema spells it Quantity; the model keeps 1.0.0's name, and that spelling wins if both come.
+    quantity: base.Quantity = Field(validation_alias=AliasChoices('quantity', 'Quantity'))
 
 
 class ItemArray(base.PSBaseModel):
@@ -98,8 +104,12 @@ type = NullablePackageArray = PackageArray | None
 class Shipment(base.PSBaseModel):
     destinationShippedInFull: bool
     customerPickup: bool
-    ShipFromAddress: ShippingContactDetails
-    ShipToAddress: ShippingContactDetails
+    # The 2.0.0 schema spells them shipFromAddress and shipToAddress; the model keeps 1.0.0's names in its
+    # output, and those win when a supplier sends both.
+    ShipFromAddress: ShippingContactDetails = Field(
+        validation_alias=AliasChoices('ShipFromAddress', 'shipFromAddress'))
+    ShipToAddress: ShippingContactDetails = Field(
+        validation_alias=AliasChoices('ShipToAddress', 'shipToAddress'))
     shipmentDestinationType: ShipmentDestinationType | None
     PackageArray: NullablePackageArray = Field(
         default=None,
