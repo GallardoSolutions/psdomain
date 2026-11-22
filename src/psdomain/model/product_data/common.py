@@ -698,6 +698,12 @@ class ProductMarketingPointArray(base.PSBaseModel):
     ProductMarketingPoint: list[ProductMarketingPoint]
 
 
+# Python 3.14 evaluates annotations lazily in the class namespace, where a field's default (None)
+# shadows a class of the same name; fields named after their type annotate through these aliases.
+_LocationDecorationArray, _ProductPriceGroupArray, _FobPointArray = \
+    LocationDecorationArray, ProductPriceGroupArray, FobPointArray
+
+
 class Product(base.PSBaseModel):
     websiteUrl: str | None = Field(default=None, description='The URL of the product in the supplier website')
     productId: str
@@ -724,9 +730,9 @@ class Product(base.PSBaseModel):
     RelatedProductArray: RelatedProductArray | None
     ProductPartArray: ProductPartArray
     ProductKeywordArray: ProductKeywordArray | None
-    LocationDecorationArray: typing.Optional[LocationDecorationArray] = None  # in V1 is not required
-    ProductPriceGroupArray: typing.Optional[ProductPriceGroupArray] = None  # in V1 is not required
-    FobPointArray: typing.Optional[FobPointArray] = None  # in V1 is not required
+    LocationDecorationArray: typing.Optional[_LocationDecorationArray] = None  # in V1 is not required
+    ProductPriceGroupArray: typing.Optional[_ProductPriceGroupArray] = None  # in V1 is not required
+    FobPointArray: typing.Optional[_FobPointArray] = None  # in V1 is not required
     ProductMarketingPointArray: typing.Optional[ProductMarketingPointArray] | None
 
     @property

@@ -7,10 +7,16 @@ from .common import ProductCloseOutArray, ProductDateModifiedArray, Product, Loc
     ProductPriceGroupArray, FobPointArray
 
 
+# Python 3.14 evaluates annotations lazily in the class namespace, where a field's default (None)
+# shadows a class of the same name; fields named after their type annotate through these aliases.
+_LocationDecorationArray, _ProductPriceGroupArray, _FobPointArray = \
+    LocationDecorationArray, ProductPriceGroupArray, FobPointArray
+
+
 class ProductLatest(Product):
-    LocationDecorationArray: typing.Optional[LocationDecorationArray] = None  # in V1 is not required
-    ProductPriceGroupArray: typing.Optional[ProductPriceGroupArray] = None  # in V1 is not required
-    FobPointArray: typing.Optional[FobPointArray] = None  # in V1 is not required
+    LocationDecorationArray: typing.Optional[_LocationDecorationArray] = None  # in V1 is not required
+    ProductPriceGroupArray: typing.Optional[_ProductPriceGroupArray] = None  # in V1 is not required
+    FobPointArray: typing.Optional[_FobPointArray] = None  # in V1 is not required
 
 
 class ProductResponseLatest(base.PSBaseModel):

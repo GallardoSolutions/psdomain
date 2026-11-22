@@ -137,15 +137,23 @@ class ParameterArray(PSBaseModel):
     Parameter: list[Parameter]
 
 
+# Python 3.14 evaluates annotations lazily in the class namespace, where a field's default (None)
+# shadows a class of the same name; fields named after their type annotate through these aliases.
+_ParameterArray = ParameterArray
+
+
 class Resolution(PSBaseModel):
     resolutionId: String64
     resolutionName: String64
     resolutionDescription: String1024
-    ParameterArray: Optional[ParameterArray] = None
+    ParameterArray: Optional[_ParameterArray] = None
 
 
 class ResolutionArray(PSBaseModel):
     Resolution: list[Resolution]
+
+
+_ResolutionArray = ResolutionArray
 
 
 class Issue(PSBaseModel):
@@ -160,7 +168,7 @@ class Issue(PSBaseModel):
     issueBlockingStatus: String64
     ContactArray: Optional[OrderContactArray] = None
     productId: Optional[String64] = None
-    ResolutionArray: Optional[ResolutionArray] = None
+    ResolutionArray: Optional[_ResolutionArray] = None
 
     @field_validator('issueResolutionURL')
     def validate_issue_resolution_url(cls, v):
@@ -198,6 +206,9 @@ class IssueArray(PSBaseModel):
     Issue: list[Issue]
 
 
+_OrderContactArray, _ProductArray, _IssueArray = OrderContactArray, ProductArray, IssueArray
+
+
 class OrderStatusDetail(PSBaseModel):
     salesOrderNumber: String64
     status: String64
@@ -206,9 +217,9 @@ class OrderStatusDetail(PSBaseModel):
     expectedDeliveryDate: Optional[date] = None
     additionalExplanation: Optional[String1024] = None
     qualityProofURL: Optional[HttpUrl] = None
-    OrderContactArray: Optional[OrderContactArray] = None
-    ProductArray: Optional[ProductArray] = None
-    IssueArray: Optional[IssueArray] = None
+    OrderContactArray: Optional[_OrderContactArray] = None
+    ProductArray: Optional[_ProductArray] = None
+    IssueArray: Optional[_IssueArray] = None
     validTimestamp: datetime
 
 
