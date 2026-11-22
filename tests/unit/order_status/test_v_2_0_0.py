@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from psdomain.model.order_status.v_2_0_0 import Issue, OrderStatusDetail, Product
+from psdomain.model.order_status.v_2_0_0 import GetServiceMethodsResponseV200, Issue, OrderStatusDetail, Product
 
 
 PRODUCT = {
@@ -123,3 +123,32 @@ def test_quality_proof_url_is_a_plain_string():
     """The WSDL types qualityProofURL as xsd:string (1-1024): keep what the supplier sent, as sent."""
     for value in ("https://proofs.example.com/SO-1", "proof sent by email"):
         assert OrderStatusDetail.model_validate(_detail(qualityProofURL=value)).qualityProofURL == value
+
+
+def test_get_service_methods_reads_the_wsdl_flat_list():
+    """SanMar (2026-11-18): ServiceMethodArray holds serviceMethod strings, as the WSDL says; it was rejected."""
+    response = GetServiceMethodsResponseV200.model_validate({
+        "ServiceMethodArray": {"serviceMethod": ["getOrderStatus", "getIssue", "getServiceMethods"]},
+        "ServiceMessageArray": None,
+    })
+
+    assert response.ServiceMethodArray.serviceMethod == ["getOrderStatus", "getIssue", "getServiceMethods"]
+
+
+def test_get_service_methods_allows_both_arrays_to_be_missing():
+    response = GetServiceMethodsResponseV200.model_validate({})
+
+    assert response.ServiceMethodArray is None
+    assert response.ServiceMessageArray is None
+
+
+def test_get_service_methods_rejects_the_old_nested_shape():
+    with pytest.raises(ValidationError):
+        GetServiceMethodsResponseV200.model_validate({
+            "ServiceMethodArray": {"ServiceMethod": [{"serviceMethod": "getOrderStatus"}]},
+        })
+
+
+def test_get_service_methods_rejects_an_empty_method_name():
+    with pytest.raises(ValidationError):
+        GetServiceMethodsResponseV200.model_validate({"ServiceMethodArray": {"serviceMethod": [""]}})

@@ -4,8 +4,8 @@ from datetime import date, datetime
 
 from pydantic import constr, EmailStr, field_validator
 
-from ..base import StrEnum, PSBaseModel, ServiceMessageArray, UOM, \
-    String35, String30, String10, String3, String2, String32, String64, String1024, String128
+from ..base import StrEnum, PSBaseModel, ServiceMessageArray, NullableServiceMessageArray, UOM, \
+    String35, String30, String10, String3, String2, String32, String64, String1024
 
 """
 The service has three endpoints:
@@ -220,14 +220,14 @@ class GetIssueResponseV200(PSBaseModel):
     ServiceMessageArray: ServiceMessageArray | None
 
 
-class ServiceMethod(PSBaseModel):
-    serviceMethod: String128
-
-
 class ServiceMethodArray(PSBaseModel):
-    ServiceMethod: list[ServiceMethod]
+    # WSDL: a flat list of serviceMethod strings (1-128 chars), with no wrapper element per method
+    serviceMethod: list[constr(min_length=1, max_length=128)]
+
+
+_ServiceMethodArray = ServiceMethodArray
 
 
 class GetServiceMethodsResponseV200(PSBaseModel):
-    ServiceMethodArray: ServiceMethodArray | None
-    ServiceMessageArray: ServiceMessageArray | None
+    ServiceMethodArray: Optional[_ServiceMethodArray] = None
+    ServiceMessageArray: NullableServiceMessageArray = None
