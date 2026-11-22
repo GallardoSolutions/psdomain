@@ -2,7 +2,7 @@ from typing import Optional
 from decimal import Decimal
 from datetime import date, datetime
 
-from pydantic import HttpUrl, constr, EmailStr, field_validator
+from pydantic import constr, EmailStr, field_validator
 
 from ..base import StrEnum, PSBaseModel, ServiceMessageArray, UOM, \
     String35, String30, String10, String3, String2, String32, String64, String1024, String128
@@ -39,14 +39,15 @@ class IssueStatus(StrEnum):
 
 
 class IssueCategory(StrEnum):
-    ORDER_ENTRY_HOLD = 'Order Entry Hold'
-    GENERAL_HOLD = 'General Hold'
-    CREDIT_HOLD = 'Credit Hold'
-    PROOF_HOLD = 'Proof Hold'
-    ART_HOLD = 'Art Hold'
-    BACK_ORDER_HOLD = 'Back Order Hold'
-    SHIPPING_HOLD = 'Shipping Hold'
-    CUSTOMER_SUPPLIED_ITEM_HOLD = 'Customer Supplied Item Hold'
+    # issueCategoryType in the Order Status 2.0.0 WSDL
+    ORDER_ENTRY_HOLD = 'orderEntryHold'
+    GENERAL_HOLD = 'generalHold'
+    CREDIT_HOLD = 'creditHold'
+    PROOF_HOLD = 'proofHold'
+    ART_HOLD = 'artHold'
+    BACK_ORDER_HOLD = 'backOrderHold'
+    SHIPPING_HOLD = 'shippingHold'
+    CUSTOMER_SUPPLIED_ITEM_HOLD = 'customerSuppliedItemHold'
 
 
 class Status(StrEnum):
@@ -124,7 +125,7 @@ class ValidResponseToArray(PSBaseModel):
 class Parameter(PSBaseModel):
     parameterId: String64
     name: String64
-    type: String64
+    type: Optional[String64] = None
     displayOrder: Optional[int] = None
     required: bool
     length: Optional[int] = None
@@ -157,40 +158,21 @@ _ResolutionArray = ResolutionArray
 
 
 class Issue(PSBaseModel):
-    issueId: String64
+    """Issue as the Order Status 2.0.0 WSDL defines it: only issueStatus, issueCategory and urgentResponseRequired
+    are required. issueResolutionURL is xsd:string, not a URL type."""
+    issueId: Optional[String64] = None
     issueStatus: IssueStatus
-    issueCategory: String64
-    issueName: String64
+    issueCategory: IssueCategory
+    issueName: Optional[String64] = None
     urgentResponseRequired: bool
-    issueDescription: String1024
-    responseRequiredBy: datetime
-    issueResolutionURL: HttpUrl
-    issueBlockingStatus: String64
+    issueDescription: Optional[String1024] = None
+    responseRequiredBy: Optional[datetime] = None
+    issueResolutionURL: Optional[String1024] = None
+    ResolutionArray: Optional[_ResolutionArray] = None
+    issueBlockingStatus: Optional[Status] = None
     ContactArray: Optional[OrderContactArray] = None
     productId: Optional[String64] = None
-    ResolutionArray: Optional[_ResolutionArray] = None
-
-    # issueResolutionURL is an HttpUrl, which already accepts only http(s). responseRequiredBy is not checked
-    # against now: a supplier may send it with or without an offset, and a deadline already past is still data.
-
-    @field_validator('issueBlockingStatus')
-    def validate_issue_blocking_status(cls, v):
-        if v not in ('Order Received', 'Order Confirmed', 'Pre-Production', 'In Production', 'In Storage', 'Complete',
-                     'Canceled'):
-            raise ValueError('issueBlockingStatus must be a valid status')
-        return v
-
-    @field_validator('issueCategory')
-    def validate_issue_category(cls, v):
-        if v not in ('Credit Hold', 'Proof Hold', 'Art Hold', 'Back Order Hold'):
-            raise ValueError('issueCategory must be a valid category')
-        return v
-
-    @field_validator('issueStatus')
-    def validate_issue_status(cls, v):
-        if v not in ('Open', 'Closed'):
-            raise ValueError('issueStatus must be a valid status')
-        return v
+    partId: Optional[String64] = None
 
 
 class IssueArray(PSBaseModel):
@@ -207,7 +189,7 @@ class OrderStatusDetail(PSBaseModel):
     expectedShipDate: Optional[date] = None
     expectedDeliveryDate: Optional[date] = None
     additionalExplanation: Optional[String1024] = None
-    qualityProofURL: Optional[HttpUrl] = None
+    qualityProofURL: Optional[String1024] = None  # xsd:string in the WSDL, not a URL type
     OrderContactArray: Optional[_OrderContactArray] = None
     ProductArray: Optional[_ProductArray] = None
     IssueArray: Optional[_IssueArray] = None
